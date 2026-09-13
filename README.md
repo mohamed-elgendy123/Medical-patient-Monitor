@@ -29,7 +29,7 @@
 | Field | Value |
 |-------|-------|
 | **Project code** | `PRJ-07-MONITOR` |
-| **Team size** | 2 – 3 students |
+| **Team size** | 4 students |
 | **Team Names** | 'Mohamed Elgendy'-'salma Ahmed'-'Ahmed Ali'-'Ahmed Elshakry' |
 | **Build window** | Days 11 – 15 (Jul 26 – Jul 30, 2026) |
 | **Demo & submission** | July 30, 2026 |
