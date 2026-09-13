@@ -31,7 +31,7 @@
 | **Project code** | `PRJ-07-MONITOR` |
 | **Team size** | 4 students |
 | **Team Names** | 'Mohamed Elgendy'-'salma Ahmed'-'Ahmed Ali'-'Ahmed Elshakry' |
-| **Build window** | Days 11 – 15 (Jul 26 – Jul 30, 2026) |
+| **Build window** | Days 11 – 15 (Sep 13 – Sep17, 2026) |
 | **Demo & submission** | July 30, 2026 |
 | **Dominant skill** | Three-tier alarm system, beat-interval measurement, trend buffers |
 | **MCU** | ATmega32A @ 8 MHz |
