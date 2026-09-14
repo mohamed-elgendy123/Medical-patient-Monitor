@@ -232,18 +232,9 @@ ISR(TIMER0_COMP_vect)
 ISR(TIMER1_CAPT_vect)
 {
     u16 Local_u16Capture = TIMER1_ICR1;
-
-    /* Calculate interval between beats */
     Timer1_Intervals[Timer1_RingIndex] = (u16)(Local_u16Capture - Timer1_LastCapture);
     Timer1_LastCapture = Local_u16Capture;
-
-    /* Advance ring index using if/else instead of bitwise mask */
-    Timer1_RingIndex++;
-    if (Timer1_RingIndex >= TIMER1_CAPTURE_RING_SIZE)
-    {
-        Timer1_RingIndex = 0U;
-    }
-
+    Timer1_RingIndex = (u8)((Timer1_RingIndex + 1U) & 7U);
     Timer1_CaptureReady = 1U;
     Timer1_OverflowCount = 0U;
     Timer1_Asystole = 0U;
