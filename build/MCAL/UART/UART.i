@@ -1,6 +1,6 @@
-# 1 "MCAL/UART/UART.c"
-# 1 "<built-in>"
-# 1 "<command-line>"
+# 0 "MCAL/UART/UART.c"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "MCAL/UART/UART.c"
 # 9 "MCAL/UART/UART.c"
 # 1 "LIB/STD_TYPES.h" 1
@@ -56,3 +56,111 @@ STD_ReturnType UART_SetTxInterrupt(uint8 Copy_u8State);
 # 11 "MCAL/UART/UART.c" 2
 # 1 "MCAL/UART/UART_private.h" 1
 # 12 "MCAL/UART/UART.c" 2
+# 22 "MCAL/UART/UART.c"
+STD_ReturnType UART_Init(uint32 Copy_u32BaudRate)
+{
+
+    if (Copy_u32BaudRate == 0)
+    {
+        return E_NOK;
+    }
+
+
+    uint16 Local_u16UBRR = (uint16)((8000000UL / (16UL * Copy_u32BaudRate)) - 1);
+    (*((volatile uint8*)0x40)) = (uint8)(Local_u16UBRR >> 8);
+    (*((volatile uint8*)0x29)) = (uint8)Local_u16UBRR;
+
+
+    (*((volatile uint8*)0x40)) = (1 << 7) | (1 << 2) | (1 << 1);
+
+
+    (*((volatile uint8*)0x2A)) = (1 << 4) | (1 << 3);
+
+    return E_OK;
+}
+# 52 "MCAL/UART/UART.c"
+STD_ReturnType UART_SendByte(uint8 Copy_u8Data)
+{
+
+    while (!((*((volatile uint8*)0x2B)) & (1 << 5)));
+
+
+    (*((volatile uint8*)0x2C)) = Copy_u8Data;
+
+    return E_OK;
+}
+# 71 "MCAL/UART/UART.c"
+ STD_ReturnType UART_ReceiveByte(uint8 *Copy_pu8Data)
+{
+
+    if (Copy_pu8Data == ((void *)0))
+    {
+        return E_NOK;
+    }
+
+
+    while (!((*((volatile uint8*)0x2B)) & (1 << 7)));
+
+
+    *Copy_pu8Data = (*((volatile uint8*)0x2C));
+
+    return E_OK;
+}
+# 96 "MCAL/UART/UART.c"
+STD_ReturnType UART_SendString(const uint8 *Copy_pu8String)
+{
+
+    if (Copy_pu8String == ((void *)0))
+    {
+        return E_NOK;
+    }
+
+
+    uint32 Local_u32Index = 0;
+    while (Copy_pu8String[Local_u32Index] != '\0')
+    {
+        UART_SendByte(Copy_pu8String[Local_u32Index]);
+        Local_u32Index++;
+    }
+
+    return E_OK;
+}
+# 122 "MCAL/UART/UART.c"
+STD_ReturnType UART_IsDataReady(void)
+{
+
+    if ((*((volatile uint8*)0x2B)) & (1 << 7))
+    {
+        return E_OK;
+    }
+
+    return E_NOK;
+}
+# 140 "MCAL/UART/UART.c"
+STD_ReturnType UART_SetRxInterrupt(uint8 Copy_u8State)
+{
+    if (Copy_u8State == 1)
+    {
+        (*((volatile uint8*)0x2A)) |= (1 << 7);
+    }
+    else
+    {
+        (*((volatile uint8*)0x2A)) &= ~(1 << 7);
+    }
+
+    return E_OK;
+}
+
+STD_ReturnType UART_SetTxInterrupt(uint8 Copy_u8State)
+{
+    if (Copy_u8State == 1)
+    {
+        (*((volatile uint8*)0x2A)) |= (1 << 5);
+    }
+    else
+    {
+        (*((volatile uint8*)0x2A)) &= ~(1 << 5);
+    }
+
+    return E_OK;
+}
