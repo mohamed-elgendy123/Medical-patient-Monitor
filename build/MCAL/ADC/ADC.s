@@ -52,6 +52,7 @@ ADC_ReadChannel:
 	cpc r23,__zero_reg__
 	breq .L10
 	in r25,0x7
+	andi r25,lo8(-32)
 	or r25,r24
 	out 0x7,r25
 	sbi 0x6,6
@@ -73,4 +74,80 @@ ADC_ReadChannel:
 /* epilogue start */
 	ret
 	.size	ADC_ReadChannel, .-ADC_ReadChannel
+	.section	.text.ADC_StartConversion,"ax",@progbits
+.global	ADC_StartConversion
+	.type	ADC_StartConversion, @function
+ADC_StartConversion:
+/* prologue: function */
+/* frame size = 0 */
+/* stack size = 0 */
+.L__stack_usage = 0
+	cpi r24,lo8(8)
+	brsh .L15
+	in r25,0x7
+	andi r25,lo8(-32)
+	or r25,r24
+	out 0x7,r25
+	sbi 0x6,6
+	ldi r24,0
+	ldi r25,0
+	ret
+.L15:
+	ldi r24,lo8(1)
+	ldi r25,0
+/* epilogue start */
+	ret
+	.size	ADC_StartConversion, .-ADC_StartConversion
+	.section	.text.ADC_GetResult,"ax",@progbits
+.global	ADC_GetResult
+	.type	ADC_GetResult, @function
+ADC_GetResult:
+/* prologue: function */
+/* frame size = 0 */
+/* stack size = 0 */
+.L__stack_usage = 0
+	sbiw r24,0
+	breq .L19
+	sbis 0x6,4
+	rjmp .L19
+	sbi 0x6,4
+	in r18,0x4
+	in r20,0x5
+	movw r30,r24
+	st Z,r18
+	std Z+1,r20
+	ldi r24,0
+	ldi r25,0
+	ret
+.L19:
+	ldi r24,lo8(1)
+	ldi r25,0
+/* epilogue start */
+	ret
+	.size	ADC_GetResult, .-ADC_GetResult
+	.section	.text.ADC_SetInterrupt,"ax",@progbits
+.global	ADC_SetInterrupt
+	.type	ADC_SetInterrupt, @function
+ADC_SetInterrupt:
+/* prologue: function */
+/* frame size = 0 */
+/* stack size = 0 */
+.L__stack_usage = 0
+	cpi r24,lo8(1)
+	brne .L21
+	sbi 0x6,3
+.L23:
+	ldi r24,0
+	ldi r25,0
+	ret
+.L21:
+	brsh .L24
+	cbi 0x6,3
+	rjmp .L23
+.L24:
+	ldi r24,lo8(1)
+	ldi r25,0
+/* epilogue start */
+	ret
+	.size	ADC_SetInterrupt, .-ADC_SetInterrupt
 	.ident	"GCC: (GNU) 15.2.0"

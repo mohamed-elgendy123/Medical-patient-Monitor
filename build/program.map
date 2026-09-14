@@ -40,7 +40,13 @@ Discarded input sections
  .text.ADC_Init
                 0x00000000       0x2a build/MCAL/ADC/ADC.o
  .text.ADC_ReadChannel
-                0x00000000       0x2e build/MCAL/ADC/ADC.o
+                0x00000000       0x30 build/MCAL/ADC/ADC.o
+ .text.ADC_StartConversion
+                0x00000000       0x1a build/MCAL/ADC/ADC.o
+ .text.ADC_GetResult
+                0x00000000       0x20 build/MCAL/ADC/ADC.o
+ .text.ADC_SetInterrupt
+                0x00000000       0x18 build/MCAL/ADC/ADC.o
  .comment       0x00000000       0x13 build/MCAL/ADC/ADC.o
  .text          0x00000000        0x0 build/MCAL/GPIO/GPIO.o
  .data          0x00000000        0x0 build/MCAL/GPIO/GPIO.o
