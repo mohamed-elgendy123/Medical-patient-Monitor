@@ -1,13 +1,17 @@
 Archive member included to satisfy reference by file (symbol)
 
+C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+                              build/HAL/Vitals/vitals.o (__umulhisi3)
+C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+                              build/HAL/Vitals/vitals.o (__udivmodhi4)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodsi4.o)
-                              build/MCAL/UART/UART.o (__udivmodsi4)
+                              build/HAL/HR_Capture/HR_Capture.o (__udivmodsi4)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_exit.o)
                               C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5/crtatmega32.o (exit)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_copy_data.o)
                               build/HAL/SevenSegment/SevenSegment.o (__do_copy_data)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_clear_bss.o)
-                              build/MCAL/INTERRUPT/INTERRUPT.o (__do_clear_bss)
+                              build/HAL/HR_Capture/HR_Capture.o (__do_clear_bss)
 
 Discarded input sections
 
@@ -16,6 +20,40 @@ Discarded input sections
  .text          0x00000000        0x0 build/main.o
  .data          0x00000000        0x0 build/main.o
  .bss           0x00000000        0x0 build/main.o
+ .text          0x00000000        0x0 build/HAL/HR_Capture/HR_Capture.o
+ .data          0x00000000        0x0 build/HAL/HR_Capture/HR_Capture.o
+ .bss           0x00000000        0x0 build/HAL/HR_Capture/HR_Capture.o
+ .text.HRC_Init
+                0x00000000       0x52 build/HAL/HR_Capture/HR_Capture.o
+ .text.HRC_OnCapture
+                0x00000000       0x5a build/HAL/HR_Capture/HR_Capture.o
+ .text.HRC_Process
+                0x00000000      0x19a build/HAL/HR_Capture/HR_Capture.o
+ .text.HRC_OnOverflow
+                0x00000000       0x18 build/HAL/HR_Capture/HR_Capture.o
+ .text.HRC_GetBpm
+                0x00000000        0xa build/HAL/HR_Capture/HR_Capture.o
+ .text.HRC_GetHrvMs
+                0x00000000        0xa build/HAL/HR_Capture/HR_Capture.o
+ .text.HRC_IsAsystole
+                0x00000000       0x1a build/HAL/HR_Capture/HR_Capture.o
+ .text.HRC_ClearAsystole
+                0x00000000        0x8 build/HAL/HR_Capture/HR_Capture.o
+ .bss.HRC_Asystole
+                0x00000000        0x1 build/HAL/HR_Capture/HR_Capture.o
+ .bss.HRC_CurrentHrvMs
+                0x00000000        0x2 build/HAL/HR_Capture/HR_Capture.o
+ .bss.HRC_CurrentBpm
+                0x00000000        0x2 build/HAL/HR_Capture/HR_Capture.o
+ .bss.HRC_IntervalIndex
+                0x00000000        0x1 build/HAL/HR_Capture/HR_Capture.o
+ .bss.HRC_MedianIndex
+                0x00000000        0x1 build/HAL/HR_Capture/HR_Capture.o
+ .bss.HRC_Intervals
+                0x00000000       0x10 build/HAL/HR_Capture/HR_Capture.o
+ .bss.HRC_MedianIntervals
+                0x00000000        0x6 build/HAL/HR_Capture/HR_Capture.o
+ .comment       0x00000000       0x13 build/HAL/HR_Capture/HR_Capture.o
  .text          0x00000000        0x0 build/HAL/KeyPad/KeyPad.o
  .data          0x00000000        0x0 build/HAL/KeyPad/KeyPad.o
  .bss           0x00000000        0x0 build/HAL/KeyPad/KeyPad.o
@@ -34,6 +72,14 @@ Discarded input sections
  .text.SevenSegment_Display
                 0x00000000       0x54 build/HAL/SevenSegment/SevenSegment.o
  .comment       0x00000000       0x13 build/HAL/SevenSegment/SevenSegment.o
+ .text          0x00000000        0x0 build/HAL/Vitals/vitals.o
+ .data          0x00000000        0x0 build/HAL/Vitals/vitals.o
+ .bss           0x00000000        0x0 build/HAL/Vitals/vitals.o
+ .text.Vitals_Init
+                0x00000000        0x8 build/HAL/Vitals/vitals.o
+ .text.Vitals_Read
+                0x00000000      0x18a build/HAL/Vitals/vitals.o
+ .comment       0x00000000       0x13 build/HAL/Vitals/vitals.o
  .text          0x00000000        0x0 build/MCAL/ADC/ADC.o
  .data          0x00000000        0x0 build/MCAL/ADC/ADC.o
  .bss           0x00000000        0x0 build/MCAL/ADC/ADC.o
@@ -111,6 +157,54 @@ Discarded input sections
  .text.UART_SetTxInterrupt
                 0x00000000       0x10 build/MCAL/UART/UART.o
  .comment       0x00000000       0x13 build/MCAL/UART/UART.o
+ .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .text.libgcc.mul
+                0x00000000       0x1e C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .text.libgcc.div
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .text.libgcc   0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .text.libgcc.prologue
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .text.libgcc.builtins
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .text.libgcc.fmul
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .text.libgcc.fixed
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .debug_line    0x00000000       0x9f C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .debug_line_str
+                0x00000000       0x5c C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .debug_info    0x00000000       0x24 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .debug_abbrev  0x00000000       0x14 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .debug_aranges
+                0x00000000       0x20 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .debug_str     0x00000000       0x68 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
+ .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .text.libgcc.mul
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .text.libgcc.div
+                0x00000000       0x28 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .text.libgcc   0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .text.libgcc.prologue
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .text.libgcc.builtins
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .text.libgcc.fmul
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .text.libgcc.fixed
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .debug_line    0x00000000       0xbd C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .debug_line_str
+                0x00000000       0x5c C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .debug_info    0x00000000       0x24 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .debug_abbrev  0x00000000       0x14 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .debug_aranges
+                0x00000000       0x20 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .debug_str     0x00000000       0x68 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
  .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodsi4.o)
  .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodsi4.o)
  .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodsi4.o)
@@ -200,8 +294,10 @@ Linker script and memory map
 
 LOAD C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5/crtatmega32.o
 LOAD build/main.o
+LOAD build/HAL/HR_Capture/HR_Capture.o
 LOAD build/HAL/KeyPad/KeyPad.o
 LOAD build/HAL/SevenSegment/SevenSegment.o
+LOAD build/HAL/Vitals/vitals.o
 LOAD build/MCAL/ADC/ADC.o
 LOAD build/MCAL/GPIO/GPIO.o
 LOAD build/MCAL/I2C/I2C.o
