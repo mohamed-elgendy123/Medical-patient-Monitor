@@ -2,34 +2,31 @@
 #define SPI_PRIVATE_H
 
 /*
- * Author: Ahmed Ellamie
- * Email:  ahmed.ellamiee@gmail.com
- *
- * STUDENT TASK — SPI private layer (ATmega32)
- * Include this file ONLY from SPI.c.
- *
- * What you must add here:
- * 1. Registers:
- *      SPCR  0x2D    SPIE SPE DORD MSTR CPOL CPHA SPR1 SPR0
- *      SPSR  0x2E    SPIF WCOL – – – – – SPI2X
- *      SPDR  0x2F    data — writing it starts the 8 clocks in master mode
- *
- * 2. Bit names:
- *      SPE=6, MSTR=5, SPR1=1, SPR0=0 in SPCR
- *      SPIF=7 in SPSR  (cleared by reading SPSR then accessing SPDR)
- *
- * 3. Pin roles on Port B (you may call GPIO from SPI.c, or set DDRB here):
- *      PB4 SS    master: output HIGH when idle
- *      PB5 MOSI  master: output
- *      PB6 MISO  master: input
- *      PB7 SCK   master: output
- *
- * 4. Keep SS as an output in master mode. If it is an input and goes LOW,
- *    the hardware forces slave mode.
- *
- * 5. Mode 0: CPOL=0, CPHA=0. Leave SPI2X = 0 unless you add a 2x API.
+ * Author: Ahmed Ellamie / Salma Eldeab
+ * MCAL SPI Private Registers and Bits (ATmega32)
  */
 
-/* TODO: map SPCR, SPSR, SPDR and the bit names. */
+#include "STD_TYPES.h"
+
+/* ---------------- 1. Hardware Registers ---------------- */
+#define SPI_SPCR_REG    (*((volatile uint8*)0x2D))
+#define SPI_SPSR_REG    (*((volatile uint8*)0x2E))
+#define SPI_SPDR_REG    (*((volatile uint8*)0x2F))
+
+/* ---------------- 2. Register Bit Definitions ---------------- */
+/* SPCR Register Bits */
+#define SPI_SPCR_SPR0   0u
+#define SPI_SPCR_SPR1   1u
+#define SPI_SPCR_CPHA   2u
+#define SPI_SPCR_CPOL   3u
+#define SPI_SPCR_MSTR   4u
+#define SPI_SPCR_DORD   5u
+#define SPI_SPCR_SPE    6u
+#define SPI_SPCR_SPIE   7u
+
+/* SPSR Register Bits */
+#define SPI_SPSR_SPI2X  0u
+#define SPI_SPSR_WCOL   6u
+#define SPI_SPSR_SPIF   7u
 
 #endif /* SPI_PRIVATE_H */
