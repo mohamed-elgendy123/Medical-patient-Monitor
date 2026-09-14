@@ -1,216 +1,261 @@
-/*
- * Author: Ahmed Ellamie
- * Email:  ahmed.ellamiee@gmail.com
- *
- * STUDENT TASK — TIMER.c  (ATmega32 Timer0 + Timer1, F_CPU = 8 MHz)
- * Implement every prototype from TIMER_interface.h.
- *
- * Rules for this file:
- *   - The application only ever sees what TIMER_interface.h declares.
- *   - Anything only this file needs is static, so no other .c can reach it.
- *   - Register names and bit numbers come from TIMER_private.h. Fill that in
- *     first, or nothing here will compile.
- *
- * Numbers you will need, all at 8 MHz:
- *   prescaler 64 -> 1 tick = 8 us      prescaler 8 -> 1 tick = 1 us
- *   A flag in TIFR is cleared by writing 1 to it, not 0.
- */
+#include <avr/interrupt.h>
 
 #include "STD_TYPES.h"
 #include "TIMER_interface.h"
 #include "TIMER_private.h"
 
-/*==================================================================
- *  Local helpers — static, used only inside TIMER.c
- *==================================================================*/
+/* Static variables to hold system states */
+static volatile u32 Timer0_Ticks;
+static volatile TIMER_CallbackType Timer0_Callback = (TIMER_CallbackType)0;
+static volatile u8 Timer0_TickPending = 0U;
 
-/*
- * TIMER_WaitFlag
- * 1. Sit in an empty while loop until the bit Copy_u8BitMask is set in the
- *    register Copy_pu8Register (that register is TIFR).
- * 2. Clear the flag by writing 1 to that bit, so the next period starts clean.
- * 3. Both delay functions call this, which is the whole reason it exists —
- *    the wait-then-clear pattern is written once and cannot drift apart.
- */
-static void TIMER_WaitFlag(volatile uint8 *Copy_pu8Register, uint8 Copy_u8BitMask);
+static volatile u16 Timer1_Intervals[TIMER1_CAPTURE_RING_SIZE];
+static volatile u16 Timer1_LastCapture = 0U;
+static volatile u8 Timer1_RingIndex = 0U;
+static volatile u8 Timer1_CaptureReady = 0U;
+static volatile u8 Timer1_Asystole = 0U;
+static volatile u16 Timer1_OverflowCount = 0U;
 
-/*
- * TIMER_DutyToCompare
- * 1. Turn a 0..100 percent into a compare value: (Top + 1) * percent / 100.
- * 2. Do the multiply in uint32. Timer1 can reach 20000 * 100 = 2,000,000,
- *    which overflows uint16 long before the divide happens.
- * 3. Return the result; the caller writes it to OCR0 or OCR1A.
- */
-static uint16 TIMER_DutyToCompare(uint16 Copy_u16Top, uint8 Copy_u8DutyPercent);
+/* ========================================================================= */
+/*                               TIMER 0                                     */
+/* ========================================================================= */
 
-/*==================================================================
- *  Timer0 — 8-bit
- *==================================================================*/
-
-STD_ReturnType TIMER0_Init(void)
+void TIMER0_Init(void)
 {
-    /*
-     * Goal: one compare match every 1 ms.
-     * 1. Select CTC mode in TCCR0: WGM01 = 1 , WGM00 = 0.
-     *    Careful — WGM00 is bit 6 and WGM01 is bit 3. They are not adjacent.
-     * 2. OCR0 = 124. With prescaler 64 a tick is 8 us, and the counter clears
-     *    after OCR0 + 1 = 125 ticks, so 125 * 8 us = 1 ms exactly.
-     * 3. Clear TCNT0 so the first millisecond is a full one.
-     * 4. Leave the clock stopped (CS02:0 = 000). The delay functions start it.
-     * 5. Return E_OK.
-     */
-     
+    /* Reset registers to a clean state */
+    TIMER0_TCCR0 = 0U;
+    TIMER0_TCNT0 = 0U;
 
-     // Seolect CTC mode 
-    TIMER0_REG_TCCR0 = (1 << 3) | (0 << 6); // Set WGM01 to 1 and WGM00 to 0 for CTC mode
-    TIMER0_REG_OCR0 = 124; // Set compare value for 1 ms delay
-    TIMER0_REG_TCNT0 = 0; // Clear timer counter
+    /* 10 ms CTC Match Value @ 8MHz, Prescaler 1024 */
+    TIMER0_OCR0 = 77U;
 
-    return E_OK;
+    /* CTC Mode (WGM01 = 1) */
+    SET_BIT(TIMER0_TCCR0, TIMER0_WGM01);
+
+    /* Clock Select: Prescaler 1024 (CS02 = 1, CS00 = 1) */
+    SET_BIT(TIMER0_TCCR0, TIMER0_CS02);
+    SET_BIT(TIMER0_TCCR0, TIMER0_CS00);
+
+    /* Enable Compare Match Interrupt */
+    SET_BIT(TIMER_TIMSK, TIMER_OCIE0);
 }
 
-STD_ReturnType TIMER0_DelayMS(uint16 Copy_u16Milliseconds)
+void TIMER0_SetCallback(TIMER_CallbackType Copy_pvCallback)
 {
-    /*
-     * 1. Clear a stale OCF0 in TIFR before starting, or the first millisecond
-     *    ends instantly on an old flag left over from last time.
-     * 2. Start the clock: CS02:0 = prescaler 64.
-     * 3. Loop Copy_u16Milliseconds times, calling TIMER_WaitFlag on OCF0 —
-     *    each pass through the loop is one millisecond.
-     * 4. Stop the clock when the loop ends, so the timer is not left running.
-     * 5. Return E_OK.
-     * 6. This blocks: nothing else in main runs while it counts.
-     */
-
-    // Clear stale OCF0 flag
-    TIFR_REG |= (1 << 1); // Clear OCF0 flag by
-    // prescaler 64 -> CS02:0 = 011
-    TIMER0_REG_TCCR0 |= (1 << 0) | (1 << 1); // Start the clock with prescaler 64
-    // Loop for the specified number of milliseconds
-    for (uint16 i = 0; i < Copy_u16Milliseconds; i++){
-        TIMER_WaitFlag(&TIFR_REG, (1 << 1)); // Wait for OCF0 flag
+    if (Copy_pvCallback != (TIMER_CallbackType)0)
+    {
+        Timer0_Callback = Copy_pvCallback;
     }
-    // Stop the clock
-    TIMER0_REG_TCCR0 &= ~((1 << 2) | (1 << 1) | (1 << 0)); // Stop the clock
-
-    return E_OK;
+    else
+    {
+        Timer0_Callback = (TIMER_CallbackType)0;
+    }
 }
 
-STD_ReturnType TIMER0_DelayS(uint16 Copy_u16Seconds)
+uint8 TIMER0_IsTickPending(void)
 {
-    /*
-     * 1. Loop Copy_u16Seconds times and call TIMER0_DelayMS(1000) each pass.
-     * 2. Do not try 1000 * seconds in one call — the argument is uint16 and
-     *    anything past 65 seconds would wrap round to a short delay.
-     * 3. Return E_OK.
-     */
+    /* Return flag using ternary/if check */
+    if (Timer0_TickPending != 0U)
+    {
+        return 1U;
+    }
+    else
+    {
+        return 0U;
+    }
 }
 
-STD_ReturnType TIMER0_PWM(uint8 Copy_u8DutyPercent)
+void TIMER0_ClearTick(void)
 {
-    /*
-     * 1. Return E_NOK if Copy_u8DutyPercent is above 100.
-     * 2. Make PB3 an output — the compare unit cannot drive a pin that DDRB
-     *    still calls an input, and this is the usual reason "PWM does nothing".
-     * 3. Fast PWM in TCCR0: WGM01 = 1 , WGM00 = 1.
-     * 4. Non-inverting output: COM01 = 1 , COM00 = 0 (TCCR0 bits 5 and 4).
-     *    The pin goes high at BOTTOM and low on the compare match.
-     * 5. OCR0 = TIMER_DutyToCompare(255, Copy_u8DutyPercent).
-     * 6. Start the clock with prescaler 64 and return E_OK.
-     *    Frequency = 8 MHz / (64 * 256) = 488 Hz, fine for an LED or a motor.
-     * 7. Known quirk to expect on the scope: 0% still emits a one-tick spike
-     *    each period. For a true off, call TIMER0_Stop instead.
-     */
+    Timer0_TickPending = 0U;
 }
 
-STD_ReturnType TIMER0_Stop(void)
+/* ========================================================================= */
+/*                               TIMER 1                                     */
+/* ========================================================================= */
+
+void TIMER1_Init(void)
 {
-    /*
-     * 1. Clear CS02:0 in TCCR0 — the counter freezes.
-     * 2. Clear COM01:COM00 as well, which hands PB3 back to GPIO. Without this
-     *    the pin keeps whatever level the compare unit left on it.
-     * 3. Return E_OK.
-     */
+    u8 Local_u8Idx = 0U;
+
+    /* Reset Timer1 Control Registers to Normal Mode (16-bit) */
+    TIMER1_TCCR1A = 0U;
+    TIMER1_TCCR1B = 0U;
+
+    /* Enable Input Capture Noise Canceler and Rising Edge Trigger */
+    SET_BIT(TIMER1_TCCR1B, TIMER1_ICNC1);
+    SET_BIT(TIMER1_TCCR1B, TIMER1_ICES1);
+
+    /* Prescaler 256 (32us tick @ 8MHz) -> CS12 = 1 */
+    SET_BIT(TIMER1_TCCR1B, TIMER1_CS12);
+
+    /* Enable Capture and Overflow Interrupts */
+    SET_BIT(TIMER_TIMSK, TIMER1_TICIE1);
+    SET_BIT(TIMER_TIMSK, TIMER1_TOIE1);
+
+    /* Clear the intervals ring buffer using a for loop */
+    for (Local_u8Idx = 0U; Local_u8Idx < TIMER1_CAPTURE_RING_SIZE; Local_u8Idx++)
+    {
+        Timer1_Intervals[Local_u8Idx] = 0U;
+    }
+
+    /* Reset internal tracking variables using do...while */
+    Local_u8Idx = 0U;
+    do
+    {
+        Timer1_LastCapture = 0U;
+        Timer1_RingIndex = 0U;
+        Timer1_CaptureReady = 0U;
+        Timer1_Asystole = 0U;
+        Timer1_OverflowCount = 0U;
+        Local_u8Idx++;
+    } while (Local_u8Idx < 1U);
 }
 
-/*==================================================================
- *  Timer1 — 16-bit
- *==================================================================*/
-
-STD_ReturnType TIMER1_Init(void)
+uint8 TIMER1_IsCaptureReady(void)
 {
-    /*
-     * Goal: one compare match every 1 ms, same idea as Timer0.
-     * 1. CTC with TOP = OCR1A is mode 4, so WGM13:0 = 0100. The bits are split:
-     *      WGM11 , WGM10 -> TCCR1A bits 1 and 0   (both 0 here)
-     *      WGM13 , WGM12 -> TCCR1B bits 4 and 3   (0 and 1 here)
-     * 2. OCR1A = 999. With prescaler 8 a tick is 1 us, so 1000 ticks = 1 ms.
-     * 3. Clear TCNT1 and leave the clock stopped.
-     * 4. Return E_OK.
-     */
+    if (Timer1_CaptureReady == 1U)
+    {
+        return 1U;
+    }
+    return 0U;
 }
 
-STD_ReturnType TIMER1_DelayMS(uint16 Copy_u16Milliseconds)
+void TIMER1_ClearCaptureFlag(void)
 {
-    /*
-     * 1. Same shape as TIMER0_DelayMS, but the flag is OCF1A in TIFR.
-     * 2. Clear the stale flag, start prescaler 8, loop calling TIMER_WaitFlag,
-     *    then stop the clock.
-     * 3. Return E_OK.
-     */
+    Timer1_CaptureReady = 0U;
 }
 
-STD_ReturnType TIMER1_PWM(uint16 Copy_u16FrequencyHz, uint8 Copy_u8DutyPercent)
+uint16 TIMER1_GetInterval(uint8 Copy_u8Index)
 {
-    /*
-     * 1. Return E_NOK if the duty is above 100, or the frequency is outside
-     *    16 .. 20000 Hz. Below 16 Hz the ICR1 value in step 4 will not fit.
-     * 2. Make PD5 an output.
-     * 3. Fast PWM with TOP = ICR1 is mode 14, so WGM13:0 = 1110:
-     *      TCCR1A: WGM11 = 1 , WGM10 = 0
-     *      TCCR1B: WGM13 = 1 , WGM12 = 1
-     *    Non-inverting on channel A: COM1A1 = 1 , COM1A0 = 0 (TCCR1A bits 7, 6).
-     * 4. With prescaler 8 a tick is 1 us, so one period needs
-     *      ICR1 = (1000000UL / Copy_u16FrequencyHz) - 1
-     *    Write the UL — 1000000 does not fit in the 16-bit int avr-gcc would
-     *    otherwise use, and the result would be nonsense.
-     * 5. OCR1A = TIMER_DutyToCompare(ICR1, Copy_u8DutyPercent).
-     * 6. Start the clock with prescaler 8 and return E_OK.
-     * 7. Servo check: 50 Hz gives ICR1 = 19999, so one tick is 1 us and a
-     *    1..2 ms pulse is a compare value of 1000..2000.
-     */
+    /* Bounds checking */
+    if (Copy_u8Index < TIMER1_CAPTURE_RING_SIZE)
+    {
+        return Timer1_Intervals[Copy_u8Index];
+    }
+    else
+    {
+        return 0U;
+    }
 }
 
-STD_ReturnType TIMER1_Stop(void)
+uint8 TIMER1_IsAsystole(void)
 {
-    /*
-     * 1. Clear CS12:0 in TCCR1B.
-     * 2. Clear COM1A1:COM1A0 in TCCR1A to hand PD5 back to GPIO.
-     * 3. Return E_OK.
-     */
+    if (Timer1_Asystole != 0U)
+    {
+        return 1U;
+    }
+    else
+    {
+        return 0U;
+    }
 }
 
-/*==================================================================
- *  Local helper bodies
- *==================================================================*/
-
-static void TIMER_WaitFlag(volatile uint8 *Copy_pu8Register, uint8 Copy_u8BitMask)
+void TIMER1_ClearAsystole(void)
 {
-    /*
-     * 1. while ((*Copy_pu8Register & Copy_u8BitMask) == 0) { }  — spin until set.
-     * 2. Then write 1 to that bit to clear it: *Copy_pu8Register = Copy_u8BitMask.
-     *    Plain assignment, not |=. On TIFR a 1 clears and a 0 leaves alone, so
-     *    assigning the single mask clears your flag and touches no other.
-     */
-    while (!( *Copy_pu8Register & Copy_u8BitMask ));
-    *Copy_pu8Register |= Copy_u8BitMask;
+    Timer1_Asystole = 0U;
+    Timer1_OverflowCount = 0U;
 }
 
-static uint16 TIMER_DutyToCompare(uint16 Copy_u16Top, uint8 Copy_u8DutyPercent)
+/* ========================================================================= */
+/*                               TIMER 2                                     */
+/* ========================================================================= */
+
+void TIMER2_Init(void)
 {
-    /*
-     * 1. Promote first: ((uint32)Copy_u16Top + 1) * Copy_u8DutyPercent / 100.
-     * 2. Cast the result back to uint16 and return it.
-     * 3. Sanity check with Timer0: Top = 255, 50 percent -> 128.
-     */
+    /* Set PD7 (OC2) as Output */
+    SET_BIT(TIMER_DDRD, TIMER_OC2_PD7);
+
+    /* Reset Timer2 registers */
+    TIMER2_TCCR2 = 0U;
+    TIMER2_TCNT2 = 0U;
+
+    /* CTC Mode (WGM21 = 1) */
+    SET_BIT(TIMER2_TCCR2, TIMER2_WGM21);
+
+    /* Toggle OC2 on Compare Match (COM20 = 1) */
+    SET_BIT(TIMER2_TCCR2, TIMER2_COM20);
+
+    /* Start in Mute State */
+    TIMER2_SetTone(TIMER2_TONE_MUTE);
+}
+
+void TIMER2_SetTone(uint8 Copy_u8Tone)
+{
+    /* Stop Clock Source first (CS22=0, CS21=0, CS20=0) */
+    CLR_BIT(TIMER2_TCCR2, TIMER2_CS22);
+    CLR_BIT(TIMER2_TCCR2, TIMER2_CS21);
+    CLR_BIT(TIMER2_TCCR2, TIMER2_CS20);
+
+    /* Logic rewritten using if - else if - else ladder */
+    if (Copy_u8Tone == TIMER2_TONE_HIGH)
+    {
+        /* 960 Hz Tone: Prescaler 32, OCR2 = 129 */
+        TIMER2_OCR2 = 129U;
+        SET_BIT(TIMER2_TCCR2, TIMER2_CS21);
+        SET_BIT(TIMER2_TCCR2, TIMER2_CS20);
+    }
+    else if (Copy_u8Tone == TIMER2_TONE_MEDIUM)
+    {
+        /* 640 Hz Tone: Prescaler 64, OCR2 = 97 */
+        TIMER2_OCR2 = 97U;
+        SET_BIT(TIMER2_TCCR2, TIMER2_CS22);
+    }
+    else if (Copy_u8Tone == TIMER2_TONE_LOW)
+    {
+        /* 480 Hz Tone: Prescaler 64, OCR2 = 129 */
+        TIMER2_OCR2 = 129U;
+        SET_BIT(TIMER2_TCCR2, TIMER2_CS22);
+    }
+    else
+    {
+        /* TIMER2_TONE_MUTE or invalid value */
+        TIMER2_OCR2 = 0U;
+    }
+}
+
+/* ========================================================================= */
+/*                         INTERRUPT SERVICE ROUTINES                        */
+/* ========================================================================= */
+
+ISR(TIMER0_COMP_vect)
+{
+    Timer0_Ticks++;
+    Timer0_TickPending = 1U;
+
+    if (Timer0_Callback != (TIMER_CallbackType)0)
+    {
+        Timer0_Callback();
+    }
+}
+
+ISR(TIMER1_CAPT_vect)
+{
+    u16 Local_u16Capture = TIMER1_ICR1;
+
+    /* Calculate interval between beats */
+    Timer1_Intervals[Timer1_RingIndex] = (u16)(Local_u16Capture - Timer1_LastCapture);
+    Timer1_LastCapture = Local_u16Capture;
+
+    /* Advance ring index using if/else instead of bitwise mask */
+    Timer1_RingIndex++;
+    if (Timer1_RingIndex >= TIMER1_CAPTURE_RING_SIZE)
+    {
+        Timer1_RingIndex = 0U;
+    }
+
+    Timer1_CaptureReady = 1U;
+    Timer1_OverflowCount = 0U;
+    Timer1_Asystole = 0U;
+}
+
+ISR(TIMER1_OVF_vect)
+{
+    Timer1_OverflowCount++;
+
+    /* Asystole threshold: 2 overflows (~4.19s without capture) */
+    if (Timer1_OverflowCount >= TIMER1_ASYSTOLE_OVF_LIMIT)
+    {
+        Timer1_Asystole = 1U;
+    }
 }

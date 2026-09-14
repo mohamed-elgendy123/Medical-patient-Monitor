@@ -1,45 +1,66 @@
 #ifndef TIMER_PRIVATE_H
 #define TIMER_PRIVATE_H
 
-/*
- * Author: Ahmed Ellamie
- * Email:  ahmed.ellamiee@gmail.com
- *
- * STUDENT TASK — TIMER private layer (ATmega32)
- * Include this file ONLY from TIMER.c.
- *
- * What you must add here:
- * 1. Timer0 registers (I/O space):
- *      TCCR0  0x53    FOC0 WGM00 COM01 COM00 WGM01 CS02 CS01 CS00
- *      TCNT0  0x52
- *      OCR0   0x5C
- * 2. Timer1 registers:
- *      TCCR1A 0x4F    COM1A1 COM1A0 COM1B1 COM1B0 FOC1A FOC1B WGM11 WGM10
- *      TCCR1B 0x4E    ICNC1  ICES1  – WGM13 WGM12 CS12 CS11 CS10
- *      TCNT1  0x4C    (16-bit, write high byte first)
- *      OCR1A  0x4A
- *      ICR1   0x46
- * 3. Shared:
- *      TIMSK  0x59    OCIE2 TOIE2 TICIE1 OCIE1A OCIE1B TOIE1 OCIE0 TOIE0
- *      TIFR   0x58    matching flags — write 1 to clear
- *
- * 4. Bit-position macros for WGM, CS, COM, TOIE0, OCIE0, OCF0, TOV0.
- *
- * 5. Remember: a flag is cleared by writing 1 to it (w1c).
- */
-#define TIMER0_REG_TCCR0  (*(volatile uint8*)0x53)
-#define TIMER0_REG_TCNT0  (*(volatile uint8*)0x52)
-#define TIMER0_REG_OCR0   (*(volatile uint8*)0x5C)
+#include "STD_TYPES.h"
 
-#define TIMER1_REG_TCCR1A (*(volatile uint8*)0x4F)
-#define TIMER1_REG_TCCR1B (*(volatile uint8*)0x4E)
-#define TIMER1_REG_TCNT1  (*(volatile uint16*)0x4C)
-#define TIMER1_REG_OCR1A  (*(volatile uint16*)0x4A)
-#define TIMER1_REG_ICR1   (*(volatile uint16*)0x46)
+#ifndef u8
+#define u8 uint8
+#endif
+#ifndef u16
+#define u16 uint16
+#endif
+#ifndef u32
+#define u32 uint32
+#endif
 
-#define TIMSK_REG         (*(volatile uint8*)0x59)
-#define TIFR_REG          (*(volatile uint8*)0x58)
+#ifndef SET_BIT
+#define SET_BIT(reg, bit) ((reg) |= (u8)(1U << (bit)))
+#endif
+#ifndef CLR_BIT
+#define CLR_BIT(reg, bit) ((reg) &= (u8) ~(1U << (bit)))
+#endif
+#ifndef READ_BIT
+#define READ_BIT(reg, bit) ((u8)(((reg) >> (bit)) & 1U))
+#endif
 
-/* TODO: map the bit names for each register. */
+#define TIMER0_TCCR0 (*(volatile u8 *)0x53U)
+#define TIMER0_TCNT0 (*(volatile u8 *)0x52U)
+#define TIMER0_OCR0 (*(volatile u8 *)0x5CU)
+
+#define TIMER1_TCCR1A (*(volatile u8 *)0x4FU)
+#define TIMER1_TCCR1B (*(volatile u8 *)0x4EU)
+#define TIMER1_TCNT1 (*(volatile u16 *)0x4CU)
+#define TIMER1_ICR1 (*(volatile u16 *)0x46U)
+
+#define TIMER2_TCCR2 (*(volatile u8 *)0x45U)
+#define TIMER2_TCNT2 (*(volatile u8 *)0x44U)
+#define TIMER2_OCR2 (*(volatile u8 *)0x43U)
+
+#define TIMER_TIMSK (*(volatile u8 *)0x59U)
+#define TIMER_DDRD (*(volatile u8 *)0x31U)
+
+#define TIMER0_WGM01 3U
+#define TIMER0_CS02 2U
+#define TIMER0_CS00 0U
+#define TIMER_OCIE0 1U
+
+#define TIMER1_ICES1 6U
+#define TIMER1_ICNC1 7U
+#define TIMER1_CS12 2U
+#define TIMER1_CS11 1U
+#define TIMER1_CS10 0U
+#define TIMER1_TICIE1 5U
+#define TIMER1_TOIE1 2U
+
+#define TIMER2_WGM21 3U
+#define TIMER2_COM20 4U
+#define TIMER2_CS22 2U
+#define TIMER2_CS21 1U
+#define TIMER2_CS20 0U
+
+#define TIMER_OC2_PD7 7U
+
+#define TIMER1_CAPTURE_RING_SIZE 8U
+#define TIMER1_ASYSTOLE_OVF_LIMIT 2U
 
 #endif /* TIMER_PRIVATE_H */
