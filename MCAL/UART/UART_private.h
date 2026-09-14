@@ -35,4 +35,44 @@
 
 /* TODO: map UDR, UCSRA, UCSRB, UCSRC, UBRRL, UBRRH and the bit names. */
 
+
+
+
+/* ATmega32 USART Registers Addresses */
+#define UDR       (*((volatile uint8*)0x2C))
+#define UCSRA     (*((volatile uint8*)0x2B))
+#define UCSRB     (*((volatile uint8*)0x2A))
+#define UCSRC     (*((volatile uint8*)0x40))
+#define UBRRH     (*((volatile uint8*)0x40))
+#define UBRRL     (*((volatile uint8*)0x29))
+
+/* UCSRA Bits */
+#define RXC       7
+#define TXC       6
+#define UDRE      5
+
+/* UCSRB Bits */
+#define RXCIE     7
+#define TXCIE     6
+#define UDRIE     5
+#define RXEN      4
+#define TXEN      3
+
+/* UCSRC Bits */
+#define URSEL     7
+#define UMSEL     6
+#define UPM1      5
+#define UPM0      4
+#define USBS      3
+#define UCSZ1     2
+#define UCSZ0     1
+
+
+
+
+
+
+
+
+
 #endif /* UART_PRIVATE_H */

@@ -1,6 +1,6 @@
-# 1 "MCAL/TIMER/TIMER.c"
-# 1 "<built-in>"
-# 1 "<command-line>"
+# 0 "MCAL/TIMER/TIMER.c"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "MCAL/TIMER/TIMER.c"
 # 19 "MCAL/TIMER/TIMER.c"
 # 1 "LIB/STD_TYPES.h" 1
