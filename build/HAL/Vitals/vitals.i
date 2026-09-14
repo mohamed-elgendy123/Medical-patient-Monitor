@@ -62,18 +62,28 @@ typedef enum {
 
 
 typedef struct {
-    uint8 HeartRate;
-    uint8 SpO2;
-    uint16 Temp_Cx10;
-    uint16 SystolicBP;
-    uint16 DiastolicBP;
-    uint8 RespirationRate;
+    uint16 hrBpm;
+    uint16 hrvMs;
+    uint8 spo2Pct;
+    uint16 tempCx10;
+    uint8 nibpSys;
+    uint8 nibpDia;
+    uint8 respBpm;
+    uint8 perfusionPct;
 
 
-    Vitals_StatusType SpO2_Status;
-    Vitals_StatusType Temp_Status;
-    Vitals_StatusType BP_Status;
-    Vitals_StatusType Resp_Status;
+    uint8 leadOff : 1;
+    uint8 probeOff : 1;
+    uint8 beatFlag : 1;
+    uint8 reserved : 5;
+
+    uint32 monitorSec;
+
+
+    Vitals_StatusType spo2Status;
+    Vitals_StatusType tempStatus;
+    Vitals_StatusType bpStatus;
+    Vitals_StatusType respStatus;
 } Vitals_t;
 
 
@@ -83,7 +93,6 @@ STD_ReturnType Vitals_Read(Vitals_t *Copy_pstrVitals);
 
 STD_ReturnType Vitals_Init(void)
 {
-
     return ADC_Init(1u, 6u);
 }
 
@@ -101,12 +110,12 @@ STD_ReturnType Vitals_Read(Vitals_t *Copy_pstrVitals)
     {
         if (Local_u16RawAdc == 0 || Local_u16RawAdc == 1023)
         {
-            Copy_pstrVitals->SpO2_Status = VITALS_SENSOR_FAULT;
+            Copy_pstrVitals->spo2Status = VITALS_SENSOR_FAULT;
         }
         else
         {
-            Copy_pstrVitals->SpO2_Status = VITALS_OK;
-            Copy_pstrVitals->SpO2 = 70 + ((uint32)Local_u16RawAdc * 30) / 1023;
+            Copy_pstrVitals->spo2Status = VITALS_OK;
+            Copy_pstrVitals->spo2Pct = (uint8)(70 + ((uint32)Local_u16RawAdc * 30) / 1023);
         }
     }
 
@@ -115,12 +124,12 @@ STD_ReturnType Vitals_Read(Vitals_t *Copy_pstrVitals)
     {
         if (Local_u16RawAdc == 0 || Local_u16RawAdc == 1023)
         {
-            Copy_pstrVitals->Temp_Status = VITALS_SENSOR_FAULT;
+            Copy_pstrVitals->tempStatus = VITALS_SENSOR_FAULT;
         }
         else
         {
-            Copy_pstrVitals->Temp_Status = VITALS_OK;
-            Copy_pstrVitals->Temp_Cx10 = 300 + ((uint32)Local_u16RawAdc * 150) / 1023;
+            Copy_pstrVitals->tempStatus = VITALS_OK;
+            Copy_pstrVitals->tempCx10 = (uint16)(300 + ((uint32)Local_u16RawAdc * 150) / 1023);
         }
     }
 
@@ -129,13 +138,13 @@ STD_ReturnType Vitals_Read(Vitals_t *Copy_pstrVitals)
     {
         if (Local_u16RawAdc == 0 || Local_u16RawAdc == 1023)
         {
-            Copy_pstrVitals->BP_Status = VITALS_SENSOR_FAULT;
+            Copy_pstrVitals->bpStatus = VITALS_SENSOR_FAULT;
         }
         else
         {
-            Copy_pstrVitals->BP_Status = VITALS_OK;
-            Copy_pstrVitals->SystolicBP = 50 + ((uint32)Local_u16RawAdc * 200) / 1023;
-            Copy_pstrVitals->DiastolicBP = (Copy_pstrVitals->SystolicBP * 2) / 3;
+            Copy_pstrVitals->bpStatus = VITALS_OK;
+            Copy_pstrVitals->nibpSys = (uint8)(50 + ((uint32)Local_u16RawAdc * 200) / 1023);
+            Copy_pstrVitals->nibpDia = (uint8)((Copy_pstrVitals->nibpSys * 2) / 3);
         }
     }
 
@@ -144,12 +153,12 @@ STD_ReturnType Vitals_Read(Vitals_t *Copy_pstrVitals)
     {
         if (Local_u16RawAdc == 0 || Local_u16RawAdc == 1023)
         {
-            Copy_pstrVitals->Resp_Status = VITALS_SENSOR_FAULT;
+            Copy_pstrVitals->respStatus = VITALS_SENSOR_FAULT;
         }
         else
         {
-            Copy_pstrVitals->Resp_Status = VITALS_OK;
-            Copy_pstrVitals->RespirationRate = ((uint32)Local_u16RawAdc * 60) / 1023;
+            Copy_pstrVitals->respStatus = VITALS_OK;
+            Copy_pstrVitals->respBpm = (uint8)(((uint32)Local_u16RawAdc * 60) / 1023);
         }
     }
 

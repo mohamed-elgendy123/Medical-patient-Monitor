@@ -3,7 +3,9 @@ Archive member included to satisfy reference by file (symbol)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
                               build/HAL/Vitals/vitals.o (__umulhisi3)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
-                              build/HAL/Vitals/vitals.o (__udivmodhi4)
+                              build/LIB/ring_buffer.o (__udivmodhi4)
+C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+                              build/HAL/Vitals/vitals.o (__divmodhi4)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodsi4.o)
                               build/HAL/HR_Capture/HR_Capture.o (__udivmodsi4)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_exit.o)
@@ -11,7 +13,7 @@ C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_exit.o)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_copy_data.o)
                               build/HAL/SevenSegment/SevenSegment.o (__do_copy_data)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_clear_bss.o)
-                              build/HAL/HR_Capture/HR_Capture.o (__do_clear_bss)
+                              build/HAL/Annunciator/Annunciator_audio.o (__do_clear_bss)
 
 Discarded input sections
 
@@ -20,6 +22,50 @@ Discarded input sections
  .text          0x00000000        0x0 build/main.o
  .data          0x00000000        0x0 build/main.o
  .bss           0x00000000        0x0 build/main.o
+ .text          0x00000000        0x0 build/LIB/ring_buffer.o
+ .data          0x00000000        0x0 build/LIB/ring_buffer.o
+ .bss           0x00000000        0x0 build/LIB/ring_buffer.o
+ .text.RingBuffer_Init
+                0x00000000       0x22 build/LIB/ring_buffer.o
+ .text.RingBuffer_IsFull
+                0x00000000       0x1a build/LIB/ring_buffer.o
+ .text.RingBuffer_Push
+                0x00000000       0x7a build/LIB/ring_buffer.o
+ .text.RingBuffer_IsEmpty
+                0x00000000       0x16 build/LIB/ring_buffer.o
+ .text.RingBuffer_Pop
+                0x00000000       0x62 build/LIB/ring_buffer.o
+ .comment       0x00000000       0x13 build/LIB/ring_buffer.o
+ .text          0x00000000        0x0 build/HAL/Annunciator/Annunciator_audio.o
+ .data          0x00000000        0x0 build/HAL/Annunciator/Annunciator_audio.o
+ .bss           0x00000000        0x0 build/HAL/Annunciator/Annunciator_audio.o
+ .text.ANN_ResetPattern
+                0x00000000       0x44 build/HAL/Annunciator/Annunciator_audio.o
+ .text.ANN_Audio_Init
+                0x00000000       0x34 build/HAL/Annunciator/Annunciator_audio.o
+ .text.ANN_Audio_SetPriority
+                0x00000000       0x22 build/HAL/Annunciator/Annunciator_audio.o
+ .text.ANN_Audio_Tick
+                0x00000000      0x17e build/HAL/Annunciator/Annunciator_audio.o
+ .text.ANN_Audio_Mute
+                0x00000000       0x18 build/HAL/Annunciator/Annunciator_audio.o
+ .text.ANN_Audio_Unmute
+                0x00000000       0x10 build/HAL/Annunciator/Annunciator_audio.o
+ .bss.Ann_Muted
+                0x00000000        0x1 build/HAL/Annunciator/Annunciator_audio.o
+ .bss.Ann_SilenceTicks
+                0x00000000        0x2 build/HAL/Annunciator/Annunciator_audio.o
+ .bss.Ann_CycleTicks
+                0x00000000        0x2 build/HAL/Annunciator/Annunciator_audio.o
+ .bss.Ann_PhaseTicks
+                0x00000000        0x2 build/HAL/Annunciator/Annunciator_audio.o
+ .bss.Ann_PulseCount
+                0x00000000        0x1 build/HAL/Annunciator/Annunciator_audio.o
+ .bss.Ann_Phase
+                0x00000000        0x1 build/HAL/Annunciator/Annunciator_audio.o
+ .bss.Ann_CurrentPriority
+                0x00000000        0x1 build/HAL/Annunciator/Annunciator_audio.o
+ .comment       0x00000000       0x13 build/HAL/Annunciator/Annunciator_audio.o
  .text          0x00000000        0x0 build/HAL/HR_Capture/HR_Capture.o
  .data          0x00000000        0x0 build/HAL/HR_Capture/HR_Capture.o
  .bss           0x00000000        0x0 build/HAL/HR_Capture/HR_Capture.o
@@ -78,7 +124,7 @@ Discarded input sections
  .text.Vitals_Init
                 0x00000000        0x8 build/HAL/Vitals/vitals.o
  .text.Vitals_Read
-                0x00000000      0x18a build/HAL/Vitals/vitals.o
+                0x00000000      0x188 build/HAL/Vitals/vitals.o
  .comment       0x00000000       0x13 build/HAL/Vitals/vitals.o
  .text          0x00000000        0x0 build/MCAL/ADC/ADC.o
  .data          0x00000000        0x0 build/MCAL/ADC/ADC.o
@@ -121,6 +167,16 @@ Discarded input sections
  .text          0x00000000        0x0 build/MCAL/SPI/SPI.o
  .data          0x00000000        0x0 build/MCAL/SPI/SPI.o
  .bss           0x00000000        0x0 build/MCAL/SPI/SPI.o
+ .text.SPI_InitMaster
+                0x00000000       0x4a build/MCAL/SPI/SPI.o
+ .text.SPI_TransceiveByte
+                0x00000000        0xa build/MCAL/SPI/SPI.o
+ .text.SPI_Transceive
+                0x00000000       0x20 build/MCAL/SPI/SPI.o
+ .text.SPI_SelectSlave
+                0x00000000       0x2c build/MCAL/SPI/SPI.o
+ .text.SPI_ReleaseSlave
+                0x00000000        0xc build/MCAL/SPI/SPI.o
  .comment       0x00000000       0x13 build/MCAL/SPI/SPI.o
  .text          0x00000000        0x0 build/MCAL/TIMER/TIMER.o
  .data          0x00000000        0x0 build/MCAL/TIMER/TIMER.o
@@ -205,6 +261,30 @@ Discarded input sections
  .debug_aranges
                 0x00000000       0x20 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
  .debug_str     0x00000000       0x68 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
+ .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .text.libgcc.mul
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .text.libgcc.div
+                0x00000000       0x28 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .text.libgcc   0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .text.libgcc.prologue
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .text.libgcc.builtins
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .text.libgcc.fmul
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .text.libgcc.fixed
+                0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .debug_line    0x00000000       0xb7 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .debug_line_str
+                0x00000000       0x5c C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .debug_info    0x00000000       0x24 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .debug_abbrev  0x00000000       0x14 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .debug_aranges
+                0x00000000       0x20 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
+ .debug_str     0x00000000       0x68 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
  .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodsi4.o)
  .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodsi4.o)
  .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodsi4.o)
@@ -294,6 +374,8 @@ Linker script and memory map
 
 LOAD C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5/crtatmega32.o
 LOAD build/main.o
+LOAD build/LIB/ring_buffer.o
+LOAD build/HAL/Annunciator/Annunciator_audio.o
 LOAD build/HAL/HR_Capture/HR_Capture.o
 LOAD build/HAL/KeyPad/KeyPad.o
 LOAD build/HAL/SevenSegment/SevenSegment.o

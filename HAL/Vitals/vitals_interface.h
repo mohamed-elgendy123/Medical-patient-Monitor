@@ -3,26 +3,36 @@
 
 #include "STD_TYPES.h"
 
-/* Sensor status enum */
+/* Sensor health status enum */
 typedef enum {
     VITALS_OK = 0,
     VITALS_SENSOR_FAULT
 } Vitals_StatusType;
 
-/* Structure for all 5 patient vital readings */
+/* Runtime vitals structure - strictly matching Data Dictionary (DB-01) */
 typedef struct {
-    uint8  HeartRate;       /* Calculated from pulse train (Digital/Timer) */
-    uint8  SpO2;            /* ADC0: Range 70 .. 100 % */
-    uint16 Temp_Cx10;       /* ADC1: Range 300 .. 450 (30.0 .. 45.0 °C) */
-    uint16 SystolicBP;      /* ADC2: Range 50 .. 250 mmHg */
-    uint16 DiastolicBP;     /* Derived: ~ 2/3 of Systolic */
-    uint8  RespirationRate; /* ADC3: Range 0 .. 60 breaths/min */
+    uint16 hrBpm;         /* 0..250, 0 = no beat detected */
+    uint16 hrvMs;         /* mean abs successive difference, ms */
+    uint8  spo2Pct;       /* 70..100 % */
+    uint16 tempCx10;      /* 300..450 (30.0 .. 45.0 °C) */
+    uint8  nibpSys;       /* 50..250 mmHg */
+    uint8  nibpDia;       /* derived, ~ 2/3 of systolic */
+    uint8  respBpm;       /* 0..60 breaths/min */
+    uint8  perfusionPct;  /* pulse strength */
+    
+    /* Hardware Flags */
+    uint8  leadOff      : 1;
+    uint8  probeOff     : 1;
+    uint8  beatFlag     : 1; /* set for one tick on each beat */
+    uint8  reserved     : 5;
+    
+    uint32 monitorSec;    /* seconds monitoring this patient */
 
-    /* Sensor Health Statuses */
-    Vitals_StatusType SpO2_Status;
-    Vitals_StatusType Temp_Status;
-    Vitals_StatusType BP_Status;
-    Vitals_StatusType Resp_Status;
+    /* Sensor Statuses for fault detection */
+    Vitals_StatusType spo2Status;
+    Vitals_StatusType tempStatus;
+    Vitals_StatusType bpStatus;
+    Vitals_StatusType respStatus;
 } Vitals_t;
 
 /* Function Prototypes */
