@@ -52,17 +52,18 @@ SevenSegment_Display:
 	ldi r25,lo8(10)
 	ldi r30,lo8(.LC0)
 	ldi r31,hi8(.LC0)
-	movw r26,r28
-	adiw r26,1
+	movw r18,r28
+	subi r18,-1
+	sbci r19,-1
+	movw r26,r18
 	0:
 	ld r0,Z+
 	st X+,r0
 	dec r25
 	brne 0b
-	movw r30,r28
-	adiw r30,1
-	add r30,r22
-	adc r31,__zero_reg__
+	add r18,r22
+	adc r19,__zero_reg__
+	movw r30,r18
 	ld r22,Z
 	call GPIO_SetPortValue
 	ldi r24,0
@@ -83,5 +84,5 @@ SevenSegment_Display:
 	ldi r25,0
 	rjmp .L4
 	.size	SevenSegment_Display, .-SevenSegment_Display
-	.ident	"GCC: (GNU) 15.2.0"
+	.ident	"GCC: (GNU) 16.1.0"
 .global __do_copy_data

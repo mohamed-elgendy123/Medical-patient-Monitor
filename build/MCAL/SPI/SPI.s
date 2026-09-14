@@ -97,26 +97,21 @@ SPI_Transceive:
 SPI_SelectSlave:
 	push r28
 	push r29
-	rcall .
-	in r28,__SP_L__
-	in r29,__SP_H__
 /* prologue: function */
-/* frame size = 2 */
-/* stack size = 4 */
-.L__stack_usage = 4
-	std Y+1,r24
-	std Y+2,r22
+/* frame size = 0 */
+/* stack size = 2 */
+.L__stack_usage = 2
+	mov r28,r24
+	mov r29,r22
 	ldi r20,lo8(1)
 	call GPIO_SetPinDirection
 	ldi r20,0
-	ldd r22,Y+2
-	ldd r24,Y+1
+	mov r22,r29
+	mov r24,r28
 	call GPIO_SetPinValue
 	ldi r24,0
 	ldi r25,0
 /* epilogue start */
-	pop __tmp_reg__
-	pop __tmp_reg__
 	pop r29
 	pop r28
 	ret
@@ -136,4 +131,4 @@ SPI_ReleaseSlave:
 /* epilogue start */
 	ret
 	.size	SPI_ReleaseSlave, .-SPI_ReleaseSlave
-	.ident	"GCC: (GNU) 15.2.0"
+	.ident	"GCC: (GNU) 16.1.0"

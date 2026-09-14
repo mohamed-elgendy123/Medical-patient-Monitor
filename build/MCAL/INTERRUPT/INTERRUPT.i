@@ -9,39 +9,56 @@
 
 
 
-# 1 "C:/avr-gcc/avr/include/avr/interrupt.h" 1 3
-# 38 "C:/avr-gcc/avr/include/avr/interrupt.h" 3
-# 1 "C:/avr-gcc/avr/include/avr/io.h" 1 3
-# 99 "C:/avr-gcc/avr/include/avr/io.h" 3
-# 1 "C:/avr-gcc/avr/include/avr/sfr_defs.h" 1 3
-# 126 "C:/avr-gcc/avr/include/avr/sfr_defs.h" 3
-# 1 "C:/avr-gcc/avr/include/inttypes.h" 1 3
-# 37 "C:/avr-gcc/avr/include/inttypes.h" 3
-# 1 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdint.h" 1 3 4
-# 9 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdint.h" 3 4
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/interrupt.h" 1 3
+# 36 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/interrupt.h" 3
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 1 3
+# 93 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 3
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/sfr_defs.h" 1 3
+# 124 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/sfr_defs.h" 3
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/inttypes.h" 1 3
+# 35 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/inttypes.h" 3
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/lib/gcc/avr/16.1.0/include/stdint.h" 1 3
+# 9 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/lib/gcc/avr/16.1.0/include/stdint.h" 3
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
-# 1 "C:/avr-gcc/avr/include/stdint.h" 1 3 4
-# 125 "C:/avr-gcc/avr/include/stdint.h" 3 4
-typedef signed int int8_t __attribute__((__mode__(__QI__)));
-typedef unsigned int uint8_t __attribute__((__mode__(__QI__)));
-typedef signed int int16_t __attribute__ ((__mode__ (__HI__)));
-typedef unsigned int uint16_t __attribute__ ((__mode__ (__HI__)));
-typedef signed int int32_t __attribute__ ((__mode__ (__SI__)));
-typedef unsigned int uint32_t __attribute__ ((__mode__ (__SI__)));
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/stdint.h" 1 3
+# 135 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/stdint.h" 3
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
 
-typedef signed int int64_t __attribute__((__mode__(__DI__)));
-typedef unsigned int uint64_t __attribute__((__mode__(__DI__)));
-# 146 "C:/avr-gcc/avr/include/stdint.h" 3 4
+
+
+typedef int int16_t;
+typedef unsigned int uint16_t;
+typedef long int int32_t;
+typedef long unsigned int uint32_t;
+typedef long long int int64_t;
+typedef long long unsigned int uint64_t;
+# 157 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/stdint.h" 3
+__extension__ typedef __int24 int24_t;
+__extension__ typedef __uint24 uint24_t;
+typedef int24_t int_least24_t;
+typedef uint24_t uint_least24_t;
+typedef int24_t int_fast24_t;
+typedef uint24_t uint_fast24_t;
+# 179 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/stdint.h" 3
 typedef int16_t intptr_t;
 
 
 
-
 typedef uint16_t uintptr_t;
-# 163 "C:/avr-gcc/avr/include/stdint.h" 3 4
-typedef int8_t int_least8_t;
 
+
+
+
+typedef int_least24_t intptr24_t;
+
+
+
+
+typedef uint_least24_t uintptr24_t;
+# 204 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/stdint.h" 3
+typedef int8_t int_least8_t;
 
 
 
@@ -49,24 +66,17 @@ typedef uint8_t uint_least8_t;
 
 
 
-
 typedef int16_t int_least16_t;
 
 
 
-
 typedef uint16_t uint_least16_t;
-
-
-
-
+# 232 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/stdint.h" 3
 typedef int32_t int_least32_t;
 
 
 
-
 typedef uint32_t uint_least32_t;
-
 
 
 
@@ -79,11 +89,9 @@ typedef int64_t int_least64_t;
 
 
 
-
 typedef uint64_t uint_least64_t;
-# 217 "C:/avr-gcc/avr/include/stdint.h" 3 4
+# 263 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/stdint.h" 3
 typedef int8_t int_fast8_t;
-
 
 
 
@@ -91,24 +99,17 @@ typedef uint8_t uint_fast8_t;
 
 
 
-
 typedef int16_t int_fast16_t;
 
 
 
-
 typedef uint16_t uint_fast16_t;
-
-
-
-
+# 291 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/stdint.h" 3
 typedef int32_t int_fast32_t;
 
 
 
-
 typedef uint32_t uint_fast32_t;
-
 
 
 
@@ -121,19 +122,19 @@ typedef int64_t int_fast64_t;
 
 
 
-
 typedef uint64_t uint_fast64_t;
-# 277 "C:/avr-gcc/avr/include/stdint.h" 3 4
+# 329 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/stdint.h" 3
 typedef int64_t intmax_t;
 
 
 
-
 typedef uint64_t uintmax_t;
-# 12 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdint.h" 2 3 4
+# 12 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/lib/gcc/avr/16.1.0/include/stdint.h" 2 3
 #pragma GCC diagnostic pop
-# 38 "C:/avr-gcc/avr/include/inttypes.h" 2 3
-# 77 "C:/avr-gcc/avr/include/inttypes.h" 3
+# 36 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/inttypes.h" 2 3
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/bits/attribs.h" 1 3
+# 37 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/inttypes.h" 2 3
+# 77 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/inttypes.h" 3
 typedef int32_t int_farptr_t;
 
 
@@ -141,13 +142,13 @@ typedef int32_t int_farptr_t;
 
 
 typedef uint32_t uint_farptr_t;
-# 127 "C:/avr-gcc/avr/include/avr/sfr_defs.h" 2 3
-# 100 "C:/avr-gcc/avr/include/avr/io.h" 2 3
-# 230 "C:/avr-gcc/avr/include/avr/io.h" 3
-# 1 "C:/avr-gcc/avr/include/avr/iom32.h" 1 3
-# 720 "C:/avr-gcc/avr/include/avr/iom32.h" 3
+# 125 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/sfr_defs.h" 2 3
+# 94 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 2 3
+# 233 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 3
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/iom32.h" 1 3
+# 718 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/iom32.h" 3
        
-# 721 "C:/avr-gcc/avr/include/avr/iom32.h" 3
+# 719 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/iom32.h" 3
 
        
        
@@ -172,35 +173,38 @@ typedef uint32_t uint_farptr_t;
        
        
        
-# 231 "C:/avr-gcc/avr/include/avr/io.h" 2 3
-# 785 "C:/avr-gcc/avr/include/avr/io.h" 3
-# 1 "C:/avr-gcc/avr/include/avr/portpins.h" 1 3
-# 786 "C:/avr-gcc/avr/include/avr/io.h" 2 3
+# 234 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 2 3
+# 723 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 3
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/portpins.h" 1 3
+# 724 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 2 3
 
-# 1 "C:/avr-gcc/avr/include/avr/common.h" 1 3
-# 788 "C:/avr-gcc/avr/include/avr/io.h" 2 3
-
-# 1 "C:/avr-gcc/avr/include/avr/version.h" 1 3
-# 790 "C:/avr-gcc/avr/include/avr/io.h" 2 3
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/common.h" 1 3
+# 726 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 2 3
 
 
 
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/version.h" 1 3
+# 730 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 2 3
 
 
 
-# 1 "C:/avr-gcc/avr/include/avr/fuse.h" 1 3
-# 248 "C:/avr-gcc/avr/include/avr/fuse.h" 3
+
+
+
+
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/fuse.h" 1 3
+# 257 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/fuse.h" 3
 typedef struct
 {
-    unsigned char low;
-    unsigned char high;
+    uint8_t low;
+    uint8_t high;
 } __fuse_t;
-# 797 "C:/avr-gcc/avr/include/avr/io.h" 2 3
+# 738 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 2 3
 
 
-# 1 "C:/avr-gcc/avr/include/avr/lock.h" 1 3
-# 800 "C:/avr-gcc/avr/include/avr/io.h" 2 3
-# 39 "C:/avr-gcc/avr/include/avr/interrupt.h" 2 3
+# 1 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/lock.h" 1 3
+# 741 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/io.h" 2 3
+# 37 "C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/avr/include/avr/interrupt.h" 2 3
 # 9 "MCAL/INTERRUPT/INTERRUPT.c" 2
 
 # 1 "LIB/STD_TYPES.h" 1
@@ -272,7 +276,7 @@ static void (* volatile callback[3])(void) = {((void *)0), ((void *)0), ((void *
 STD_ReturnType INTERRUPT_EnableGlobal(void){
     
 # 34 "MCAL/INTERRUPT/INTERRUPT.c" 3
-   __asm__ __volatile__ ("sei" ::: "memory")
+   __asm__ __volatile__ ("sei ; [[len=1]]" ::: "memory")
 # 34 "MCAL/INTERRUPT/INTERRUPT.c"
         ;
     return E_OK;
@@ -281,7 +285,7 @@ STD_ReturnType INTERRUPT_EnableGlobal(void){
 STD_ReturnType INTERRUPT_DisableGlobal(void){
     
 # 39 "MCAL/INTERRUPT/INTERRUPT.c" 3
-   __asm__ __volatile__ ("cli" ::: "memory")
+   __asm__ __volatile__ ("cli ; [[len=1]]" ::: "memory")
 # 39 "MCAL/INTERRUPT/INTERRUPT.c"
         ;
     return E_OK;

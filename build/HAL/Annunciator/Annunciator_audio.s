@@ -93,7 +93,7 @@ ANN_Audio_Tick:
 /* stack size = 0 */
 .L__stack_usage = 0
 	lds r24,Ann_Muted
-	cp r24, __zero_reg__
+	cpi r24,lo8(0)
 	breq .L10
 	lds r24,Ann_SilenceTicks
 	lds r25,Ann_SilenceTicks+1
@@ -111,23 +111,23 @@ ANN_Audio_Tick:
 	breq .+2
 	rjmp .L9
 	sts Ann_Muted,__zero_reg__
-.L33:
+.L37:
 	jmp ANN_ResetPattern
 .L10:
 	lds r24,Ann_CurrentPriority
 	cpse r24,__zero_reg__
-	rjmp .L14
+	rjmp .L13
 	call TIMER2_SetTone
 	ldi r24,lo8(3)
 	sts Ann_Phase,r24
 	ret
-.L14:
+.L13:
 	lds r24,Ann_CurrentPriority
 	cpi r24,lo8(3)
-	breq .L25
+	breq .L23
 	lds r24,Ann_CurrentPriority
 	cpi r24,lo8(2)
-	brne .L26
+	brne .L24
 	ldi r24,lo8(-36)
 	ldi r25,lo8(5)
 	ldi r18,lo8(3)
@@ -135,20 +135,20 @@ ANN_Audio_Tick:
 	ldi r21,0
 	ldi r22,lo8(20)
 	ldi r23,0
-.L15:
+.L14:
 	lds r30,Ann_CycleTicks
 	lds r31,Ann_CycleTicks+1
 	adiw r30,1
-	breq .L16
+	breq .L15
 	lds r30,Ann_CycleTicks
 	lds r31,Ann_CycleTicks+1
 	adiw r30,1
 	sts Ann_CycleTicks+1,r31
 	sts Ann_CycleTicks,r30
-.L16:
+.L15:
 	lds r19,Ann_Phase
 	cpse r19,__zero_reg__
-	rjmp .L17
+	rjmp .L16
 	lds r24,Ann_PhaseTicks
 	lds r25,Ann_PhaseTicks+1
 	adiw r24,1
@@ -161,12 +161,12 @@ ANN_Audio_Tick:
 	brsh .+2
 	rjmp .L9
 	ldi r24,lo8(1)
-.L35:
+.L39:
 	sts Ann_Phase,r24
 	sts Ann_PhaseTicks+1,__zero_reg__
 	sts Ann_PhaseTicks,__zero_reg__
-	rjmp .L24
-.L25:
+	rjmp .L22
+.L23:
 	ldi r24,lo8(-12)
 	ldi r25,lo8(1)
 	ldi r18,lo8(10)
@@ -174,8 +174,8 @@ ANN_Audio_Tick:
 	ldi r21,0
 	ldi r22,lo8(15)
 	ldi r23,0
-	rjmp .L15
-.L26:
+	rjmp .L14
+.L24:
 	ldi r24,0
 	ldi r25,0
 	ldi r18,lo8(2)
@@ -183,11 +183,11 @@ ANN_Audio_Tick:
 	ldi r21,0
 	ldi r22,lo8(25)
 	ldi r23,0
-	rjmp .L15
-.L17:
+	rjmp .L14
+.L16:
 	lds r19,Ann_Phase
 	cpi r19,lo8(1)
-	brne .L19
+	brne .L17
 	lds r24,Ann_PhaseTicks
 	lds r25,Ann_PhaseTicks+1
 	adiw r24,1
@@ -203,47 +203,47 @@ ANN_Audio_Tick:
 	sts Ann_PulseCount,r24
 	lds r24,Ann_PulseCount
 	cp r24,r18
-	brsh .L20
+	brsh .L18
 	sts Ann_Phase,__zero_reg__
 	sts Ann_PhaseTicks+1,__zero_reg__
 	sts Ann_PhaseTicks,__zero_reg__
 	lds r24,Ann_CurrentPriority
 	cpi r24,lo8(3)
-	brne .L21
+	brne .L19
 	ldi r24,lo8(1)
-.L34:
+.L38:
 	jmp TIMER2_SetTone
-.L21:
+.L19:
 	lds r24,Ann_CurrentPriority
 	cpi r24,lo8(2)
-	breq .L34
+	breq .L38
 	lds r24,Ann_CurrentPriority
 	cpi r24,lo8(1)
 	brne .L9
 	ldi r24,lo8(3)
-	rjmp .L34
-.L20:
+	rjmp .L38
+.L18:
 	lds r24,Ann_CurrentPriority
 	cpi r24,lo8(1)
-	brne .L23
+	brne .L21
 	ldi r24,lo8(3)
 	sts Ann_Phase,r24
-.L24:
+.L22:
 	ldi r24,0
-	rjmp .L34
-.L23:
+	rjmp .L38
+.L21:
 	ldi r24,lo8(2)
-	rjmp .L35
-.L19:
+	rjmp .L39
+.L17:
 	lds r18,Ann_Phase
 	cpi r18,lo8(2)
-	brne .L24
+	brne .L22
 	lds r18,Ann_CycleTicks
 	lds r19,Ann_CycleTicks+1
 	cp r18,r24
 	cpc r19,r25
 	brlo .+2
-	rjmp .L33
+	rjmp .L37
 .L9:
 /* epilogue start */
 	ret
@@ -313,5 +313,5 @@ Ann_Phase:
 	.size	Ann_CurrentPriority, 1
 Ann_CurrentPriority:
 	.zero	1
-	.ident	"GCC: (GNU) 15.2.0"
+	.ident	"GCC: (GNU) 16.1.0"
 .global __do_clear_bss
