@@ -67,8 +67,8 @@ Vitals_Read:
 .L5:
 	ldi r24,lo8(1)
 	movw r30,r16
-	std Z+9,r24
-	std Z+10,__zero_reg__
+	std Z+16,r24
+	std Z+17,__zero_reg__
 .L4:
 	ldd r22,Y+3
 	mov r23,r15
@@ -88,8 +88,8 @@ Vitals_Read:
 .L8:
 	ldi r24,lo8(1)
 	movw r30,r16
-	std Z+11,r24
-	std Z+12,__zero_reg__
+	std Z+18,r24
+	std Z+19,__zero_reg__
 .L7:
 	ldd r22,Y+3
 	mov r23,r15
@@ -109,8 +109,8 @@ Vitals_Read:
 .L11:
 	ldi r24,lo8(1)
 	movw r30,r16
-	std Z+13,r24
-	std Z+14,__zero_reg__
+	std Z+20,r24
+	std Z+21,__zero_reg__
 .L10:
 	ldd r22,Y+3
 	mov r23,r15
@@ -136,8 +136,8 @@ Vitals_Read:
 	ret
 .L6:
 	movw r30,r16
-	std Z+9,__zero_reg__
-	std Z+10,__zero_reg__
+	std Z+16,__zero_reg__
+	std Z+17,__zero_reg__
 	ldi r26,lo8(30)
 	ldi r27,0
 	call __umulhisi3
@@ -148,12 +148,12 @@ Vitals_Read:
 	call __udivmodsi4
 	subi r18,lo8(-(70))
 	movw r30,r16
-	std Z+1,r18
+	std Z+4,r18
 	rjmp .L4
 .L9:
 	movw r30,r16
-	std Z+11,__zero_reg__
-	std Z+12,__zero_reg__
+	std Z+18,__zero_reg__
+	std Z+19,__zero_reg__
 	ldi r26,lo8(-106)
 	ldi r27,0
 	call __umulhisi3
@@ -165,13 +165,13 @@ Vitals_Read:
 	subi r18,-44
 	sbci r19,-2
 	movw r30,r16
-	std Z+2,r18
-	std Z+3,r19
+	std Z+5,r18
+	std Z+6,r19
 	rjmp .L7
 .L12:
 	movw r30,r16
-	std Z+13,__zero_reg__
-	std Z+14,__zero_reg__
+	std Z+20,__zero_reg__
+	std Z+21,__zero_reg__
 	ldi r26,lo8(-56)
 	ldi r27,0
 	call __umulhisi3
@@ -180,18 +180,17 @@ Vitals_Read:
 	ldi r20,0
 	ldi r21,0
 	call __udivmodsi4
-	movw r24,r18
-	adiw r24,50
+	subi r18,lo8(-(50))
 	movw r30,r16
-	std Z+4,r24
-	std Z+5,r25
+	std Z+7,r18
+	mov r24,r18
+	ldi r25,0
 	lsl r24
 	rol r25
 	ldi r22,lo8(3)
 	ldi r23,0
-	call __udivmodhi4
-	std Z+6,r22
-	std Z+7,r23
+	call __divmodhi4
+	std Z+8,r22
 	rjmp .L10
 .L13:
 	ldd r18,Y+1
@@ -206,13 +205,13 @@ Vitals_Read:
 .L14:
 	ldi r24,lo8(1)
 	movw r30,r16
-	std Z+15,r24
-	std Z+16,__zero_reg__
+	std Z+22,r24
+	std Z+23,__zero_reg__
 	rjmp .L16
 .L15:
 	movw r30,r16
-	std Z+15,__zero_reg__
-	std Z+16,__zero_reg__
+	std Z+22,__zero_reg__
+	std Z+23,__zero_reg__
 	ldi r26,lo8(60)
 	ldi r27,0
 	call __umulhisi3
@@ -222,7 +221,7 @@ Vitals_Read:
 	ldi r21,0
 	call __udivmodsi4
 	movw r30,r16
-	std Z+8,r18
+	std Z+9,r18
 	rjmp .L16
 	.size	Vitals_Read, .-Vitals_Read
 	.ident	"GCC: (GNU) 15.2.0"
