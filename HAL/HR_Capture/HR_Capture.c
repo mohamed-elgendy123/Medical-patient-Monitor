@@ -41,6 +41,9 @@ void HRC_Init(void)
 
 void HRC_Process(void)
 {
+    u8 Local_u8CaptureCount;
+    u8 Local_u8WriteIndex;
+    u8 Local_u8ReadIndex;
     u8 Local_u8Index;
 
     if ((TIMER1_IsAsystole() != 0U) || (HRC_Asystole != 0U))
@@ -53,9 +56,14 @@ void HRC_Process(void)
 
     if (TIMER1_IsCaptureReady() != 0U)
     {
-        for (Local_u8Index = 0U; Local_u8Index < HRV_WINDOW; Local_u8Index++)
+        Local_u8CaptureCount = TIMER1_GetCaptureCount();
+        Local_u8WriteIndex = TIMER1_GetCaptureWriteIndex();
+        for (Local_u8Index = 0U; Local_u8Index < Local_u8CaptureCount; Local_u8Index++)
         {
-            HRC_OnCapture(TIMER1_GetInterval(Local_u8Index));
+            Local_u8ReadIndex = (u8)((Local_u8WriteIndex + HRV_WINDOW -
+                                      Local_u8CaptureCount + Local_u8Index) %
+                                     HRV_WINDOW);
+            HRC_OnCapture(TIMER1_GetInterval(Local_u8ReadIndex));
         }
         TIMER1_ClearCaptureFlag();
     }
@@ -139,7 +147,8 @@ static u16 HRC_CalculateMedian(void)
         {
             Local_u8HasEmpty = 1U;
         }
-        else
+        else if (Local_u8Index == ((HRC_MedianIndex + MEDIAN_WINDOW_SIZE - 1U) %
+                                   MEDIAN_WINDOW_SIZE))
         {
             Local_u16LatestInterval = Local_u16Arr[Local_u8Index];
         }
@@ -195,6 +204,11 @@ static u16 HRC_CalculateHrvMs(void)
 
     for (Local_u8Index = 1U; Local_u8Index < HRV_WINDOW; Local_u8Index++)
     {
+        if ((HRC_Intervals[Local_u8Index] == 0U) ||
+            (HRC_Intervals[Local_u8Index - 1U] == 0U))
+        {
+            return 0U;
+        }
         Local_u32DiffSum += ABS_DIFF(HRC_Intervals[Local_u8Index],
                                      HRC_Intervals[Local_u8Index - 1U]);
     }

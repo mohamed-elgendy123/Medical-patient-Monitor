@@ -3,6 +3,16 @@
 
 #include "STD_TYPES.h"
 
+#ifndef u8
+#define u8 uint8
+#endif
+#ifndef u16
+#define u16 uint16
+#endif
+#ifndef u32
+#define u32 uint32
+#endif
+
 typedef void (*TIMER_CallbackType)(void);
 
 #define TIMER2_TONE_MUTE 0U
@@ -12,14 +22,16 @@ typedef void (*TIMER_CallbackType)(void);
 
 void TIMER0_Init(void);
 void TIMER0_SetCallback(TIMER_CallbackType Copy_pvCallback);
-uint8 TIMER0_IsTickPending(void);
+u8 TIMER0_IsTickPending(void);
 void TIMER0_ClearTick(void);
 
 void TIMER1_Init(void);
-uint8 TIMER1_IsCaptureReady(void);
+u8 TIMER1_IsCaptureReady(void);
 void TIMER1_ClearCaptureFlag(void);
-uint16 TIMER1_GetInterval(uint8 Copy_u8Index);
-uint8 TIMER1_IsAsystole(void);
+u16 TIMER1_GetInterval(u8 Copy_u8Index);
+u8 TIMER1_GetCaptureCount(void);
+u8 TIMER1_GetCaptureWriteIndex(void);
+u8 TIMER1_IsAsystole(void);
 void TIMER1_ClearAsystole(void);
 
 void TIMER2_Init(void);
