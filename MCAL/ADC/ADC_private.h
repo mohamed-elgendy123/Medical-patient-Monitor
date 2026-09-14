@@ -28,9 +28,28 @@
 
 /* TODO: map ADMUX, ADCSRA, ADCL, ADCH and the bit names. */
 
-#define ADC_ADMUX   (*(volatile uint8 *)0x27)
-#define ADC_ADCSRA  (*(volatile uint8 *)0x26)
-#define ADC_ADCH    (*(volatile uint8 *)0x25)
-#define ADC_ADCL    (*(volatile uint8 *)0x24)
+
+
+/* Registers */
+#define ADC_ADMUX    (*((volatile uint8*)0x27))
+#define ADC_ADCSRA   (*((volatile uint8*)0x26))
+#define ADC_ADCH     (*((volatile uint8*)0x25))
+#define ADC_ADCL     (*((volatile uint8*)0x24))
+#define ADC_DATA     (*((volatile uint16*)0x24))
+
+/* ADMUX Bits */
+#define REFS1        7
+#define REFS0        6
+#define ADLAR        5
+
+/* ADCSRA Bits */
+#define ADEN         7
+#define ADSC         6
+#define ADATE        5
+#define ADIF         4
+#define ADIE         3
+#define ADPS2        2
+#define ADPS1        1
+#define ADPS0        0
 
 #endif /* ADC_PRIVATE_H */

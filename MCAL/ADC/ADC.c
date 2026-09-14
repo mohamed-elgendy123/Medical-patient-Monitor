@@ -44,7 +44,8 @@ STD_ReturnType ADC_ReadChannel(uint8 Copy_u8Channel, uint16 *Copy_pu16Reading){
         return E_NOK;
     }
     // Select channel, keep reference bits
-    ADC_ADMUX |=  (Copy_u8Channel & 0x1F);    // XXX0 0000 | (XXXX XXXX & 0001 1111) = 000X XXXX                   
+    //ADC_ADMUX |=  (Copy_u8Channel & 0x1F);    // XXX0 0000 | (XXXX XXXX & 0001 1111) = 000X XXXX     
+      ADC_ADMUX = (ADC_ADMUX & 0xE0) | (Copy_u8Channel & 0x07);            
                                               // 000X XXXX 
     // Start conversion
     ADC_ADCSRA |= (1 << 6);                   // 0000 0001 << 6 = 0100 0000
@@ -62,14 +63,75 @@ STD_ReturnType ADC_ReadChannel(uint8 Copy_u8Channel, uint16 *Copy_pu16Reading){
  * 2. Set ADSC and return. Used when the result will be read later or in an ISR.
  */
 
+STD_ReturnType ADC_StartConversion(uint8 Copy_u8Channel)
+{
+    /* Reject invalid channel */
+    if (Copy_u8Channel > 7)
+    {
+        return E_NOK;
+    }
+
+    /* 1. Select channel safely */
+    ADC_ADMUX = (ADC_ADMUX & 0xE0) | (Copy_u8Channel & 0x07);
+
+    /* 2. Start conversion (Set ADSC) */
+    ADC_ADCSRA |= (1 << 6);
+
+    return E_OK;
+}
+
 /*
  * ADC_GetResult
  * 1. If ADIF is 0, return E_NOK (still busy).
  * 2. Clear ADIF, read ADCL then ADCH, store the 10-bit value.
  */
 
+STD_ReturnType ADC_GetResult(uint16 *Copy_pu16Reading)
+{
+    if (Copy_pu16Reading == NULL)
+    {
+        return E_NOK;
+    }
+
+    /* Check if ADIF flag is set (Conversion Complete) */
+    if (ADC_ADCSRA & (1 << 4))
+    {
+        /* Clear ADIF flag by writing 1 to it */
+        ADC_ADCSRA |= (1 << 4);
+
+        /* Read 10-bit result */
+        *Copy_pu16Reading = ADC_ADCL | ((uint16)ADC_ADCH << 8);
+
+        return E_OK;
+    }
+
+    /* Return E_NOK if conversion is still running */
+    return E_NOK;
+}
+
 /*
  * ADC_SetInterrupt
  * 1. Copy_u8State == 1 -> set ADIE.  == 0 -> clear ADIE.
  * 2. The ISR vector is ADC_vect. Do not write the ISR in this file unless asked.
  */
+
+
+STD_ReturnType ADC_SetInterrupt(uint8 Copy_u8State)
+{
+    if (Copy_u8State == 1)
+    {
+        /* Enable ADC Interrupt (Set ADIE) */
+        ADC_ADCSRA |= (1 << 3);
+    }
+    else if (Copy_u8State == 0)
+    {
+        /* Disable ADC Interrupt (Clear ADIE) */
+        ADC_ADCSRA &= ~(1 << 3);
+    }
+    else
+    {
+        return E_NOK; // Invalid state
+    }
+
+    return E_OK;
+}

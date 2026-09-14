@@ -1,6 +1,6 @@
-# 1 "MCAL/ADC/ADC.c"
-# 1 "<built-in>"
-# 1 "<command-line>"
+# 0 "MCAL/ADC/ADC.c"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "MCAL/ADC/ADC.c"
 # 9 "MCAL/ADC/ADC.c"
 # 1 "LIB/STD_TYPES.h" 1
@@ -58,10 +58,10 @@ STD_ReturnType ADC_Init(uint8 Copy_u8Ref, uint8 Copy_u8Prescaler){
         return E_NOK;
     }
 
-    (*(volatile uint8 *)0x27) = (Copy_u8Ref << 6) | (0u << 5);
+    (*((volatile uint8*)0x27)) = (Copy_u8Ref << 6) | (0u << 5);
 
 
-    (*(volatile uint8 *)0x26) = (Copy_u8Prescaler & 0x07) | (1 << 7);
+    (*((volatile uint8*)0x26)) = (Copy_u8Prescaler & 0x07) | (1 << 7);
 
 
     return E_OK;
@@ -72,15 +72,87 @@ STD_ReturnType ADC_ReadChannel(uint8 Copy_u8Channel, uint16 *Copy_pu16Reading){
         return E_NOK;
     }
 
-    (*(volatile uint8 *)0x27) |= (Copy_u8Channel & 0x1F);
+
+      (*((volatile uint8*)0x27)) = ((*((volatile uint8*)0x27)) & 0xE0) | (Copy_u8Channel & 0x07);
 
 
-    (*(volatile uint8 *)0x26) |= (1 << 6);
+    (*((volatile uint8*)0x26)) |= (1 << 6);
 
-    while(((*(volatile uint8 *)0x26) & (1 << 4)) == 0);
+    while(((*((volatile uint8*)0x26)) & (1 << 4)) == 0);
 
-    (*(volatile uint8 *)0x26) |= (1 << 4);
+    (*((volatile uint8*)0x26)) |= (1 << 4);
 
-    *Copy_pu16Reading = (*(volatile uint8 *)0x24) | ((uint16)(*(volatile uint8 *)0x25) << 8);
+    *Copy_pu16Reading = (*((volatile uint8*)0x24)) | ((uint16)(*((volatile uint8*)0x25)) << 8);
+    return E_OK;
+}
+
+
+
+
+
+
+STD_ReturnType ADC_StartConversion(uint8 Copy_u8Channel)
+{
+
+    if (Copy_u8Channel > 7)
+    {
+        return E_NOK;
+    }
+
+
+    (*((volatile uint8*)0x27)) = ((*((volatile uint8*)0x27)) & 0xE0) | (Copy_u8Channel & 0x07);
+
+
+    (*((volatile uint8*)0x26)) |= (1 << 6);
+
+    return E_OK;
+}
+
+
+
+
+
+
+
+STD_ReturnType ADC_GetResult(uint16 *Copy_pu16Reading)
+{
+    if (Copy_pu16Reading == ((void *)0))
+    {
+        return E_NOK;
+    }
+
+
+    if ((*((volatile uint8*)0x26)) & (1 << 4))
+    {
+
+        (*((volatile uint8*)0x26)) |= (1 << 4);
+
+
+        *Copy_pu16Reading = (*((volatile uint8*)0x24)) | ((uint16)(*((volatile uint8*)0x25)) << 8);
+
+        return E_OK;
+    }
+
+
+    return E_NOK;
+}
+# 119 "MCAL/ADC/ADC.c"
+STD_ReturnType ADC_SetInterrupt(uint8 Copy_u8State)
+{
+    if (Copy_u8State == 1)
+    {
+
+        (*((volatile uint8*)0x26)) |= (1 << 3);
+    }
+    else if (Copy_u8State == 0)
+    {
+
+        (*((volatile uint8*)0x26)) &= ~(1 << 3);
+    }
+    else
+    {
+        return E_NOK;
+    }
+
     return E_OK;
 }
