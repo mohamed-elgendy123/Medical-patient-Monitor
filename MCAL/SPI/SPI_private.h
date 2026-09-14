@@ -1,12 +1,8 @@
 #ifndef SPI_PRIVATE_H
 #define SPI_PRIVATE_H
 
-/*
- * Author: Ahmed Ellamie / Salma Eldeab
- * MCAL SPI Private Registers and Bits (ATmega32)
- */
 
-#include "STD_TYPES.h"
+#include "../../LIB/STD_TYPES.h"
 
 /* ---------------- 1. Hardware Registers ---------------- */
 #define SPI_SPCR_REG    (*((volatile uint8*)0x2D))
@@ -28,5 +24,11 @@
 #define SPI_SPSR_SPI2X  0u
 #define SPI_SPSR_WCOL   6u
 #define SPI_SPSR_SPIF   7u
+
+/* ---------------- 3. Prescaler Definitions ---------------- */
+#define SPI_PRESC_4     0u
+#define SPI_PRESC_16    1u
+#define SPI_PRESC_64    2u
+#define SPI_PRESC_128   3u
 
 #endif /* SPI_PRIVATE_H */

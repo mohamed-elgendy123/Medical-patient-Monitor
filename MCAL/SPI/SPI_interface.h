@@ -11,7 +11,7 @@
  * Master pins: SS=PB4, MOSI=PB5, MISO=PB6, SCK=PB7.
  */
 
-#include "STD_TYPES.h"
+#include "../../LIB/STD_TYPES.h"
 
 /* ---------------- Clock rate (SPCR SPR1:0, SPSR SPI2X = 0) ---------------- */
 #define SPI_PRESC_4           0u
@@ -33,6 +33,11 @@ STD_ReturnType SPI_InitMaster(uint8 Copy_u8Prescaler);
  * Description : Enable SPI as slave. MISO is an output; MOSI, SCK, SS are inputs.
  */
 STD_ReturnType SPI_InitSlave(void);
+
+/*
+ * Description : Write Copy_u8Data to SPDR, wait for SPIF, then return received byte directly.
+ */
+uint8 SPI_TransceiveByte(uint8 Copy_u8Data);
 
 /*
  * Description : Write Copy_u8Sent to SPDR, wait for SPIF, then store SPDR
