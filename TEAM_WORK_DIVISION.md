@@ -40,7 +40,7 @@
 
 ---
 
-### Student 1: The `TIMER` Lead (Timing, Beat Math & Audio Tones)
+### Student 1:(mohamed elgendy) The `TIMER` Lead (Timing, Beat Math & Audio Tones)
 
 #### 1. MCAL Driver Owned: `MCAL/TIMER/`
 * **Timer0 (System Heartbeat):**
@@ -75,7 +75,7 @@
 
 ---
 
-### Student 2: The `SPI` Lead (Visual Annunciation, Status Bar & Alarm Engine)
+### Student 2:(salma Ahmed) The `SPI` Lead (Visual Annunciation, Status Bar & Alarm Engine)
 
 #### 1. MCAL Driver Owned: `MCAL/SPI/`
 * **Master SPI Driver:**
@@ -111,7 +111,7 @@
 
 ---
 
-### Student 3: The `I2C` Lead (Bedside LCD, Control Panel & Settings Menu)
+### Student 3:(Ahmed Ali) The `I2C` Lead (Bedside LCD, Control Panel & Settings Menu)
 
 #### 1. MCAL Driver Owned: `MCAL/I2C/`
 * **Master TWI Driver (`PC0` SCL, `PC1` SDA):**
@@ -144,7 +144,7 @@
 
 ---
 
-### Student 4: The `USART` Lead (Telemetry, Data Logging & Analog Vitals)
+### Student 4:(Ahmed Elshakry) The `USART` Lead (Telemetry, Data Logging & Analog Vitals)
 
 #### 1. MCAL Driver Owned: `MCAL/UART/` (+ `MCAL/ADC/`)
 * **USART Serial Driver (`PD0` RXD, `PD1` TXD):**
