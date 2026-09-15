@@ -16,7 +16,7 @@ UART_init:
 	out 0x20,__zero_reg__
 	ldi r24,lo8(103)
 	out 0x9,r24
-	ldi r24,lo8(8)
+	ldi r24,lo8(24)
 	out 0xa,r24
 	ldi r24,lo8(-122)
 	out 0x20,r24
@@ -145,61 +145,79 @@ ADC_read:
 	.string	": "
 .LC3:
 	.string	"\r\n"
+.LC4:
+	.string	"\r\n--- Sending Trends CSV Data ---\r\n"
+.LC5:
+	.string	"--- End of Trends ---\r\n\r\n"
 	.section	.text.startup.main,"ax",@progbits
 .global	main
 	.type	main, @function
 main:
-	rcall .
-	rcall .
 	in r28,__SP_L__
 	in r29,__SP_H__
+	sbiw r28,54
+	in __tmp_reg__,__SREG__
+	cli
+	out __SP_H__,r29
+	out __SREG__,__tmp_reg__
+	out __SP_L__,r28
 /* prologue: function */
-/* frame size = 4 */
-/* stack size = 4 */
-.L__stack_usage = 4
+/* frame size = 54 */
+/* stack size = 54 */
+.L__stack_usage = 54
 	call UART_init
 	call ADC_init
+	call Trends_Init
 	sbi 0x17,0
-	ldi r17,lo8(1)
-.L16:
+	mov r15,__zero_reg__
+	movw r24,r28
+	adiw r24,1
+	std Y+51,r24
+	std Y+52,r25
+.L15:
 	in r24,0x18
-	eor r24,r17
+	ldi r18,lo8(1)
+	eor r24,r18
 	out 0x18,r24
 	ldi r24,lo8(.LC0)
 	ldi r25,hi8(.LC0)
 	call UART_sendString
-	std Y+3,__zero_reg__
-	std Y+4,__zero_reg__
-.L15:
-	ldd r24,Y+3
+	ldi r16,0
+	ldi r17,0
+.L16:
+	mov r24,r16
 	call ADC_read
-	std Y+1,r24
-	std Y+2,r25
+	std Y+53,r24
+	std Y+54,r25
 	ldi r24,lo8(.LC1)
 	ldi r25,hi8(.LC1)
 	call UART_sendString
-	ldd r24,Y+3
-	ldd r25,Y+4
+	movw r24,r16
 	call UART_sendNumber
 	ldi r24,lo8(.LC2)
 	ldi r25,hi8(.LC2)
 	call UART_sendString
-	ldd r24,Y+1
-	ldd r25,Y+2
+	ldd r24,Y+53
+	ldd r25,Y+54
 	call UART_sendNumber
 	ldi r24,lo8(.LC3)
 	ldi r25,hi8(.LC3)
 	call UART_sendString
-	ldd r24,Y+3
-	ldd r25,Y+4
-	adiw r24,1
-	std Y+3,r24
-	std Y+4,r25
-	sbiw r24,4
-	brne .L15
+	subi r16,-1
+	sbci r17,-1
+	cpi r16,4
+	cpc r17,__zero_reg__
+	brne .L16
 	ldi r24,lo8(.LC3)
 	ldi r25,hi8(.LC3)
 	call UART_sendString
+	inc r15
+	ldi r24,lo8(20)
+	cpse r15,r24
+	rjmp .L17
+	call Task_Trend
+	mov r15,__zero_reg__
+.L17:
 	ldi r25,lo8(1599999)
 	ldi r18,hi8(1599999)
 	ldi r24,hlo8(1599999)
@@ -209,7 +227,36 @@ main:
 	brne 1b
 	rjmp .
 	nop
-	rjmp .L16
+	sbis 0xb,7
+	rjmp .L15
+	in r24,0xc
+	andi r24,lo8(-33)
+	cpi r24,lo8(84)
+	breq .+2
+	rjmp .L15
+	ldi r24,lo8(.LC4)
+	ldi r25,hi8(.LC4)
+	call UART_sendString
+	call Trends_GetCount
+	mov r17,r24
+	ldi r16,0
+.L19:
+	cpse r16,r17
+	rjmp .L20
+	ldi r24,lo8(.LC5)
+	ldi r25,hi8(.LC5)
+	call UART_sendString
+	rjmp .L15
+.L20:
+	ldd r22,Y+51
+	ldd r23,Y+52
+	mov r24,r16
+	call Trends_GetSampleLine
+	ldd r24,Y+51
+	ldd r25,Y+52
+	call UART_sendString
+	subi r16,lo8(-(1))
+	rjmp .L19
 	.size	main, .-main
 	.ident	"GCC: (GNU) 15.2.0"
 .global __do_copy_data

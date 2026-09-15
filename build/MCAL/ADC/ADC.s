@@ -16,16 +16,12 @@ ADC_Init:
 	cpi r24,lo8(2)
 	brlo .L2
 	cpi r24,lo8(3)
-	breq .L2
-.L4:
-	ldi r24,lo8(1)
-	ldi r25,0
-	ret
+	brne .L5
 .L2:
-	mov r25,r22
-	subi r25,lo8(-(-1))
+	ldi r25,lo8(-1)
+	add r25,r22
 	cpi r25,lo8(7)
-	brsh .L4
+	brsh .L5
 	swap r24
 	lsl r24
 	lsl r24
@@ -34,6 +30,10 @@ ADC_Init:
 	ori r22,lo8(-128)
 	out 0x6,r22
 	ldi r24,0
+	ldi r25,0
+	ret
+.L5:
+	ldi r24,lo8(1)
 	ldi r25,0
 /* epilogue start */
 	ret
@@ -47,23 +47,18 @@ ADC_ReadChannel:
 /* stack size = 0 */
 .L__stack_usage = 0
 	cpi r24,lo8(8)
-	brlo .L9
-.L11:
-	ldi r24,lo8(1)
-	ldi r25,0
-	ret
-.L9:
-	cpi r22,0
-	cpc r23,r22
-	breq .L11
+	brsh .L10
+	cp r22,__zero_reg__
+	cpc r23,__zero_reg__
+	breq .L10
 	in r25,0x7
 	andi r25,lo8(-32)
 	or r25,r24
 	out 0x7,r25
 	sbi 0x6,6
-.L12:
+.L8:
 	sbis 0x6,4
-	rjmp .L12
+	rjmp .L8
 	sbi 0x6,4
 	in r24,0x4
 	in r18,0x5
@@ -71,6 +66,10 @@ ADC_ReadChannel:
 	st Z,r24
 	std Z+1,r18
 	ldi r24,0
+	ldi r25,0
+	ret
+.L10:
+	ldi r24,lo8(1)
 	ldi r25,0
 /* epilogue start */
 	ret
@@ -84,7 +83,7 @@ ADC_StartConversion:
 /* stack size = 0 */
 .L__stack_usage = 0
 	cpi r24,lo8(8)
-	brsh .L21
+	brsh .L15
 	in r25,0x7
 	andi r25,lo8(-32)
 	or r25,r24
@@ -93,7 +92,7 @@ ADC_StartConversion:
 	ldi r24,0
 	ldi r25,0
 	ret
-.L21:
+.L15:
 	ldi r24,lo8(1)
 	ldi r25,0
 /* epilogue start */
@@ -108,14 +107,9 @@ ADC_GetResult:
 /* stack size = 0 */
 .L__stack_usage = 0
 	sbiw r24,0
-	brne .L23
-.L25:
-	ldi r24,lo8(1)
-	ldi r25,0
-	ret
-.L23:
+	breq .L19
 	sbis 0x6,4
-	rjmp .L25
+	rjmp .L19
 	sbi 0x6,4
 	in r18,0x4
 	in r20,0x5
@@ -123,6 +117,10 @@ ADC_GetResult:
 	st Z,r18
 	std Z+1,r20
 	ldi r24,0
+	ldi r25,0
+	ret
+.L19:
+	ldi r24,lo8(1)
 	ldi r25,0
 /* epilogue start */
 	ret
@@ -136,20 +134,20 @@ ADC_SetInterrupt:
 /* stack size = 0 */
 .L__stack_usage = 0
 	cpi r24,lo8(1)
-	brne .L30
+	brne .L21
 	sbi 0x6,3
-.L31:
+.L23:
 	ldi r24,0
 	ldi r25,0
 	ret
-.L30:
-	brsh .L33
+.L21:
+	brsh .L24
 	cbi 0x6,3
-	rjmp .L31
-.L33:
+	rjmp .L23
+.L24:
 	ldi r24,lo8(1)
 	ldi r25,0
 /* epilogue start */
 	ret
 	.size	ADC_SetInterrupt, .-ADC_SetInterrupt
-	.ident	"GCC: (GNU) 16.1.0"
+	.ident	"GCC: (GNU) 15.2.0"

@@ -2,7 +2,7 @@
 # 0 "<built-in>"
 # 0 "<command-line>"
 # 1 "main.c"
-# 208 "main.c"
+# 210 "main.c"
 # 1 "C:/avr-gcc/avr/include/avr/io.h" 1 3
 # 99 "C:/avr-gcc/avr/include/avr/io.h" 3
 # 1 "C:/avr-gcc/avr/include/avr/sfr_defs.h" 1 3
@@ -192,7 +192,7 @@ typedef struct
 
 # 1 "C:/avr-gcc/avr/include/avr/lock.h" 1 3
 # 800 "C:/avr-gcc/avr/include/avr/io.h" 2 3
-# 209 "main.c" 2
+# 211 "main.c" 2
 # 1 "C:/avr-gcc/avr/include/util/delay.h" 1 3
 # 50 "C:/avr-gcc/avr/include/util/delay.h" 3
 # 1 "C:/avr-gcc/avr/include/util/delay_basic.h" 1 3
@@ -269,7 +269,7 @@ _delay_us(double __us)
  __builtin_avr_delay_cycles(__ticks_dc);
 # 281 "C:/avr-gcc/avr/include/util/delay.h" 3
 }
-# 210 "main.c" 2
+# 212 "main.c" 2
 # 1 "C:/avr-gcc/avr/include/stdlib.h" 1 3
 # 48 "C:/avr-gcc/avr/include/stdlib.h" 3
 # 1 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stddef.h" 1 3 4
@@ -552,65 +552,86 @@ extern char *ldtostrf(long double __val, signed char __width,
 # 778 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern int system (const char *);
 extern char *getenv (const char *);
-# 211 "main.c" 2
+# 213 "main.c" 2
+# 1 "Logic/trends/trends.h" 1
 
 
 
-# 213 "main.c"
+
+
+
+
+
+# 8 "Logic/trends/trends.h"
+typedef struct {
+    uint16_t channels[4];
+} TrendSample_t;
+
+void Trends_Init(void);
+void Task_Trend(void);
+uint8_t Trends_GetCount(void);
+void Trends_GetSampleLine(uint8_t index, char *dest);
+# 214 "main.c" 2
+
+
 void UART_init(void) {
     uint16_t ubrr_value = 103;
     
-# 215 "main.c" 3
+# 218 "main.c" 3
    (*(volatile uint8_t *)((0x20) + 0x20)) 
-# 215 "main.c"
+# 218 "main.c"
          = (uint8_t)(ubrr_value >> 8);
     
-# 216 "main.c" 3
+# 219 "main.c" 3
    (*(volatile uint8_t *)((0x09) + 0x20)) 
-# 216 "main.c"
-         = (uint8_t)ubrr_value;
+# 219 "main.c"
+         = (uint8_t)(ubrr_value);
     
-# 217 "main.c" 3
+# 220 "main.c" 3
    (*(volatile uint8_t *)((0x0A) + 0x20)) 
-# 217 "main.c"
+# 220 "main.c"
          = (1 << 
-# 217 "main.c" 3
+# 220 "main.c" 3
                  3
-# 217 "main.c"
-                     );
+# 220 "main.c"
+                     ) | (1 << 
+# 220 "main.c" 3
+                               4
+# 220 "main.c"
+                                   );
     
-# 218 "main.c" 3
+# 221 "main.c" 3
    (*(volatile uint8_t *)((0x20) + 0x20)) 
-# 218 "main.c"
+# 221 "main.c"
          = (1 << 
-# 218 "main.c" 3
+# 221 "main.c" 3
                  7
-# 218 "main.c"
+# 221 "main.c"
                       ) | (1 << 
-# 218 "main.c" 3
+# 221 "main.c" 3
                                 2
-# 218 "main.c"
+# 221 "main.c"
                                      ) | (1 << 
-# 218 "main.c" 3
+# 221 "main.c" 3
                                                1
-# 218 "main.c"
+# 221 "main.c"
                                                     );
 }
 
 void UART_sendChar(char data) {
     while (!(
-# 222 "main.c" 3
+# 225 "main.c" 3
             (*(volatile uint8_t *)((0x0B) + 0x20)) 
-# 222 "main.c"
+# 225 "main.c"
                   & (1 << 
-# 222 "main.c" 3
+# 225 "main.c" 3
                           5
-# 222 "main.c"
+# 225 "main.c"
                               )));
     
-# 223 "main.c" 3
+# 226 "main.c" 3
    (*(volatile uint8_t *)((0x0C) + 0x20)) 
-# 223 "main.c"
+# 226 "main.c"
        = data;
 }
 
@@ -629,95 +650,98 @@ void UART_sendNumber(uint16_t num) {
 
 void ADC_init(void) {
     
-# 240 "main.c" 3
+# 243 "main.c" 3
    (*(volatile uint8_t *)((0x07) + 0x20)) 
-# 240 "main.c"
+# 243 "main.c"
          = (1 << 
-# 240 "main.c" 3
+# 243 "main.c" 3
                  6
-# 240 "main.c"
+# 243 "main.c"
                       );
     
-# 241 "main.c" 3
+# 244 "main.c" 3
    (*(volatile uint8_t *)((0x06) + 0x20)) 
-# 241 "main.c"
+# 244 "main.c"
           = (1 << 
-# 241 "main.c" 3
+# 244 "main.c" 3
                   7
-# 241 "main.c"
+# 244 "main.c"
                       ) | (1 << 
-# 241 "main.c" 3
+# 244 "main.c" 3
                                 2
-# 241 "main.c"
+# 244 "main.c"
                                      ) | (1 << 
-# 241 "main.c" 3
+# 244 "main.c" 3
                                                1
-# 241 "main.c"
+# 244 "main.c"
                                                     ) | (1 << 
-# 241 "main.c" 3
+# 244 "main.c" 3
                                                               0
-# 241 "main.c"
+# 244 "main.c"
                                                                    );
 }
 
 uint16_t ADC_read(uint8_t channel) {
     
-# 245 "main.c" 3
+# 248 "main.c" 3
    (*(volatile uint8_t *)((0x07) + 0x20)) 
-# 245 "main.c"
+# 248 "main.c"
          = (
-# 245 "main.c" 3
+# 248 "main.c" 3
             (*(volatile uint8_t *)((0x07) + 0x20)) 
-# 245 "main.c"
+# 248 "main.c"
                   & 0xF0) | (channel & 0x07);
     
-# 246 "main.c" 3
+# 249 "main.c" 3
    (*(volatile uint8_t *)((0x06) + 0x20)) 
-# 246 "main.c"
+# 249 "main.c"
           |= (1 << 
-# 246 "main.c" 3
+# 249 "main.c" 3
                    6
-# 246 "main.c"
+# 249 "main.c"
                        );
     while (
-# 247 "main.c" 3
+# 250 "main.c" 3
           (*(volatile uint8_t *)((0x06) + 0x20)) 
-# 247 "main.c"
+# 250 "main.c"
                  & (1 << 
-# 247 "main.c" 3
+# 250 "main.c" 3
                          6
-# 247 "main.c"
+# 250 "main.c"
                              ));
     return 
-# 248 "main.c" 3
+# 251 "main.c" 3
           (*(volatile uint16_t *)((0x04) + 0x20))
-# 248 "main.c"
+# 251 "main.c"
              ;
 }
 
 int main(void) {
     UART_init();
     ADC_init();
+    Trends_Init();
 
     
-# 255 "main.c" 3
+# 259 "main.c" 3
    (*(volatile uint8_t *)((0x17) + 0x20)) 
-# 255 "main.c"
+# 259 "main.c"
         |= (1 << 
-# 255 "main.c" 3
+# 259 "main.c" 3
                  0
-# 255 "main.c"
+# 259 "main.c"
                     );
+
+    uint8_t trend_timer = 0;
 
     while (1) {
         
-# 258 "main.c" 3
+# 264 "main.c" 3
        (*(volatile uint8_t *)((0x18) + 0x20)) 
-# 258 "main.c"
+# 264 "main.c"
              ^= (1 << 
-# 258 "main.c" 3
+# 264 "main.c" 3
                       0
-# 258 "main.c"
+# 264 "main.c"
                          );
 
         UART_sendString("--- Patient Vitals ---\r\n");
@@ -732,7 +756,48 @@ int main(void) {
         }
 
         UART_sendString("\r\n");
+
+
+        trend_timer++;
+        if (trend_timer >= 20) {
+            trend_timer = 0;
+            Task_Trend();
+        }
+
         _delay_ms(500);
+
+
+        if (
+# 289 "main.c" 3
+           (*(volatile uint8_t *)((0x0B) + 0x20)) 
+# 289 "main.c"
+                 & (1 << 
+# 289 "main.c" 3
+                         7
+# 289 "main.c"
+                            )) {
+            char received_char = 
+# 290 "main.c" 3
+                                (*(volatile uint8_t *)((0x0C) + 0x20))
+# 290 "main.c"
+                                   ;
+
+
+            if (received_char == 'T' || received_char == 't') {
+                UART_sendString("\r\n--- Sending Trends CSV Data ---\r\n");
+
+                uint8_t count = Trends_GetCount();
+                char line_buffer[50];
+
+                for (uint8_t i = 0; i < count; i++) {
+                    Trends_GetSampleLine(i, line_buffer);
+                    UART_sendString(line_buffer);
+                }
+                UART_sendString("--- End of Trends ---\r\n\r\n");
+            }
+        }
+
+
     }
 
     return 0;
