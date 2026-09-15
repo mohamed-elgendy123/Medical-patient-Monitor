@@ -1,3 +1,4 @@
+
 #define F_CPU 8000000UL
 
 #include "STD_TYPES.h"
@@ -199,4 +200,77 @@ int main(void)
       }
     }
   }
+}
+
+// ده كود انا عملته وانا بختبر الvitals
+
+#define F_CPU 16000000UL
+#include <avr/io.h>
+#include <util/delay.h>
+#include <stdlib.h>
+
+// 1. تهيئة الـ UART (Baud Rate: 9600 @ 16MHz)
+void UART_init(void) {
+    uint16_t ubrr_value = 103; // 9600 Baud Rate عند تردد 16MHz
+    UBRRH = (uint8_t)(ubrr_value >> 8);
+    UBRRL = (uint8_t)ubrr_value;
+    UCSRB = (1 << TXEN); // تفعيل الإرسال
+    UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0); // 8-bit data, 1 stop bit
+}
+
+void UART_sendChar(char data) {
+    while (!(UCSRA & (1 << UDRE)));
+    UDR = data;
+}
+
+void UART_sendString(char *str) {
+    while (*str) {
+        UART_sendChar(*str++);
+    }
+}
+
+void UART_sendNumber(uint16_t num) {
+    char buffer[10];
+    itoa(num, buffer, 10);
+    UART_sendString(buffer);
+}
+
+// 2. تهيئة الـ ADC
+void ADC_init(void) {
+    ADMUX = (1 << REFS0); // AVcc (5V) كمرجع
+    ADCSRA = (1 << ADEN) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // Prescaler 128
+}
+
+uint16_t ADC_read(uint8_t channel) {
+    ADMUX = (ADMUX & 0xF0) | (channel & 0x07);
+    ADCSRA |= (1 << ADSC);
+    while (ADCSRA & (1 << ADSC));
+    return ADC;
+}
+
+int main(void) {
+    UART_init();
+    ADC_init();
+
+    DDRB |= (1 << PB0); // جعل PB0 مخرج للـ LED الاختبارية
+
+    while (1) {
+        PORTB ^= (1 << PB0); // عكس حالة الـ LED في كل دورة (Blinker Test)
+
+        UART_sendString("--- Patient Vitals ---\r\n");
+
+        for (uint8_t ch = 0; ch < 4; ch++) {
+            uint16_t val = ADC_read(ch);
+            UART_sendString("Ch ");
+            UART_sendNumber(ch);
+            UART_sendString(": ");
+            UART_sendNumber(val);
+            UART_sendString("\r\n");
+        }
+
+        UART_sendString("\r\n");
+        _delay_ms(500);
+    }
+
+    return 0;
 }
