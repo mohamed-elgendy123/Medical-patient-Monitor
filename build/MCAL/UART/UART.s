@@ -19,21 +19,21 @@ UART_Init:
 	breq .L3
 	movw r18,r22
 	movw r20,r24
-	ldi r24,4
+	andi r21,15
+	ori r21,16
 	1:
 	lsl r18
 	rol r19
 	rol r20
 	rol r21
-	dec r24
-	brne 1b
+	brcc 1b
 	ldi r22,0
 	ldi r23,lo8(18)
 	ldi r24,lo8(122)
 	ldi r25,0
 	call __udivmodsi4
 	subi r18,1
-	sbc r19,__zero_reg__
+	sbci r19,0
 	out 0x20,r19
 	out 0x9,r18
 	ldi r24,lo8(-122)
@@ -181,4 +181,4 @@ UART_SetTxInterrupt:
 	cbi 0xa,5
 	rjmp .L24
 	.size	UART_SetTxInterrupt, .-UART_SetTxInterrupt
-	.ident	"GCC: (GNU) 15.2.0"
+	.ident	"GCC: (GNU) 16.1.0"

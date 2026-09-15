@@ -5,18 +5,6 @@ __SREG__ = 0x3f
 __tmp_reg__ = 0
 __zero_reg__ = 1
 	.text
-	.section	.text.INT0_Handler,"ax",@progbits
-.global	INT0_Handler
-	.type	INT0_Handler, @function
-INT0_Handler:
-/* prologue: function */
-/* frame size = 0 */
-/* stack size = 0 */
-.L__stack_usage = 0
-	ldi r22,lo8(6)
-	ldi r24,0
-	jmp GPIO_TogglePinValue
-	.size	INT0_Handler, .-INT0_Handler
 	.section	.text.startup.main,"ax",@progbits
 .global	main
 	.type	main, @function
@@ -26,35 +14,115 @@ main:
 /* stack size = 0 */
 .L__stack_usage = 0
 	ldi r20,lo8(1)
-	ldi r22,lo8(5)
-	ldi r24,0
+	ldi r22,0
+	ldi r24,lo8(1)
 	call GPIO_SetPinDirection
 	ldi r20,lo8(1)
-	ldi r22,lo8(6)
-	ldi r24,0
+	ldi r22,lo8(1)
+	ldi r24,lo8(1)
+	call GPIO_SetPinDirection
+	ldi r20,lo8(1)
+	ldi r22,lo8(2)
+	ldi r24,lo8(1)
+	call GPIO_SetPinDirection
+	ldi r20,lo8(1)
+	ldi r22,lo8(3)
+	ldi r24,lo8(1)
+	call GPIO_SetPinDirection
+	ldi r20,lo8(1)
+	ldi r22,lo8(7)
+	ldi r24,lo8(2)
 	call GPIO_SetPinDirection
 	ldi r20,0
-	ldi r22,lo8(2)
-	ldi r24,lo8(3)
-	call GPIO_SetPinDirection
+	ldi r22,lo8(7)
+	ldi r24,lo8(2)
+	call GPIO_SetPinValue
 	call TIMER0_Init
-	ldi r22,lo8(gs(INT0_Handler))
-	ldi r23,hi8(gs(INT0_Handler))
-	ldi r24,0
-	call EXTI_SetCallback
+	call HRC_Init
+	call ANN_Audio_Init
+	ldi r20,lo8(1)
+	ldi r22,0
+	ldi r24,lo8(1)
+	call GPIO_SetPinValue
+	ldi r20,lo8(1)
 	ldi r22,lo8(1)
-	ldi r24,0
-	call EXTI_SetSense
-	ldi r24,0
-	call EXTI_Enable
+	ldi r24,lo8(1)
+	call GPIO_SetPinValue
+	ldi r20,lo8(1)
+	ldi r22,lo8(2)
+	ldi r24,lo8(1)
+	call GPIO_SetPinValue
+	ldi r24,lo8(2)
+	call ANN_Audio_SetPriority
 	call INTERRUPT_EnableGlobal
+	ldi r28,0
+	ldi r29,0
 .L3:
-	ldi r22,lo8(5)
-	ldi r24,0
-	call GPIO_TogglePinValue
-	ldi r24,lo8(-24)
-	ldi r25,lo8(3)
-	call TIMER0_DelayMS
+	call TIMER0_IsTickPending
+	cpi r24,lo8(0)
+	breq .L3
+	call TIMER0_ClearTick
+	adiw r28,1
+	call ANN_Audio_Tick
+	cpi r28,50
+	cpc r29,__zero_reg__
+	brne .L4
+	call ANN_Audio_Mute
 	rjmp .L3
+.L4:
+	cpi r28,44
+	ldi r24,1
+	cpc r29,r24
+	brne .L3
+	call INTERRUPT_DisableGlobal
+	ldi r20,0
+	ldi r22,0
+	ldi r24,lo8(1)
+	call GPIO_SetPinValue
+	ldi r20,0
+	ldi r22,lo8(1)
+	ldi r24,lo8(1)
+	call GPIO_SetPinValue
+	ldi r20,0
+	ldi r22,lo8(2)
+	ldi r24,lo8(1)
+	call GPIO_SetPinValue
+	call ANN_Audio_Init
+	ldi r24,0
+	call ANN_Audio_SetPriority
+	call HRC_ClearAsystole
+	call TIMER0_ClearTick
+	call INTERRUPT_EnableGlobal
+.L11:
+	ldi r28,0
+	ldi r29,0
+.L7:
+	call TIMER0_IsTickPending
+	cpi r24,lo8(0)
+	breq .L7
+	call TIMER0_ClearTick
+	ldi r20,lo8(1)
+	ldi r22,lo8(7)
+	ldi r24,lo8(2)
+	call GPIO_SetPinValue
+	movw r24,r28
+	ldi r22,lo8(50)
+	ldi r23,0
+	call __udivmodhi4
+	sbiw r24,4
+	brne .L8
+	call HRC_Process
+.L8:
+	call ANN_Audio_Tick
+	ldi r20,0
+	ldi r22,lo8(7)
+	ldi r24,lo8(2)
+	call GPIO_SetPinValue
+	adiw r28,1
+	cpi r28,-24
+	ldi r24,3
+	cpc r29,r24
+	brne .L7
+	rjmp .L11
 	.size	main, .-main
-	.ident	"GCC: (GNU) 15.2.0"
+	.ident	"GCC: (GNU) 16.1.0"

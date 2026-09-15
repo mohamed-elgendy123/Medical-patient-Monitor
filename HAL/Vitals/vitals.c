@@ -4,7 +4,6 @@
 
 STD_ReturnType Vitals_Init(void)
 {
-    /* Initialize ADC with AVCC reference voltage and prescaler 64 */
     return ADC_Init(ADC_REF_AVCC, ADC_PRESC_64);
 }
 
@@ -17,60 +16,60 @@ STD_ReturnType Vitals_Read(Vitals_t *Copy_pstrVitals)
 
     uint16 Local_u16RawAdc = 0;
 
-    /* 1. Read ADC0 (PA0) -> SpO2 (70 .. 100 %) */
+    /* 1. ADC0 (PA0) -> SpO2 */
     if (ADC_ReadChannel(ADC_CHANNEL_0, &Local_u16RawAdc) == E_OK)
     {
         if (Local_u16RawAdc == 0 || Local_u16RawAdc == 1023)
         {
-            Copy_pstrVitals->SpO2_Status = VITALS_SENSOR_FAULT;
+            Copy_pstrVitals->spo2Status = VITALS_SENSOR_FAULT;
         }
         else
         {
-            Copy_pstrVitals->SpO2_Status = VITALS_OK;
-            Copy_pstrVitals->SpO2 = 70 + ((uint32)Local_u16RawAdc * 30) / 1023;
+            Copy_pstrVitals->spo2Status = VITALS_OK;
+            Copy_pstrVitals->spo2Pct = (uint8)(70 + ((uint32)Local_u16RawAdc * 30) / 1023);
         }
     }
 
-    /* 2. Read ADC1 (PA1) -> Body Temp (300 .. 450 = 30.0 .. 45.0 °C) */
+    /* 2. ADC1 (PA1) -> Temperature (30.0 .. 45.0 °C stored x10) */
     if (ADC_ReadChannel(ADC_CHANNEL_1, &Local_u16RawAdc) == E_OK)
     {
         if (Local_u16RawAdc == 0 || Local_u16RawAdc == 1023)
         {
-            Copy_pstrVitals->Temp_Status = VITALS_SENSOR_FAULT;
+            Copy_pstrVitals->tempStatus = VITALS_SENSOR_FAULT;
         }
         else
         {
-            Copy_pstrVitals->Temp_Status = VITALS_OK;
-            Copy_pstrVitals->Temp_Cx10 = 300 + ((uint32)Local_u16RawAdc * 150) / 1023;
+            Copy_pstrVitals->tempStatus = VITALS_OK;
+            Copy_pstrVitals->tempCx10 = (uint16)(300 + ((uint32)Local_u16RawAdc * 150) / 1023);
         }
     }
 
-    /* 3. Read ADC2 (PA2) -> Systolic BP (50 .. 250 mmHg) & Diastolic BP (~2/3 Systolic) */
+    /* 3. ADC2 (PA2) -> Systolic & Diastolic BP */
     if (ADC_ReadChannel(ADC_CHANNEL_2, &Local_u16RawAdc) == E_OK)
     {
         if (Local_u16RawAdc == 0 || Local_u16RawAdc == 1023)
         {
-            Copy_pstrVitals->BP_Status = VITALS_SENSOR_FAULT;
+            Copy_pstrVitals->bpStatus = VITALS_SENSOR_FAULT;
         }
         else
         {
-            Copy_pstrVitals->BP_Status = VITALS_OK;
-            Copy_pstrVitals->SystolicBP = 50 + ((uint32)Local_u16RawAdc * 200) / 1023;
-            Copy_pstrVitals->DiastolicBP = (Copy_pstrVitals->SystolicBP * 2) / 3;
+            Copy_pstrVitals->bpStatus = VITALS_OK;
+            Copy_pstrVitals->nibpSys = (uint8)(50 + ((uint32)Local_u16RawAdc * 200) / 1023);
+            Copy_pstrVitals->nibpDia = (uint8)((Copy_pstrVitals->nibpSys * 2) / 3);
         }
     }
 
-    /* 4. Read ADC3 (PA3) -> Respiration Rate (0 .. 60 breaths/min) */
+    /* 4. ADC3 (PA3) -> Respiration Rate */
     if (ADC_ReadChannel(ADC_CHANNEL_3, &Local_u16RawAdc) == E_OK)
     {
         if (Local_u16RawAdc == 0 || Local_u16RawAdc == 1023)
         {
-            Copy_pstrVitals->Resp_Status = VITALS_SENSOR_FAULT;
+            Copy_pstrVitals->respStatus = VITALS_SENSOR_FAULT;
         }
         else
         {
-            Copy_pstrVitals->Resp_Status = VITALS_OK;
-            Copy_pstrVitals->RespirationRate = ((uint32)Local_u16RawAdc * 60) / 1023;
+            Copy_pstrVitals->respStatus = VITALS_OK;
+            Copy_pstrVitals->respBpm = (uint8)(((uint32)Local_u16RawAdc * 60) / 1023);
         }
     }
 

@@ -12,6 +12,7 @@ static volatile u8 Timer0_TickPending = 0U;
 static volatile u16 Timer1_Intervals[TIMER1_CAPTURE_RING_SIZE];
 static volatile u16 Timer1_LastCapture = 0U;
 static volatile u8 Timer1_RingIndex = 0U;
+static volatile u8 Timer1_CaptureCount = 0U;
 static volatile u8 Timer1_CaptureReady = 0U;
 static volatile u8 Timer1_Asystole = 0U;
 static volatile u16 Timer1_OverflowCount = 0U;
@@ -105,6 +106,7 @@ void TIMER1_Init(void)
     {
         Timer1_LastCapture = 0U;
         Timer1_RingIndex = 0U;
+        Timer1_CaptureCount = 0U;
         Timer1_CaptureReady = 0U;
         Timer1_Asystole = 0U;
         Timer1_OverflowCount = 0U;
@@ -124,6 +126,7 @@ uint8 TIMER1_IsCaptureReady(void)
 void TIMER1_ClearCaptureFlag(void)
 {
     Timer1_CaptureReady = 0U;
+    Timer1_CaptureCount = 0U;
 }
 
 uint16 TIMER1_GetInterval(uint8 Copy_u8Index)
@@ -137,6 +140,16 @@ uint16 TIMER1_GetInterval(uint8 Copy_u8Index)
     {
         return 0U;
     }
+}
+
+uint8 TIMER1_GetCaptureCount(void)
+{
+    return Timer1_CaptureCount;
+}
+
+uint8 TIMER1_GetCaptureWriteIndex(void)
+{
+    return Timer1_RingIndex;
 }
 
 uint8 TIMER1_IsAsystole(void)
@@ -235,6 +248,7 @@ ISR(TIMER1_CAPT_vect)
     Timer1_Intervals[Timer1_RingIndex] = (u16)(Local_u16Capture - Timer1_LastCapture);
     Timer1_LastCapture = Local_u16Capture;
     Timer1_RingIndex = (u8)((Timer1_RingIndex + 1U) & 7U);
+    Timer1_CaptureCount = (Timer1_CaptureCount < TIMER1_CAPTURE_RING_SIZE) ? (u8)(Timer1_CaptureCount + 1U) : TIMER1_CAPTURE_RING_SIZE;
     Timer1_CaptureReady = 1U;
     Timer1_OverflowCount = 0U;
     Timer1_Asystole = 0U;

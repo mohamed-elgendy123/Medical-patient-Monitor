@@ -32,7 +32,7 @@ typedef enum
 
 # 1 "LIB/STD_TYPES.h" 1
 # 5 "./MCAL/TIMER/TIMER_interface.h" 2
-
+# 16 "./MCAL/TIMER/TIMER_interface.h"
 typedef void (*TIMER_CallbackType)(void);
 
 
@@ -49,6 +49,8 @@ void TIMER1_Init(void);
 uint8 TIMER1_IsCaptureReady(void);
 void TIMER1_ClearCaptureFlag(void);
 uint16 TIMER1_GetInterval(uint8 Copy_u8Index);
+uint8 TIMER1_GetCaptureCount(void);
+uint8 TIMER1_GetCaptureWriteIndex(void);
 uint8 TIMER1_IsAsystole(void);
 void TIMER1_ClearAsystole(void);
 
@@ -105,6 +107,9 @@ void HRC_Init(void)
 
 void HRC_Process(void)
 {
+    uint8 Local_u8CaptureCount;
+    uint8 Local_u8WriteIndex;
+    uint8 Local_u8ReadIndex;
     uint8 Local_u8Index;
 
     if ((TIMER1_IsAsystole() != 0U) || (HRC_Asystole != 0U))
@@ -117,9 +122,14 @@ void HRC_Process(void)
 
     if (TIMER1_IsCaptureReady() != 0U)
     {
-        for (Local_u8Index = 0U; Local_u8Index < 8U; Local_u8Index++)
+        Local_u8CaptureCount = TIMER1_GetCaptureCount();
+        Local_u8WriteIndex = TIMER1_GetCaptureWriteIndex();
+        for (Local_u8Index = 0U; Local_u8Index < Local_u8CaptureCount; Local_u8Index++)
         {
-            HRC_OnCapture(TIMER1_GetInterval(Local_u8Index));
+            Local_u8ReadIndex = (uint8)((Local_u8WriteIndex + 8U -
+                                      Local_u8CaptureCount + Local_u8Index) %
+                                     8U);
+            HRC_OnCapture(TIMER1_GetInterval(Local_u8ReadIndex));
         }
         TIMER1_ClearCaptureFlag();
     }
@@ -203,7 +213,8 @@ static uint16 HRC_CalculateMedian(void)
         {
             Local_u8HasEmpty = 1U;
         }
-        else
+        else if (Local_u8Index == ((HRC_MedianIndex + 3U - 1U) %
+                                   3U))
         {
             Local_u16LatestInterval = Local_u16Arr[Local_u8Index];
         }
@@ -259,6 +270,11 @@ static uint16 HRC_CalculateHrvMs(void)
 
     for (Local_u8Index = 1U; Local_u8Index < 8U; Local_u8Index++)
     {
+        if ((HRC_Intervals[Local_u8Index] == 0U) ||
+            (HRC_Intervals[Local_u8Index - 1U] == 0U))
+        {
+            return 0U;
+        }
         Local_u32DiffSum += (((HRC_Intervals[Local_u8Index]) >= (HRC_Intervals[Local_u8Index - 1U])) ? ((HRC_Intervals[Local_u8Index]) - (HRC_Intervals[Local_u8Index - 1U])) : ((HRC_Intervals[Local_u8Index - 1U]) - (HRC_Intervals[Local_u8Index])))
                                                                        ;
     }
