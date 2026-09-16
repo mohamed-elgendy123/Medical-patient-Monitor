@@ -71,7 +71,6 @@ void CONSOLE_Task(void) {
 
         if (c == '\r' || c == '\n') {
             if (overflow_flag) {
-                // لو السطر تجاوز الحد الأقصى
                 UART_SendString((const uint8 *)"ERR LONG\r\n");
                 overflow_flag = 0;
             } else {
@@ -88,8 +87,21 @@ void CONSOLE_Task(void) {
 
             if (line_length < CONSOLE_MAX_LINE_LENGTH) {
                 line_buffer[line_length++] = c;
+                line_buffer[line_length] = '\0'; // Null-terminate للحماية
+
+                // ميزة ذكية: تنفيذ الأمر فوراً لو تطابق تماماً مع أحد الأوامر الأساسية (بدون انتظار Enter)
+                if (strcmp(line_buffer, "STATUS") == 0 ||
+                    strcmp(line_buffer, "VITALS?") == 0 ||
+                    strcmp(line_buffer, "ACK") == 0 ||
+                    strcmp(line_buffer, "SILENCE") == 0 ||
+                    strcmp(line_buffer, "HELP") == 0) {
+                    
+                    CONSOLE_ProcessLine(line_buffer);
+                    line_length = 0;
+                    overflow_flag = 0;
+                    return;
+                }
             } else {
-                // تجاوز 40 حرف -> تفعيل علم الـ Overflow
                 overflow_flag = 1;
                 UART_SendString((const uint8 *)"ERR LONG\r\n");
                 line_length = 0;

@@ -5,15 +5,19 @@ C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_umulhisi3.o)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodhi4.o)
                               build/main.o (__udivmodhi4)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_divmodhi4.o)
-                              build/HAL/Vitals/vitals.o (__divmodhi4)
+                              build/Logic/menu.o (__divmodhi4)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_udivmodsi4.o)
                               build/HAL/HR_Capture/HR_Capture.o (__udivmodsi4)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_exit.o)
                               C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5/crtatmega32.o (exit)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_copy_data.o)
-                              build/HAL/LCD_I2C/LCD_I2C.o (__do_copy_data)
+                              build/Logic/menu.o (__do_copy_data)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_clear_bss.o)
-                              build/HAL/Annunciator/Annunciator_audio.o (__do_clear_bss)
+                              build/Logic/menu.o (__do_clear_bss)
+C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(memset.o)
+                              build/Logic/menu.o (memset)
+C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strcmp.o)
+                              build/Logic/console/console.o (strcmp)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strncmp.o)
                               build/Logic/console/console.o (strncmp)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strstr.o)
@@ -58,6 +62,80 @@ Discarded input sections
  .text.RingBuffer_Pop
                 0x00000000       0x62 build/LIB/ring_buffer.o
  .comment       0x00000000       0x13 build/LIB/ring_buffer.o
+ .text          0x00000000        0x0 build/Logic/menu.o
+ .data          0x00000000        0x0 build/Logic/menu.o
+ .bss           0x00000000        0x0 build/Logic/menu.o
+ .text.PutStr   0x00000000       0x1e build/Logic/menu.o
+ .text.FormatNumber.isra.0
+                0x00000000       0xd8 build/Logic/menu.o
+ .rodata.Menu_RenderEdit.str1.1
+                0x00000000       0x15 build/Logic/menu.o
+ .text.Menu_RenderEdit
+                0x00000000      0x164 build/Logic/menu.o
+ .text.PutNum   0x00000000       0x4a build/Logic/menu.o
+ .text.Menu_Init
+                0x00000000       0x16 build/Logic/menu.o
+ .rodata.Menu_Update.str1.1
+                0x00000000       0x34 build/Logic/menu.o
+ .text.Menu_Update
+                0x00000000      0x442 build/Logic/menu.o
+ .text.Menu_IsInDashboard
+                0x00000000        0xc build/Logic/menu.o
+ .bss.g_u8DashTick
+                0x00000000        0x1 build/Logic/menu.o
+ .bss.g_s16EditValue
+                0x00000000        0x2 build/Logic/menu.o
+ .bss.g_u8SelectedVital
+                0x00000000        0x1 build/Logic/menu.o
+ .bss.g_u8State
+                0x00000000        0x1 build/Logic/menu.o
+ .comment       0x00000000       0x13 build/Logic/menu.o
+ .text          0x00000000        0x0 build/Logic/patient_cfg.o
+ .data          0x00000000        0x0 build/Logic/patient_cfg.o
+ .bss           0x00000000        0x0 build/Logic/patient_cfg.o
+ .text.PatientCfg_LoadProfile.part.0
+                0x00000000       0x38 build/Logic/patient_cfg.o
+ .text.PatientCfg_Init
+                0x00000000       0x1c build/Logic/patient_cfg.o
+ .text.PatientCfg_LoadProfile
+                0x00000000        0xa build/Logic/patient_cfg.o
+ .text.PatientCfg_GetActiveProfile
+                0x00000000        0x6 build/Logic/patient_cfg.o
+ .text.PatientCfg_GetLimits
+                0x00000000       0x22 build/Logic/patient_cfg.o
+ .text.PatientCfg_SetLow
+                0x00000000       0x16 build/Logic/patient_cfg.o
+ .text.PatientCfg_SetHigh
+                0x00000000       0x16 build/Logic/patient_cfg.o
+ .text.PatientCfg_GetVital
+                0x00000000       0x18 build/Logic/patient_cfg.o
+ .text.PatientCfg_EvalAlarms
+                0x00000000       0x44 build/Logic/patient_cfg.o
+ .text.PatientCfg_GetHighestAlarm
+                0x00000000       0x16 build/Logic/patient_cfg.o
+ .rodata.PatientCfg_VitalName.str1.1
+                0x00000000        0x2 build/Logic/patient_cfg.o
+ .text.PatientCfg_VitalName
+                0x00000000       0x18 build/Logic/patient_cfg.o
+ .text.PatientCfg_ProfileName
+                0x00000000       0x18 build/Logic/patient_cfg.o
+ .text.PatientCfg_GetStep
+                0x00000000       0x1c build/Logic/patient_cfg.o
+ .rodata.g_as16Steps
+                0x00000000        0xa build/Logic/patient_cfg.o
+ .rodata.g_acProfiles
+                0x00000000       0x1b build/Logic/patient_cfg.o
+ .rodata.g_acNames
+                0x00000000       0x19 build/Logic/patient_cfg.o
+ .progmem.data.g_as16Defaults
+                0x00000000       0x3c build/Logic/patient_cfg.o
+ .bss.g_u8ActiveProfile
+                0x00000000        0x1 build/Logic/patient_cfg.o
+ .bss.g_astVitals
+                0x00000000       0x14 build/Logic/patient_cfg.o
+ .bss.g_astLimits
+                0x00000000       0x14 build/Logic/patient_cfg.o
+ .comment       0x00000000       0x13 build/Logic/patient_cfg.o
  .text          0x00000000        0x0 build/HAL/Annunciator/Annunciator_audio.o
  .data          0x00000000        0x0 build/HAL/Annunciator/Annunciator_audio.o
  .bss           0x00000000        0x0 build/HAL/Annunciator/Annunciator_audio.o
@@ -166,12 +244,16 @@ Discarded input sections
  .text          0x00000000        0x0 build/Logic/console/console.o
  .data          0x00000000        0x0 build/Logic/console/console.o
  .bss           0x00000000        0x0 build/Logic/console/console.o
+ .rodata.CONSOLE_ProcessLine.constprop.0.str1.1
+                0x00000000       0x95 build/Logic/console/console.o
+ .text.CONSOLE_ProcessLine.constprop.0
+                0x00000000       0xda build/Logic/console/console.o
  .text.CONSOLE_Init
                 0x00000000       0x18 build/Logic/console/console.o
  .rodata.CONSOLE_Task.str1.1
-                0x00000000       0xa0 build/Logic/console/console.o
+                0x00000000        0xb build/Logic/console/console.o
  .text.CONSOLE_Task
-                0x00000000      0x14c build/Logic/console/console.o
+                0x00000000      0x100 build/Logic/console/console.o
  .bss.overflow_flag
                 0x00000000        0x1 build/Logic/console/console.o
  .bss.line_length
@@ -415,6 +497,16 @@ Discarded input sections
                 0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_clear_bss.o)
  .text.libgcc.fixed
                 0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_clear_bss.o)
+ .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(memset.o)
+ .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(memset.o)
+ .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(memset.o)
+ .text.avr-libc
+                0x00000000        0xe C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(memset.o)
+ .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strcmp.o)
+ .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strcmp.o)
+ .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strcmp.o)
+ .text.avr-libc
+                0x00000000       0x12 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strcmp.o)
  .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strncmp.o)
  .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strncmp.o)
  .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strncmp.o)
@@ -548,6 +640,8 @@ Linker script and memory map
 LOAD C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5/crtatmega32.o
 LOAD build/main.o
 LOAD build/LIB/ring_buffer.o
+LOAD build/Logic/menu.o
+LOAD build/Logic/patient_cfg.o
 LOAD build/HAL/Annunciator/Annunciator_audio.o
 LOAD build/HAL/Annunciator/Annunciator_visual.o
 LOAD build/HAL/HR_Capture/HR_Capture.o
