@@ -92,7 +92,9 @@ static void Application_ClearState(void)
   Clear_TrendState();
   ANN_Audio_SetPriority(ANN_PRI_NONE);
   ANN_Visual_SetPriority(ANN_PRI_NONE);
-  NurseCall_Disable();
+  //NurseCall_Disable();
+  NurseCall_voidDisable();
+
   HRC_ClearAsystole();
 }
 
@@ -103,7 +105,8 @@ static void Application_SelfTest(void)
   /* Test Audio & Visual Annunciators during Self-Test */
   ANN_Audio_SetPriority(ANN_PRI_MEDIUM);
   ANN_Visual_SetPriority(ANN_PRI_HIGH);
-  NurseCall_Enable();
+  //NurseCall_Enable();
+  NurseCall_voidEnable();
   ShiftReg_voidWriteByte(0xFF); /* Turn ON Vital Status LEDs */
 
   (void)INTERRUPT_EnableGlobal();
@@ -126,7 +129,8 @@ static void Application_SelfTest(void)
 
   ANN_Audio_Init();
   ANN_Visual_Init();
-  NurseCall_Disable();
+  //NurseCall_Disable();
+  NurseCall_voidDisable();
   ShiftReg_voidWriteByte(0x00);
   Application_ClearState();
   TIMER0_ClearTick();
@@ -142,7 +146,8 @@ static void Application_Init(void)
   
   /* Initialize Student 2 HAL Drivers */
   ShiftReg_voidInit();
-  NurseCall_Init();
+ // NurseCall_Init();
+  NurseCall_voidInit();
   ANN_Audio_Init();
   ANN_Visual_Init();
 

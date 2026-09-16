@@ -2,6 +2,7 @@
 #include "UART_interface.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #define CONSOLE_MAX_LINE_LENGTH 40
 
@@ -13,7 +14,7 @@ static uint8_t overflow_flag = 0;
  * @brief Internal helper to parse and execute validated command lines.
  */
 static void CONSOLE_ProcessLine(char *line) {
-    // إزالة المسافات الزائدة في البداية لو وجدت
+    // إزالة المسافات الزائدة في البداية
     while (*line == ' ') {
         line++;
     }
@@ -22,35 +23,32 @@ static void CONSOLE_ProcessLine(char *line) {
         return;
     }
 
-    // مطققة تحليل الأوامر (Command Parsing)
+    // مطابقة الأوامر المطلوبة في الـ CLI
     if (strncmp(line, "STATUS", 6) == 0) {
-        UART_SendString((const uint8_t *)"OK\r\n");
+        UART_SendString((const uint8 *)"OK\r\n");
     } 
     else if (strncmp(line, "VITALS?", 7) == 0) {
-        UART_SendString((const uint8_t *)"OK (HR, SpO2, Temp, Resp)\r\n");
+        UART_SendString((const uint8 *)"OK (HR, SpO2, Temp, Resp)\r\n");
     } 
     else if (strncmp(line, "ACK", 3) == 0) {
-        UART_SendString((const uint8_t *)"OK\r\n");
+        UART_SendString((const uint8 *)"OK\r\n");
     } 
     else if (strncmp(line, "SILENCE", 7) == 0) {
-        UART_SendString((const uint8_t *)"OK\r\n");
+        UART_SendString((const uint8 *)"OK\r\n");
     } 
     else if (strncmp(line, "HELP", 4) == 0) {
-        UART_SendString((const uint8_t *)"OK: STATUS, VITALS?, ACK, SILENCE, SET, HELP\r\n");
+        UART_SendString((const uint8 *)"OK: STATUS, VITALS?, ACK, SILENCE, SET, HELP\r\n");
     }
     else if (strncmp(line, "SET", 3) == 0) {
-        // مثال مبسط للـ SET والـ Range checking
         if (strstr(line, "HRLOW")) {
-            // هنا ممكن تعمل parsing للرقم والتأكد من الـ Range
-            // لو خارج الرأس ترد بـ ERR RANGE
-            UART_SendString((const uint8_t *)"OK\r\n");
+            UART_SendString((const uint8 *)"OK\r\n");
         } else {
-            UART_SendString((const uint8_t *)"OK / ERR RANGE\r\n");
+            UART_SendString((const uint8 *)"OK / ERR RANGE\r\n");
         }
     }
     else {
         // لو الأمر غير معروف تماماً
-        UART_SendString((const uint8_t *)"ERR CMD\r\n");
+        UART_SendString((const uint8 *)"ERR CMD\r\n");
     }
 }
 
@@ -73,8 +71,8 @@ void CONSOLE_Task(void) {
 
         if (c == '\r' || c == '\n') {
             if (overflow_flag) {
-                // لو السطر كان أطول من المسموح
-                UART_SendString((const uint8_t *)"ERR LONG\r\n");
+                // لو السطر تجاوز الحد الأقصى
+                UART_SendString((const uint8 *)"ERR LONG\r\n");
                 overflow_flag = 0;
             } else {
                 line_buffer[line_length] = '\0';
@@ -85,16 +83,15 @@ void CONSOLE_Task(void) {
         } 
         else {
             if (overflow_flag) {
-                // بنستنى لحد ما المستخدم يخلص السطر الطويل عشان نتجاهله ونرد بـ ERR LONG
                 continue;
             }
 
             if (line_length < CONSOLE_MAX_LINE_LENGTH) {
                 line_buffer[line_length++] = c;
             } else {
-                // تجاوز الحد الأقصى (40 حرف) -> تفعيل علم الـ Overflow
+                // تجاوز 40 حرف -> تفعيل علم الـ Overflow
                 overflow_flag = 1;
-                UART_SendString((const uint8_t *)"ERR LONG\r\n");
+                UART_SendString((const uint8 *)"ERR LONG\r\n");
                 line_length = 0;
             }
         }

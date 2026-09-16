@@ -35,7 +35,7 @@ SPI_InitMaster:
 	ldi r22,lo8(7)
 	ldi r24,lo8(1)
 	call GPIO_SetPinDirection
-	ldi r20,lo8(1)
+	ldi r20,0
 	ldi r22,lo8(4)
 	ldi r24,lo8(1)
 	call GPIO_SetPinValue
