@@ -14,8 +14,8 @@
 #endif
 
 #define HRC_INVALID_HR 0U
-#define HRC_MIN_BPM 30U
-#define HRC_MAX_BPM 250U
+#define HRC_MIN_BPM 1U
+#define HRC_MAX_BPM 300U
 
 void HRC_Init(void);
 void HRC_Process(void);

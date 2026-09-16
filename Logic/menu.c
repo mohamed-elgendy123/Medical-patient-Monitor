@@ -27,7 +27,6 @@
 static uint8  g_u8State         = MENU_DASHBOARD;
 static uint8  g_u8SelectedVital = 0u;
 static sint16 g_s16EditValue    = 0;
-static uint8  g_u8DashTick      = 0u;  /* for alarm banner alternation */
 
 /* ======================== Helpers ======================== */
 
@@ -123,89 +122,6 @@ static void PutNum(char *Copy_pcLine, uint8 Copy_u8Col, sint16 Copy_s16Val)
     PutStr(Copy_pcLine, Copy_u8Col, Local_acBuf);
 }
 
-/* ======================== Dashboard ======================== */
-
-/*
- * Layout:
- *   Col  0123456789012345
- *   R0   HR:nnn S:nnn T:nn
- *   R1   RR:nn  BP:nnn      (or alarm banner)
- */
-static void Dashboard_Render(void)
-{
-    char        Local_acLine[LCD_I2C_COLS + 1u];
-    VitalData_t *Local_pstV;
-    uint8       Local_u8Alarm;
-
-    /* ---------- Row 0 ---------- */
-    memset(Local_acLine, ' ', LCD_I2C_COLS);
-    Local_acLine[LCD_I2C_COLS] = '\0';
-
-    /* HR (col 0–6) */
-    PutStr(Local_acLine, 0, "HR:");
-    Local_pstV = PatientCfg_GetVital(VITAL_HR);
-    if (Local_pstV != NULL && Local_pstV->Valid) {
-        PutNum(Local_acLine, 3, Local_pstV->Value);
-    } else {
-        PutStr(Local_acLine, 3, "---");
-    }
-
-    /* SpO2 (col 7–11) */
-    PutStr(Local_acLine, 7, "S:");
-    Local_pstV = PatientCfg_GetVital(VITAL_SPO2);
-    if (Local_pstV != NULL && Local_pstV->Valid) {
-        PutNum(Local_acLine, 9, Local_pstV->Value);
-    } else {
-        PutStr(Local_acLine, 9, "---");
-    }
-
-    /* Temp — whole degrees (col 13–15) */
-    PutStr(Local_acLine, 13, "T:");
-    Local_pstV = PatientCfg_GetVital(VITAL_TEMP);
-    if (Local_pstV != NULL && Local_pstV->Valid) {
-        PutNum(Local_acLine, 15, Local_pstV->Value / 10);
-    } else {
-        PutStr(Local_acLine, 15, "-");
-    }
-
-    LCD_I2C_SetCursor(0, 0);
-    LCD_I2C_WriteString(Local_acLine);
-
-    /* ---------- Row 1 ---------- */
-    memset(Local_acLine, ' ', LCD_I2C_COLS);
-    Local_acLine[LCD_I2C_COLS] = '\0';
-
-    Local_u8Alarm = PatientCfg_GetHighestAlarm();
-
-    if (Local_u8Alarm < VITAL_COUNT && (g_u8DashTick & 0x04u)) {
-        /* Alarm banner — alternates every ~4 update cycles */
-        PutStr(Local_acLine, 0, "*HI ");
-        PutStr(Local_acLine, 4, PatientCfg_VitalName(Local_u8Alarm));
-        PutStr(Local_acLine, 9, "ALARM*");
-    } else {
-        /* Normal: RR + BP */
-        PutStr(Local_acLine, 0, "RR:");
-        Local_pstV = PatientCfg_GetVital(VITAL_RR);
-        if (Local_pstV != NULL && Local_pstV->Valid) {
-            PutNum(Local_acLine, 3, Local_pstV->Value);
-        } else {
-            PutStr(Local_acLine, 3, "--");
-        }
-
-        PutStr(Local_acLine, 6, "BP:");
-        Local_pstV = PatientCfg_GetVital(VITAL_NIBP);
-        if (Local_pstV != NULL && Local_pstV->Valid) {
-            PutNum(Local_acLine, 9, Local_pstV->Value);
-        } else {
-            PutStr(Local_acLine, 9, "---");
-        }
-    }
-
-    LCD_I2C_SetCursor(1, 0);
-    LCD_I2C_WriteString(Local_acLine);
-
-    g_u8DashTick++;
-}
 
 /* ======================== Menu screens ======================== */
 
@@ -284,80 +200,125 @@ void Menu_Init(void)
     g_u8State         = MENU_DASHBOARD;
     g_u8SelectedVital = 0u;
     g_s16EditValue    = 0;
-    g_u8DashTick      = 0u;
 }
+
+/* Inactivity timeout counter (at 50 Hz / 20 ms ticks: 3000 ticks = 60 s) */
+static uint16 g_u16MenuTimeout = 0u;
 
 void Menu_Update(void)
 {
     VitalLimits_t Local_stLim;
+    uint8 Local_u8Redraw = 0u;
 
     switch (g_u8State) {
 
     /* ---------- DASHBOARD ---------- */
     case MENU_DASHBOARD:
-        Dashboard_Render();
-
+        /* Do NOT call Dashboard_Render() here — main.c Task_Lcd handles the live dashboard */
         if (Panel_IsPressed(BTN_MENU)) {
             g_u8State         = MENU_SELECT_VITAL;
             g_u8SelectedVital = 0u;
+            g_u16MenuTimeout  = 0u;
             LCD_I2C_Clear();
+            Menu_RenderSelect();
         }
         break;
 
     /* ---------- SELECT VITAL ---------- */
     case MENU_SELECT_VITAL:
-        Menu_RenderSelect();
-
         if (Panel_IsPressed(BTN_UP)) {
             g_u8SelectedVital = (g_u8SelectedVital == 0u)
                               ? (uint8)(VITAL_COUNT - 1u)
                               : (uint8)(g_u8SelectedVital - 1u);
+            Local_u8Redraw = 1u;
         }
         if (Panel_IsPressed(BTN_DOWN)) {
             g_u8SelectedVital++;
             if (g_u8SelectedVital >= VITAL_COUNT) { g_u8SelectedVital = 0u; }
+            Local_u8Redraw = 1u;
         }
         if (Panel_IsPressed(BTN_MENU)) {
-            Local_stLim    = PatientCfg_GetLimits(g_u8SelectedVital);
-            g_s16EditValue = Local_stLim.LowLimit;
-            g_u8State      = MENU_EDIT_LOW;
+            Local_stLim       = PatientCfg_GetLimits(g_u8SelectedVital);
+            g_s16EditValue    = Local_stLim.LowLimit;
+            g_u8State         = MENU_EDIT_LOW;
+            g_u16MenuTimeout  = 0u;
             LCD_I2C_Clear();
+            Menu_RenderEdit();
+            break;
+        }
+
+        if (Local_u8Redraw != 0u) {
+            g_u16MenuTimeout = 0u;
+            Menu_RenderSelect();
+        } else {
+            g_u16MenuTimeout++;
+            if (g_u16MenuTimeout >= 3000u) {
+                /* 60s timeout -> return to dashboard */
+                g_u8State = MENU_DASHBOARD;
+                LCD_I2C_Clear();
+            }
         }
         break;
 
     /* ---------- EDIT LOW LIMIT ---------- */
     case MENU_EDIT_LOW:
-        Menu_RenderEdit();
-
         if (Panel_IsPressed(BTN_UP)) {
             g_s16EditValue += PatientCfg_GetStep(g_u8SelectedVital);
+            Local_u8Redraw = 1u;
         }
         if (Panel_IsPressed(BTN_DOWN)) {
             g_s16EditValue -= PatientCfg_GetStep(g_u8SelectedVital);
+            Local_u8Redraw = 1u;
         }
         if (Panel_IsPressed(BTN_MENU)) {
             PatientCfg_SetLow(g_u8SelectedVital, g_s16EditValue);
-            Local_stLim    = PatientCfg_GetLimits(g_u8SelectedVital);
-            g_s16EditValue = Local_stLim.HighLimit;
-            g_u8State      = MENU_EDIT_HIGH;
+            Local_stLim       = PatientCfg_GetLimits(g_u8SelectedVital);
+            g_s16EditValue    = Local_stLim.HighLimit;
+            g_u8State         = MENU_EDIT_HIGH;
+            g_u16MenuTimeout  = 0u;
             LCD_I2C_Clear();
+            Menu_RenderEdit();
+            break;
+        }
+
+        if (Local_u8Redraw != 0u) {
+            g_u16MenuTimeout = 0u;
+            Menu_RenderEdit();
+        } else {
+            g_u16MenuTimeout++;
+            if (g_u16MenuTimeout >= 3000u) {
+                g_u8State = MENU_DASHBOARD;
+                LCD_I2C_Clear();
+            }
         }
         break;
 
     /* ---------- EDIT HIGH LIMIT ---------- */
     case MENU_EDIT_HIGH:
-        Menu_RenderEdit();
-
         if (Panel_IsPressed(BTN_UP)) {
             g_s16EditValue += PatientCfg_GetStep(g_u8SelectedVital);
+            Local_u8Redraw = 1u;
         }
         if (Panel_IsPressed(BTN_DOWN)) {
             g_s16EditValue -= PatientCfg_GetStep(g_u8SelectedVital);
+            Local_u8Redraw = 1u;
         }
         if (Panel_IsPressed(BTN_MENU)) {
             PatientCfg_SetHigh(g_u8SelectedVital, g_s16EditValue);
             g_u8State = MENU_DASHBOARD;
             LCD_I2C_Clear();
+            break;
+        }
+
+        if (Local_u8Redraw != 0u) {
+            g_u16MenuTimeout = 0u;
+            Menu_RenderEdit();
+        } else {
+            g_u16MenuTimeout++;
+            if (g_u16MenuTimeout >= 3000u) {
+                g_u8State = MENU_DASHBOARD;
+                LCD_I2C_Clear();
+            }
         }
         break;
 

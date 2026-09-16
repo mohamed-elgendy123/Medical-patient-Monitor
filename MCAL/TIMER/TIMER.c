@@ -20,7 +20,7 @@ static volatile u8 Timer1_HasLastCapture = 0U;
 static volatile u16 Timer1_LastInterval = 0U;
 
 /* ========================================================================= */
-/*                               TIMER 0                                     */
+/* TIMER 0                                    */
 /* ========================================================================= */
 
 void TIMER0_Init(void)
@@ -57,7 +57,6 @@ void TIMER0_SetCallback(TIMER_CallbackType Copy_pvCallback)
 
 uint8 TIMER0_IsTickPending(void)
 {
-    /* Return flag using ternary/if check */
     if (Timer0_TickPending != 0U)
     {
         return 1U;
@@ -74,7 +73,7 @@ void TIMER0_ClearTick(void)
 }
 
 /* ========================================================================= */
-/*                               TIMER 1                                     */
+/* TIMER 1                                    */
 /* ========================================================================= */
 
 void TIMER1_Init(void)
@@ -128,7 +127,6 @@ u16 TIMER1_GetLastInterval(void)
 {
     u16 Local_u16Val;
 
-    /* قراءة ذرية آمنة لمتغير 16-بت تمنع المقاطعة أثناء نقل البايتين */
     (void)INTERRUPT_DisableGlobal();
     Local_u16Val = Timer1_LastInterval;
     (void)INTERRUPT_EnableGlobal();
@@ -145,10 +143,11 @@ void TIMER1_ClearAsystole(void)
 {
     Timer1_Asystole = 0U;
     Timer1_OverflowCount = 0U;
+    Timer1_HasLastCapture = 0U;
 }
 
 /* ========================================================================= */
-/*                               TIMER 2                                     */
+/* TIMER 2                                    */
 /* ========================================================================= */
 
 void TIMER2_Init(void)
@@ -177,7 +176,6 @@ void TIMER2_SetTone(uint8 Copy_u8Tone)
     CLR_BIT(TIMER2_TCCR2, TIMER2_CS21);
     CLR_BIT(TIMER2_TCCR2, TIMER2_CS20);
 
-    /* Logic rewritten using if - else if - else ladder */
     if (Copy_u8Tone == TIMER2_TONE_HIGH)
     {
         /* 960 Hz Tone: Prescaler 32, OCR2 = 129 */
@@ -205,7 +203,7 @@ void TIMER2_SetTone(uint8 Copy_u8Tone)
 }
 
 /* ========================================================================= */
-/*                         INTERRUPT SERVICE ROUTINES                        */
+/* INTERRUPT SERVICE ROUTINES                        */
 /* ========================================================================= */
 
 ISR(TIMER0_COMP_vect)
@@ -223,17 +221,21 @@ ISR(TIMER1_CAPT_vect)
 {
     u16 Local_u16Capture = TIMER1_ICR1;
 
-    if (Timer1_HasLastCapture == 0U)
+    /* إعادة الضبط المرجعي عند أول نبضة أو بعد زوال توقف القلب */
+    if ((Timer1_HasLastCapture == 0U) || (Timer1_Asystole != 0U))
     {
         Timer1_LastCapture = Local_u16Capture;
         Timer1_HasLastCapture = 1U;
+        Timer1_OverflowCount = 0U;
+        Timer1_Asystole = 0U;
         return;
     }
 
+    /* حساب الفارق الزمني */
     Timer1_LastInterval = (u16)(Local_u16Capture - Timer1_LastCapture);
-    Timer1_Intervals[Timer1_RingIndex] = Timer1_LastInterval;
     Timer1_LastCapture = Local_u16Capture;
 
+    Timer1_Intervals[Timer1_RingIndex] = Timer1_LastInterval;
     Timer1_RingIndex++;
     if (Timer1_RingIndex >= TIMER1_CAPTURE_RING_SIZE)
     {
@@ -242,16 +244,33 @@ ISR(TIMER1_CAPT_vect)
 
     Timer1_CaptureReady = 1U;
     Timer1_OverflowCount = 0U;
-    Timer1_Asystole = 0U; /* إلغاء توقف القلب فور التقاط النبضة */
+    Timer1_Asystole = 0U;
 }
 
 ISR(TIMER1_OVF_vect)
 {
-    Timer1_OverflowCount++;
-
-    /* Asystole threshold: 2 overflows (~4.19s without capture) */
-    if (Timer1_OverflowCount >= TIMER1_ASYSTOLE_OVF_LIMIT)
+    if (Timer1_OverflowCount < 255U)
     {
-        Timer1_Asystole = 1U;
+        Timer1_OverflowCount++;
+    }
+
+    if (Timer1_HasLastCapture != 0U)
+    {
+        /* 4.0 seconds @ 31,250 Hz = 125,000 ticks.
+         * Each overflow is 65,536 ticks.
+         */
+        u32 Local_u32Elapsed = ((u32)Timer1_OverflowCount << 16) + (u32)TIMER1_TCNT1 - (u32)Timer1_LastCapture;
+        if (Local_u32Elapsed >= 125000UL)
+        {
+            Timer1_Asystole = 1U;
+            Timer1_HasLastCapture = 0U;
+        }
+    }
+    else
+    {
+        if (Timer1_OverflowCount >= 2U)
+        {
+            Timer1_Asystole = 1U;
+        }
     }
 }

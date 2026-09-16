@@ -333,7 +333,6 @@ void TIMER0_SetCallback(TIMER_CallbackType Copy_pvCallback)
 
 uint8 TIMER0_IsTickPending(void)
 {
-
     if (Timer0_TickPending != 0U)
     {
         return 1U;
@@ -404,7 +403,6 @@ uint16 TIMER1_GetLastInterval(void)
 {
     uint16 Local_u16Val;
 
-
     (void)INTERRUPT_DisableGlobal();
     Local_u16Val = Timer1_LastInterval;
     (void)INTERRUPT_EnableGlobal();
@@ -421,6 +419,7 @@ void TIMER1_ClearAsystole(void)
 {
     Timer1_Asystole = 0U;
     Timer1_OverflowCount = 0U;
+    Timer1_HasLastCapture = 0U;
 }
 
 
@@ -453,7 +452,6 @@ void TIMER2_SetTone(uint8 Copy_u8Tone)
     (((*(volatile uint8 *)0x45U)) &= (uint8) ~(1U << (1U)));
     (((*(volatile uint8 *)0x45U)) &= (uint8) ~(1U << (0U)));
 
-
     if (Copy_u8Tone == 1U)
     {
 
@@ -485,10 +483,10 @@ void TIMER2_SetTone(uint8 Copy_u8Tone)
 
 
 
-# 211 "MCAL/TIMER/TIMER.c" 3
+# 209 "MCAL/TIMER/TIMER.c" 3
 void __vector_10 (void) __attribute__ ((__signal__,__used__, __externally_visible__)) ; void __vector_10 (void)
 
-# 212 "MCAL/TIMER/TIMER.c"
+# 210 "MCAL/TIMER/TIMER.c"
 {
     Timer0_Ticks++;
     Timer0_TickPending = 1U;
@@ -500,24 +498,28 @@ void __vector_10 (void) __attribute__ ((__signal__,__used__, __externally_visibl
 }
 
 
-# 222 "MCAL/TIMER/TIMER.c" 3
+# 220 "MCAL/TIMER/TIMER.c" 3
 void __vector_6 (void) __attribute__ ((__signal__,__used__, __externally_visible__)) ; void __vector_6 (void)
 
-# 223 "MCAL/TIMER/TIMER.c"
+# 221 "MCAL/TIMER/TIMER.c"
 {
     uint16 Local_u16Capture = (*(volatile uint16 *)0x46U);
 
-    if (Timer1_HasLastCapture == 0U)
+
+    if ((Timer1_HasLastCapture == 0U) || (Timer1_Asystole != 0U))
     {
         Timer1_LastCapture = Local_u16Capture;
         Timer1_HasLastCapture = 1U;
+        Timer1_OverflowCount = 0U;
+        Timer1_Asystole = 0U;
         return;
     }
 
+
     Timer1_LastInterval = (uint16)(Local_u16Capture - Timer1_LastCapture);
-    Timer1_Intervals[Timer1_RingIndex] = Timer1_LastInterval;
     Timer1_LastCapture = Local_u16Capture;
 
+    Timer1_Intervals[Timer1_RingIndex] = Timer1_LastInterval;
     Timer1_RingIndex++;
     if (Timer1_RingIndex >= 8U)
     {
@@ -530,16 +532,33 @@ void __vector_6 (void) __attribute__ ((__signal__,__used__, __externally_visible
 }
 
 
-# 248 "MCAL/TIMER/TIMER.c" 3
+# 250 "MCAL/TIMER/TIMER.c" 3
 void __vector_9 (void) __attribute__ ((__signal__,__used__, __externally_visible__)) ; void __vector_9 (void)
 
-# 249 "MCAL/TIMER/TIMER.c"
+# 251 "MCAL/TIMER/TIMER.c"
 {
-    Timer1_OverflowCount++;
-
-
-    if (Timer1_OverflowCount >= 2U)
+    if (Timer1_OverflowCount < 255U)
     {
-        Timer1_Asystole = 1U;
+        Timer1_OverflowCount++;
+    }
+
+    if (Timer1_HasLastCapture != 0U)
+    {
+
+
+
+        uint32 Local_u32Elapsed = ((uint32)Timer1_OverflowCount << 16) + (uint32)(*(volatile uint16 *)0x4CU) - (uint32)Timer1_LastCapture;
+        if (Local_u32Elapsed >= 125000UL)
+        {
+            Timer1_Asystole = 1U;
+            Timer1_HasLastCapture = 0U;
+        }
+    }
+    else
+    {
+        if (Timer1_OverflowCount >= 2U)
+        {
+            Timer1_Asystole = 1U;
+        }
     }
 }

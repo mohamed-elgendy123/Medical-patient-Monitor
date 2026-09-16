@@ -12,8 +12,8 @@
 
 #include "STD_TYPES.h"
 
-#define LCD_I2C_ROWS    2u
-#define LCD_I2C_COLS    16u
+#define LCD_I2C_ROWS 2u
+#define LCD_I2C_COLS 16u
 
 /*
  * Description : Initialise HD44780 in 4-bit mode through PCF8574.
@@ -51,6 +51,8 @@ STD_ReturnType LCD_I2C_WriteString(const char *Copy_pcStr);
  */
 STD_ReturnType LCD_I2C_WriteStringAt(uint8 Copy_u8Row, uint8 Copy_u8Col,
                                      const char *Copy_pcStr);
+
+STD_ReturnType LCD_I2C_FormatLine(uint8 Copy_u8Row, const char *Copy_pcFormat, ...);
 
 /*
  * Description : Write a signed 16-bit integer in decimal at the current cursor.

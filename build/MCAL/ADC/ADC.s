@@ -13,26 +13,19 @@ ADC_Init:
 /* frame size = 0 */
 /* stack size = 0 */
 .L__stack_usage = 0
-	cpi r24,lo8(2)
-	brlo .L2
-	cpi r24,lo8(3)
+	cpi r24,lo8(1)
 	breq .L2
 .L4:
 	ldi r24,lo8(1)
 	ldi r25,0
 	ret
 .L2:
-	mov r25,r22
-	subi r25,lo8(-(-1))
-	cpi r25,lo8(7)
-	brsh .L4
-	swap r24
-	lsl r24
-	lsl r24
-	andi r24,lo8(-64)
+	cpi r22,lo8(6)
+	brne .L4
+	ldi r24,lo8(64)
 	out 0x7,r24
-	ori r22,lo8(-128)
-	out 0x6,r22
+	ldi r24,lo8(-122)
+	out 0x6,r24
 	ldi r24,0
 	ldi r25,0
 /* epilogue start */
@@ -47,23 +40,45 @@ ADC_ReadChannel:
 /* stack size = 0 */
 .L__stack_usage = 0
 	cpi r24,lo8(8)
-	brlo .L9
-.L11:
+	brsh .L6
+	cpi r22,0
+	cpc r23,r22
+	brne .L7
+.L6:
 	ldi r24,lo8(1)
 	ldi r25,0
 	ret
-.L9:
-	cpi r22,0
-	cpc r23,r22
-	breq .L11
+.L7:
 	in r25,0x7
 	andi r25,lo8(-32)
 	or r25,r24
 	out 0x7,r25
+	ldi r24,lo8(26)
+1:	dec r24
+	brne 1b
+	rjmp .
+	sbi 0x6,4
 	sbi 0x6,6
-.L12:
-	sbis 0x6,4
-	rjmp .L12
+	ldi r24,lo8(80)
+	ldi r25,lo8(-61)
+	ldi r26,0
+	ldi r27,0
+.L9:
+	sbic 0x6,4
+	rjmp .L10
+	sbiw r26,0
+	sbci r25,hi8(0)
+	sbci r24,lo8(0)
+	breq .L6
+	sbiw r24,1
+	sbci r26,0
+	sbci r27,0
+	rjmp .L9
+.L10:
+	or r24,r25
+	or r24,r26
+	or r24,r27
+	breq .L6
 	sbi 0x6,4
 	in r24,0x4
 	in r18,0x5
@@ -84,7 +99,7 @@ ADC_StartConversion:
 /* stack size = 0 */
 .L__stack_usage = 0
 	cpi r24,lo8(8)
-	brsh .L21
+	brsh .L18
 	in r25,0x7
 	andi r25,lo8(-32)
 	or r25,r24
@@ -93,7 +108,7 @@ ADC_StartConversion:
 	ldi r24,0
 	ldi r25,0
 	ret
-.L21:
+.L18:
 	ldi r24,lo8(1)
 	ldi r25,0
 /* epilogue start */
@@ -108,14 +123,14 @@ ADC_GetResult:
 /* stack size = 0 */
 .L__stack_usage = 0
 	sbiw r24,0
-	brne .L23
-.L25:
+	brne .L20
+.L22:
 	ldi r24,lo8(1)
 	ldi r25,0
 	ret
-.L23:
+.L20:
 	sbis 0x6,4
-	rjmp .L25
+	rjmp .L22
 	sbi 0x6,4
 	in r18,0x4
 	in r20,0x5
@@ -136,17 +151,17 @@ ADC_SetInterrupt:
 /* stack size = 0 */
 .L__stack_usage = 0
 	cpi r24,lo8(1)
-	brne .L30
+	brne .L27
 	sbi 0x6,3
-.L31:
+.L28:
 	ldi r24,0
 	ldi r25,0
 	ret
-.L30:
-	brsh .L33
+.L27:
+	brsh .L30
 	cbi 0x6,3
-	rjmp .L31
-.L33:
+	rjmp .L28
+.L30:
 	ldi r24,lo8(1)
 	ldi r25,0
 /* epilogue start */

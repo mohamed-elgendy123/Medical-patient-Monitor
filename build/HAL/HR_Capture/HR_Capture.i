@@ -71,7 +71,7 @@ void HRC_ClearAsystole(void);
 static uint16 HRC_CalculateMedian(void);
 static uint16 HRC_CalculateHrvMs(void);
 # 10 "HAL/HR_Capture/HR_Capture.c" 2
-
+# 44 "HAL/HR_Capture/HR_Capture.c"
 static volatile uint16 HRC_MedianIntervals[3U];
 static volatile uint16 HRC_Intervals[8U];
 static volatile uint8 HRC_MedianIndex;
@@ -80,6 +80,10 @@ static volatile uint8 HRC_IntervalIndex;
 static volatile uint16 HRC_CurrentBpm;
 static volatile uint16 HRC_CurrentHrvMs;
 static volatile uint8 HRC_Asystole;
+static volatile uint16 HRC_LastRawInterval;
+
+static uint16 HRC_CalculateMedian(void);
+static uint16 HRC_CalculateHrvMs(void);
 
 void HRC_Init(void)
 {
@@ -91,6 +95,7 @@ void HRC_Init(void)
     HRC_CurrentBpm = 0U;
     HRC_CurrentHrvMs = 0U;
     HRC_Asystole = 0U;
+    HRC_LastRawInterval = 0U;
 
     for (Local_u8Index = 0U; Local_u8Index < 3U; Local_u8Index++)
     {
@@ -108,15 +113,6 @@ void HRC_Init(void)
 void HRC_Process(void)
 {
 
-    if (TIMER1_IsAsystole() != 0U)
-    {
-        HRC_Asystole = 1U;
-        HRC_CurrentBpm = 0U;
-        HRC_CurrentHrvMs = 0U;
-        return;
-    }
-
-
     if (TIMER1_IsCaptureReady() != 0U)
     {
         uint16 Local_u16Interval = TIMER1_GetLastInterval();
@@ -127,14 +123,27 @@ void HRC_Process(void)
         TIMER1_ClearCaptureFlag();
     }
 
-    if (HRC_IsAsystole() != 0U)
+
+    if (TIMER1_IsAsystole() != 0U)
     {
+        HRC_Asystole = 1U;
         HRC_CurrentBpm = 0U;
         HRC_CurrentHrvMs = 0U;
         return;
     }
 
-    HRC_CurrentBpm = HRC_CalculateMedian();
+
+    uint16 Local_u16Bpm = HRC_CalculateMedian();
+    if ((Local_u16Bpm == 0U) && (HRC_LastRawInterval > 0U))
+    {
+        uint32 Local_u32DirectBpm = 1875000UL / (uint32)HRC_LastRawInterval;
+        if ((Local_u32DirectBpm >= 1U) && (Local_u32DirectBpm <= 300U))
+        {
+            Local_u16Bpm = (uint16)Local_u32DirectBpm;
+        }
+    }
+
+    HRC_CurrentBpm = Local_u16Bpm;
     HRC_CurrentHrvMs = HRC_CalculateHrvMs();
 }
 
@@ -142,6 +151,8 @@ void HRC_OnCapture(uint16 Copy_u16IntervalTicks)
 {
     if (Copy_u16IntervalTicks != 0U)
     {
+        HRC_LastRawInterval = Copy_u16IntervalTicks;
+
         HRC_MedianIntervals[HRC_MedianIndex] = Copy_u16IntervalTicks;
         HRC_MedianIndex++;
         if (HRC_MedianIndex >= 3U)
@@ -160,7 +171,9 @@ void HRC_OnCapture(uint16 Copy_u16IntervalTicks)
             HRC_IntervalIndex = 0U;
         }
 
+
         HRC_Asystole = 0U;
+        TIMER1_ClearAsystole();
     }
 }
 
@@ -178,6 +191,11 @@ uint16 HRC_GetBpm(void)
     return HRC_CurrentBpm;
 }
 
+uint16 HRC_GetRate(void)
+{
+    return HRC_CurrentBpm;
+}
+
 uint16 HRC_GetHrvMs(void)
 {
     return HRC_CurrentHrvMs;
@@ -189,10 +207,7 @@ uint8 HRC_IsAsystole(void)
     {
         return 1U;
     }
-    else
-    {
-        return 0U;
-    }
+    return 0U;
 }
 
 void HRC_ClearAsystole(void)
@@ -211,12 +226,10 @@ static uint16 HRC_CalculateMedian(void)
     Local_u16Arr[2] = HRC_MedianIntervals[2];
 
     if ((HRC_MedianCount < 3U) ||
-        (Local_u16Arr[0] == 0U) || (Local_u16Arr[1] == 0U) ||
-        (Local_u16Arr[2] == 0U))
+        (Local_u16Arr[0] == 0U) || (Local_u16Arr[1] == 0U) || (Local_u16Arr[2] == 0U))
     {
         return 0U;
     }
-
 
     if (Local_u16Arr[0] > Local_u16Arr[1])
     {
@@ -237,18 +250,15 @@ static uint16 HRC_CalculateMedian(void)
         Local_u16Arr[1] = Local_u16Temp;
     }
 
-
     uint16 Local_u16Median = Local_u16Arr[1];
-
     if (Local_u16Median == 0U)
     {
         return 0U;
     }
 
+    uint32 Local_u32Bpm = 1875000UL / (uint32)Local_u16Median;
 
-    uint32 Local_u32Bpm = (uint32)(1875000UL / Local_u16Median);
-
-    if ((Local_u32Bpm < 30U) || (Local_u32Bpm > 250U))
+    if ((Local_u32Bpm < 1U) || (Local_u32Bpm > 300U))
     {
         return 0U;
     }
@@ -274,7 +284,7 @@ static uint16 HRC_CalculateHrvMs(void)
                                                                        ;
     }
 
-    Local_u32AverageDiff = Local_u32DiffSum / 7UL;
+    Local_u32AverageDiff = Local_u32DiffSum / (uint32)(8U - 1U);
     Local_u32HrvMs = (Local_u32AverageDiff * 32U) / 1000UL;
 
     if (Local_u32HrvMs > 65535UL)

@@ -1,18 +1,34 @@
 /*
- * HAL Panel — 10 ms debounced operator buttons on PORTC (PC2–PC6).
+ * HAL Panel — 10 ms debounced operator buttons.
+ * Pin assignments per SimulIDE circuit:
+ *   PC2 = Silence   (BTN_SILENCE = 0)
+ *   PC3 = Menu      (BTN_MENU = 1)
+ *   PC4 = Up        (BTN_UP = 2)
+ *   PC5 = Down      (BTN_DOWN = 3)
+ *   PC6 = Standby   (BTN_STANDBY = 4)
  *
- * Buttons are active-low (pressed = GND) with internal pull-ups enabled.
- * Debounce uses a counter: a new stable state is accepted only after
- * DEBOUNCE_COUNT consecutive identical readings.
- *
- * The Silence button (PC2) starts a 120 s countdown; Panel_IsSilenceActive()
- * returns 1 while the timer is still running.
+ * All buttons are active-low (pressed = GND) with internal pull-ups enabled.
+ * JTAG is disabled twice to free PC2..PC5 for GPIO.
  */
 
+#include <avr/io.h>
 #include "STD_TYPES.h"
 #include "GPIO_interface.h"
 #include "Panel_interface.h"
 #include "Panel_private.h"
+
+typedef struct {
+    uint8 port;
+    uint8 pin;
+} ButtonPin_t;
+
+static const ButtonPin_t g_asButtonPins[BTN_COUNT] = {
+    { GPIO_PORTC, GPIO_PIN2 }, /* BTN_SILENCE */
+    { GPIO_PORTC, GPIO_PIN3 }, /* BTN_MENU */
+    { GPIO_PORTC, GPIO_PIN4 }, /* BTN_UP */
+    { GPIO_PORTC, GPIO_PIN5 }, /* BTN_DOWN */
+    { GPIO_PORTC, GPIO_PIN6 }  /* BTN_STANDBY */
+};
 
 /* ======================== Private state ======================== */
 
@@ -26,8 +42,17 @@ static uint16 g_u16SilenceTimer;           /* ticks remaining (0 = inactive)  */
 void Panel_Init(void)
 {
     uint8 i;
+
+    /* 1. Disable JTAG twice within 4 cycles to release PC2..PC5 */
+    MCUCSR |= (1u << 7);
+    MCUCSR |= (1u << 7);
+
+    /* 2. Configure PC2..PC6 as inputs with internal pull-ups enabled */
+    DDRC &= ~(0x7Cu);
+    PORTC |= 0x7Cu;
+
     for (i = 0; i < BTN_COUNT; i++) {
-        GPIO_SetPinDirection(PANEL_PORT, PANEL_PIN_BASE + i, GPIO_INPUT_PULLUP);
+        GPIO_SetPinDirection(g_asButtonPins[i].port, g_asButtonPins[i].pin, GPIO_INPUT_PULLUP);
         g_au8Debounce[i] = 0u;
         g_au8Stable[i]   = 1u;   /* released (HIGH with pull-up) */
         g_au8Pressed[i]  = 0u;
@@ -41,7 +66,7 @@ void Panel_Update(void)
     uint8 Local_u8Raw;
 
     for (i = 0; i < BTN_COUNT; i++) {
-        GPIO_GetPinValue(PANEL_PORT, PANEL_PIN_BASE + i, &Local_u8Raw);
+        GPIO_GetPinValue(g_asButtonPins[i].port, g_asButtonPins[i].pin, &Local_u8Raw);
 
         if (Local_u8Raw != g_au8Stable[i]) {
             /* Pin differs from accepted state — count up */
@@ -52,7 +77,7 @@ void Panel_Update(void)
                 g_au8Stable[i]     = Local_u8Raw;
                 g_au8Debounce[i]   = 0u;
 
-                /* Falling edge  (1 → 0 = released → pressed) */
+                /* Falling edge  (1 -> 0 = released -> pressed) */
                 if (Local_u8Prev == 1u && Local_u8Raw == 0u) {
                     g_au8Pressed[i] = 1u;
 

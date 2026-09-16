@@ -23,7 +23,12 @@ typedef enum
 # 2 "MCAL/SPI/SPI.c" 2
 # 15 "MCAL/SPI/SPI.c"
 # 1 "MCAL/SPI/../GPIO/GPIO_interface.h" 1
-# 42 "MCAL/SPI/../GPIO/GPIO_interface.h"
+# 13 "MCAL/SPI/../GPIO/GPIO_interface.h"
+# 1 "LIB/STD_TYPES.h" 1
+# 14 "MCAL/SPI/../GPIO/GPIO_interface.h" 2
+
+void GPIO_DisableJtag(void);
+# 45 "MCAL/SPI/../GPIO/GPIO_interface.h"
 STD_ReturnType GPIO_SetPinDirection(uint8 Copy_u8Port, uint8 Copy_u8Pin, uint8 Copy_u8Direction);
 
 

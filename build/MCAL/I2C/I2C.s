@@ -68,8 +68,8 @@ I2C_SendStart:
 .L__stack_usage = 0
 	ldi r24,lo8(-92)
 	out 0x36,r24
-	ldi r24,lo8(80)
-	ldi r25,lo8(-61)
+	ldi r24,lo8(-48)
+	ldi r25,lo8(7)
 	ldi r26,0
 	ldi r27,0
 .L9:
@@ -104,8 +104,8 @@ I2C_SendRepeatedStart:
 .L__stack_usage = 0
 	ldi r24,lo8(-92)
 	out 0x36,r24
-	ldi r24,lo8(80)
-	ldi r25,lo8(-61)
+	ldi r24,lo8(-48)
+	ldi r25,lo8(7)
 	ldi r26,0
 	ldi r27,0
 .L16:
@@ -147,8 +147,8 @@ I2C_SendStop:
 	sbrs __tmp_reg__,4
 	rjmp .L21
 	adiw r24,1
-	cpi r24,80
-	ldi r18,-61
+	cpi r24,-48
+	ldi r18,7
 	cpc r25,r18
 	brne .L23
 .L21:
@@ -176,8 +176,8 @@ I2C_SendSlaveAddressWithWrite:
 	out 0x3,r24
 	ldi r24,lo8(-124)
 	out 0x36,r24
-	ldi r24,lo8(80)
-	ldi r25,lo8(-61)
+	ldi r24,lo8(-48)
+	ldi r25,lo8(7)
 	ldi r26,0
 	ldi r27,0
 .L33:
@@ -220,8 +220,8 @@ I2C_SendSlaveAddressWithRead:
 	out 0x3,r24
 	ldi r24,lo8(-124)
 	out 0x36,r24
-	ldi r24,lo8(80)
-	ldi r25,lo8(-61)
+	ldi r24,lo8(-48)
+	ldi r25,lo8(7)
 	ldi r26,0
 	ldi r27,0
 .L42:
@@ -253,8 +253,8 @@ I2C_SendByte:
 	out 0x3,r24
 	ldi r24,lo8(-124)
 	out 0x36,r24
-	ldi r24,lo8(80)
-	ldi r25,lo8(-61)
+	ldi r24,lo8(-48)
+	ldi r25,lo8(7)
 	ldi r26,0
 	ldi r27,0
 .L49:
@@ -294,8 +294,8 @@ I2C_ReceiveByte:
 	brne .L56
 	ldi r24,lo8(-60)
 	out 0x36,r24
-	ldi r20,lo8(80)
-	ldi r21,lo8(-61)
+	ldi r20,lo8(-48)
+	ldi r21,lo8(7)
 	ldi r22,0
 	ldi r23,0
 .L58:
@@ -316,8 +316,8 @@ I2C_ReceiveByte:
 	brsh .L55
 	ldi r24,lo8(-124)
 	out 0x36,r24
-	ldi r20,lo8(80)
-	ldi r21,lo8(-61)
+	ldi r20,lo8(-48)
+	ldi r21,lo8(7)
 	ldi r22,0
 	ldi r23,0
 .L61:

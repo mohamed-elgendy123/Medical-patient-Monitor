@@ -91,7 +91,7 @@ STD_ReturnType I2C_InitMaster(uint32 Copy_u32SclHz){
 
 
 STD_ReturnType I2C_SendStart(void){
-    do { uint32 Local_u32Timeout = 50000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | ((1u << 5)); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x08u)) return E_NOK; } while(0);
+    do { uint32 Local_u32Timeout = 2000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | ((1u << 5)); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x08u)) return E_NOK; } while(0);
     return E_OK;
 }
 
@@ -100,7 +100,7 @@ STD_ReturnType I2C_SendStart(void){
 
 
 STD_ReturnType I2C_SendRepeatedStart(void){
-    do { uint32 Local_u32Timeout = 50000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | ((1u << 5)); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x10u)) return E_NOK; } while(0);
+    do { uint32 Local_u32Timeout = 2000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | ((1u << 5)); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x10u)) return E_NOK; } while(0);
     return E_OK;
 }
 
@@ -109,7 +109,7 @@ STD_ReturnType I2C_SendRepeatedStart(void){
 
 
 void I2C_SendStop(void){
-    uint32 Local_u32Timeout = 50000UL;
+    uint32 Local_u32Timeout = 2000UL;
     (*(volatile uint8*)0x56) = (1u << 7) | (1u << 4) | (1u << 2);
 
     while (((*(volatile uint8*)0x56) & (1u << 4)) && (--Local_u32Timeout > 0)) ;
@@ -121,7 +121,7 @@ STD_ReturnType I2C_SendSlaveAddressWithWrite(uint8 Copy_u8Address){
     }
 
     (*(volatile uint8*)0x23) = (((Copy_u8Address) << 1) | 0);
-    do { uint32 Local_u32Timeout = 50000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | (0); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x18u)) return E_NOK; } while(0);
+    do { uint32 Local_u32Timeout = 2000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | (0); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x18u)) return E_NOK; } while(0);
     return E_OK;
 }
 
@@ -131,7 +131,7 @@ STD_ReturnType I2C_SendSlaveAddressWithRead(uint8 Copy_u8Address){
     }
 
     (*(volatile uint8*)0x23) = (((Copy_u8Address) << 1) | 1);
-    do { uint32 Local_u32Timeout = 50000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | (0); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x40u)) return E_NOK; } while(0);
+    do { uint32 Local_u32Timeout = 2000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | (0); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x40u)) return E_NOK; } while(0);
     return E_OK;
 }
 
@@ -141,7 +141,7 @@ STD_ReturnType I2C_SendSlaveAddressWithRead(uint8 Copy_u8Address){
 
 STD_ReturnType I2C_SendByte(uint8 Copy_u8Data){
     (*(volatile uint8*)0x23) = Copy_u8Data;
-    do { uint32 Local_u32Timeout = 50000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | (0); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x28u)) return E_NOK; } while(0);
+    do { uint32 Local_u32Timeout = 2000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | (0); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x28u)) return E_NOK; } while(0);
     return E_OK;
 }
 # 112 "MCAL/I2C/I2C.c"
@@ -151,9 +151,9 @@ STD_ReturnType I2C_ReceiveByte(uint8 *Copy_pu8Data, uint8 Copy_u8SendAck){
     }
 
     if (Copy_u8SendAck == 1u) {
-        do { uint32 Local_u32Timeout = 50000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | ((1u << 6)); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x50u)) return E_NOK; } while(0);
+        do { uint32 Local_u32Timeout = 2000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | ((1u << 6)); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x50u)) return E_NOK; } while(0);
     } else if (Copy_u8SendAck == 0u) {
-        do { uint32 Local_u32Timeout = 50000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | (0); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x58u)) return E_NOK; } while(0);
+        do { uint32 Local_u32Timeout = 2000UL; (*(volatile uint8*)0x56) = (1u << 7) | (1u << 2) | (0); while ((((*(volatile uint8*)0x56) & (1u << 7)) == 0) && (--Local_u32Timeout > 0)) ; if (Local_u32Timeout == 0) return E_NOK; if (((*(volatile uint8*)0x21) & 0xF8u) != (0x58u)) return E_NOK; } while(0);
     } else {
         return E_NOK;
     }

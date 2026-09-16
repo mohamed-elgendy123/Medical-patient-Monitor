@@ -26,7 +26,9 @@ typedef enum
 } STD_ReturnType;
 # 5 "HAL/KeyPad/KeyPad_interface.h" 2
 # 1 "MCAL/GPIO/GPIO_interface.h" 1
-# 42 "MCAL/GPIO/GPIO_interface.h"
+# 15 "MCAL/GPIO/GPIO_interface.h"
+void GPIO_DisableJtag(void);
+# 45 "MCAL/GPIO/GPIO_interface.h"
 STD_ReturnType GPIO_SetPinDirection(uint8 Copy_u8Port, uint8 Copy_u8Pin, uint8 Copy_u8Direction);
 
 

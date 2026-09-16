@@ -9,31 +9,34 @@
  * Include this header from HAL, Logic, and main. Do not include GPIO_private.h there.
  */
 
-
 /* ---------------- Ports ---------------- */
-#define GPIO_PORTA    0u
-#define GPIO_PORTB    1u
-#define GPIO_PORTC    2u
-#define GPIO_PORTD    3u
+#include "STD_TYPES.h"
+
+void GPIO_DisableJtag(void);
+
+#define GPIO_PORTA 0u
+#define GPIO_PORTB 1u
+#define GPIO_PORTC 2u
+#define GPIO_PORTD 3u
 
 /* ---------------- Pins ---------------- */
-#define GPIO_PIN0     0u
-#define GPIO_PIN1     1u
-#define GPIO_PIN2     2u
-#define GPIO_PIN3     3u
-#define GPIO_PIN4     4u
-#define GPIO_PIN5     5u
-#define GPIO_PIN6     6u
-#define GPIO_PIN7     7u
+#define GPIO_PIN0 0u
+#define GPIO_PIN1 1u
+#define GPIO_PIN2 2u
+#define GPIO_PIN3 3u
+#define GPIO_PIN4 4u
+#define GPIO_PIN5 5u
+#define GPIO_PIN6 6u
+#define GPIO_PIN7 7u
 
 /* ---------------- Direction ---------------- */
-#define GPIO_INPUT           0u
-#define GPIO_OUTPUT          1u
-#define GPIO_INPUT_PULLUP    2u
+#define GPIO_INPUT 0u
+#define GPIO_OUTPUT 1u
+#define GPIO_INPUT_PULLUP 2u
 
 /* ---------------- Pin level ---------------- */
-#define GPIO_LOW      0u
-#define GPIO_HIGH     1u
+#define GPIO_LOW 0u
+#define GPIO_HIGH 1u
 
 /*
  * Description : Set one pin as input, output, or input with internal pull-up.
