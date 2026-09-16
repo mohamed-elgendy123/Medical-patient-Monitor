@@ -1,13 +1,18 @@
-#ifndef SHIFTREG_INTERFACE_H
+        #ifndef SHIFTREG_INTERFACE_H
 #define SHIFTREG_INTERFACE_H
-
 
 #include "../../LIB/STD_TYPES.h"
 
-/* Initialize Latch pin (PB4) and SPI Master */
+/*
+ * Description : Initialize SPI in Master mode and configure PB4 (Latch/RCLK)
+ *               as output for the 74HC595 shift register.
+ */
 void ShiftReg_voidInit(void);
 
-/* Send byte via SPI and toggle Latch (RCLK) pin to update LEDs */
+/*
+ * Description : Transmit a byte over SPI and generate a Latch pulse (LOW -> HIGH -> LOW)
+ *               to display the 8-bit pattern on the vital status LED bar.
+ */
 void ShiftReg_voidWriteByte(uint8 Copy_u8Data);
 
 #endif /* SHIFTREG_INTERFACE_H */

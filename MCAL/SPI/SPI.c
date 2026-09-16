@@ -1,5 +1,3 @@
-
-
 #include "../../LIB/STD_TYPES.h"
 
 #ifndef NULL_PTR
@@ -29,18 +27,18 @@ STD_ReturnType SPI_InitMaster(uint8 Copy_u8Prescaler)
     else
     {
         /* Configure Master Pins Direction:
-         * PB4 (SS / Latch) : Output
-         * PB5 (MOSI)       : Output
-         * PB6 (MISO)       : Input
-         * PB7 (SCK)        : Output
+         * PB4 (Latch / RCLK) : Output
+         * PB5 (MOSI)         : Output
+         * PB6 (MISO)         : Input
+         * PB7 (SCK)          : Output
          */
         GPIO_SetPinDirection(GPIO_PORTB, GPIO_PIN4, GPIO_OUTPUT);
         GPIO_SetPinDirection(GPIO_PORTB, GPIO_PIN5, GPIO_OUTPUT);
         GPIO_SetPinDirection(GPIO_PORTB, GPIO_PIN6, GPIO_INPUT);
         GPIO_SetPinDirection(GPIO_PORTB, GPIO_PIN7, GPIO_OUTPUT);
 
-        /* Idle SS Pin HIGH */
-        GPIO_SetPinValue(GPIO_PORTB, GPIO_PIN4, GPIO_HIGH);
+        /* Idle Latch Pin LOW for 74HC595 */
+        GPIO_SetPinValue(GPIO_PORTB, GPIO_PIN4, GPIO_LOW);
 
         /* SPI Setup: Enable, Master, Mode 0 (CPOL=0, CPHA=0) */
         SPI_SPCR_REG = (1u << SPI_SPCR_SPE) | (1u << SPI_SPCR_MSTR) | (Copy_u8Prescaler & 0x03u);

@@ -24,4 +24,10 @@ void ANN_Audio_Tick(void);
 void ANN_Audio_Mute(void);
 void ANN_Audio_Unmute(void);
 
+
+void ANN_Visual_Init(void);
+void ANN_Visual_SetPriority(u8 Copy_u8Priority);
+void ANN_Visual_Tick(void);
+void ANN_Visual_TriggerHeartbeat(void);
+
 #endif /* ANNUNCIATOR_INTERFACE_H */
