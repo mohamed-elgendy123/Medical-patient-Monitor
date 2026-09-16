@@ -40,9 +40,7 @@ void TIMER0_ClearTick(void);
 void TIMER1_Init(void);
 uint8 TIMER1_IsCaptureReady(void);
 void TIMER1_ClearCaptureFlag(void);
-uint16 TIMER1_GetInterval(uint8 Copy_u8Index);
-uint8 TIMER1_GetCaptureCount(void);
-uint8 TIMER1_GetCaptureWriteIndex(void);
+uint16 TIMER1_GetLastInterval(void);
 uint8 TIMER1_IsAsystole(void);
 void TIMER1_ClearAsystole(void);
 
@@ -157,6 +155,50 @@ static void Application_ClearState(void);
 static void Application_SelfTest(void);
 static void Application_Init(void);
 
+static uint8 Heartbeat_Counter = 0U;
+
+static void Task_Timers(void)
+{
+
+  if (Heartbeat_Counter > 0U)
+  {
+    Heartbeat_Counter--;
+    GPIO_SetPinValue(1u, 3u, 1u);
+  }
+  else
+  {
+    GPIO_SetPinValue(1u, 3u, 0u);
+  }
+}
+
+static void Task_FastVitals(void)
+{
+  uint16 Local_u16Interval = 0U;
+
+  if (TIMER1_IsCaptureReady() != 0U)
+  {
+    Local_u16Interval = TIMER1_GetLastInterval();
+  }
+
+  HRC_Process();
+
+  if (Local_u16Interval > 0U)
+  {
+    Heartbeat_Counter = 2U;
+  }
+
+  if ((HRC_IsAsystole() != 0U) || (HRC_GetBpm() == 0U))
+  {
+
+    GPIO_SetPinValue(1u, 0u, 1u);
+  }
+  else
+  {
+
+    GPIO_SetPinValue(1u, 0u, 0u);
+  }
+}
+
 static void Task_Panel(void)
 {
 }
@@ -169,21 +211,12 @@ static void Task_Console(void)
 {
 }
 
-static void Task_Timers(void)
-{
-}
-
 static void Task_Alarms(void)
 {
 }
 
 static void Task_Lcd(void)
 {
-}
-
-static void Task_FastVitals(void)
-{
-  HRC_Process();
 }
 
 static void Task_OneHz(void)
@@ -254,6 +287,7 @@ static void Application_Init(void)
   GPIO_SetPinDirection(1u, 2u, 1u);
   GPIO_SetPinDirection(1u, 3u, 1u);
   GPIO_SetPinDirection(2u, 7u, 1u);
+  GPIO_SetPinDirection(3u, 6u, 0u);
 
   GPIO_SetPinValue(2u, 7u, 0u);
   TIMER0_Init();

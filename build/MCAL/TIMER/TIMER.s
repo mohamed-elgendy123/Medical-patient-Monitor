@@ -90,6 +90,14 @@ TIMER1_Init:
 .L__stack_usage = 0
 	out 0x2f,__zero_reg__
 	out 0x2e,__zero_reg__
+	out 0x2c+1,__zero_reg__
+	out 0x2c,__zero_reg__
+	in r24,0x38
+	ori r24,lo8(32)
+	out 0x38,r24
+	in r24,0x38
+	ori r24,lo8(4)
+	out 0x38,r24
 	in r24,0x2e
 	ori r24,lo8(-128)
 	out 0x2e,r24
@@ -122,11 +130,12 @@ TIMER1_Init:
 	sts Timer1_LastCapture+1,__zero_reg__
 	sts Timer1_LastCapture,__zero_reg__
 	sts Timer1_RingIndex,__zero_reg__
-	sts Timer1_CaptureCount,__zero_reg__
 	sts Timer1_CaptureReady,__zero_reg__
 	sts Timer1_Asystole,__zero_reg__
-	sts Timer1_OverflowCount+1,__zero_reg__
 	sts Timer1_OverflowCount,__zero_reg__
+	sts Timer1_HasLastCapture,__zero_reg__
+	sts Timer1_LastInterval+1,__zero_reg__
+	sts Timer1_LastInterval,__zero_reg__
 /* epilogue start */
 	ret
 	.size	TIMER1_Init, .-TIMER1_Init
@@ -140,8 +149,8 @@ TIMER1_IsCaptureReady:
 .L__stack_usage = 0
 	lds r25,Timer1_CaptureReady
 	ldi r24,lo8(1)
-	cpi r25,lo8(1)
-	breq .L13
+	cpse r25,__zero_reg__
+	rjmp .L13
 	ldi r24,0
 .L13:
 /* epilogue start */
@@ -156,59 +165,30 @@ TIMER1_ClearCaptureFlag:
 /* stack size = 0 */
 .L__stack_usage = 0
 	sts Timer1_CaptureReady,__zero_reg__
-	sts Timer1_CaptureCount,__zero_reg__
 /* epilogue start */
 	ret
 	.size	TIMER1_ClearCaptureFlag, .-TIMER1_ClearCaptureFlag
-	.section	.text.TIMER1_GetInterval,"ax",@progbits
-.global	TIMER1_GetInterval
-	.type	TIMER1_GetInterval, @function
-TIMER1_GetInterval:
+	.section	.text.TIMER1_GetLastInterval,"ax",@progbits
+.global	TIMER1_GetLastInterval
+	.type	TIMER1_GetLastInterval, @function
+TIMER1_GetLastInterval:
+	push r28
+	push r29
 /* prologue: function */
 /* frame size = 0 */
-/* stack size = 0 */
-.L__stack_usage = 0
-	cpi r24,lo8(8)
-	brsh .L20
-	mov r30,r24
-	ldi r31,0
-	lsl r30
-	rol r31
-	subi r30,lo8(-(Timer1_Intervals))
-	sbci r31,hi8(-(Timer1_Intervals))
-	ld r24,Z
-	ldd r25,Z+1
-	ret
-.L20:
-	ldi r24,0
-	ldi r25,0
+/* stack size = 2 */
+.L__stack_usage = 2
+	call INTERRUPT_DisableGlobal
+	lds r24,Timer1_LastInterval
+	lds r25,Timer1_LastInterval+1
+	movw r28,r24
+	call INTERRUPT_EnableGlobal
+	movw r24,r28
 /* epilogue start */
+	pop r29
+	pop r28
 	ret
-	.size	TIMER1_GetInterval, .-TIMER1_GetInterval
-	.section	.text.TIMER1_GetCaptureCount,"ax",@progbits
-.global	TIMER1_GetCaptureCount
-	.type	TIMER1_GetCaptureCount, @function
-TIMER1_GetCaptureCount:
-/* prologue: function */
-/* frame size = 0 */
-/* stack size = 0 */
-.L__stack_usage = 0
-	lds r24,Timer1_CaptureCount
-/* epilogue start */
-	ret
-	.size	TIMER1_GetCaptureCount, .-TIMER1_GetCaptureCount
-	.section	.text.TIMER1_GetCaptureWriteIndex,"ax",@progbits
-.global	TIMER1_GetCaptureWriteIndex
-	.type	TIMER1_GetCaptureWriteIndex, @function
-TIMER1_GetCaptureWriteIndex:
-/* prologue: function */
-/* frame size = 0 */
-/* stack size = 0 */
-.L__stack_usage = 0
-	lds r24,Timer1_RingIndex
-/* epilogue start */
-	ret
-	.size	TIMER1_GetCaptureWriteIndex, .-TIMER1_GetCaptureWriteIndex
+	.size	TIMER1_GetLastInterval, .-TIMER1_GetLastInterval
 	.section	.text.TIMER1_IsAsystole,"ax",@progbits
 .global	TIMER1_IsAsystole
 	.type	TIMER1_IsAsystole, @function
@@ -220,9 +200,9 @@ TIMER1_IsAsystole:
 	lds r25,Timer1_Asystole
 	ldi r24,lo8(1)
 	cpse r25,__zero_reg__
-	rjmp .L24
+	rjmp .L17
 	ldi r24,0
-.L24:
+.L17:
 /* epilogue start */
 	ret
 	.size	TIMER1_IsAsystole, .-TIMER1_IsAsystole
@@ -235,7 +215,6 @@ TIMER1_ClearAsystole:
 /* stack size = 0 */
 .L__stack_usage = 0
 	sts Timer1_Asystole,__zero_reg__
-	sts Timer1_OverflowCount+1,__zero_reg__
 	sts Timer1_OverflowCount,__zero_reg__
 /* epilogue start */
 	ret
@@ -258,7 +237,7 @@ TIMER2_SetTone:
 	andi r25,lo8(-2)
 	out 0x25,r25
 	cpi r24,lo8(1)
-	brne .L27
+	brne .L20
 	ldi r24,lo8(-127)
 	out 0x23,r24
 	in r24,0x25
@@ -266,24 +245,24 @@ TIMER2_SetTone:
 	out 0x25,r24
 	in r24,0x25
 	ori r24,lo8(1)
-.L31:
+.L24:
 	out 0x25,r24
 	ret
-.L27:
+.L20:
 	cpi r24,lo8(2)
-	brne .L29
+	brne .L22
 	ldi r24,lo8(97)
-.L32:
+.L25:
 	out 0x23,r24
 	in r24,0x25
 	ori r24,lo8(4)
-	rjmp .L31
-.L29:
+	rjmp .L24
+.L22:
 	cpi r24,lo8(3)
-	brne .L30
+	brne .L23
 	ldi r24,lo8(-127)
-	rjmp .L32
-.L30:
+	rjmp .L25
+.L23:
 	out 0x23,__zero_reg__
 /* epilogue start */
 	ret
@@ -349,11 +328,11 @@ __vector_10:
 	lds r24,Timer0_Callback
 	lds r25,Timer0_Callback+1
 	or r24,r25
-	breq .L34
+	breq .L27
 	lds r30,Timer0_Callback
 	lds r31,Timer0_Callback+1
 	icall
-.L34:
+.L27:
 /* epilogue start */
 	pop r31
 	pop r30
@@ -391,38 +370,14 @@ __vector_6:
 .L__stack_usage = 7 + __gcc_isr.n_pushed
 	in r24,0x26
 	in r25,0x26+1
-	lds r18,Timer1_LastCapture
-	lds r19,Timer1_LastCapture+1
-	lds r30,Timer1_RingIndex
-	ldi r31,0
-	movw r20,r24
-	sub r20,r18
-	sbc r21,r19
-	movw r18,r20
-	lsl r30
-	rol r31
-	subi r30,lo8(-(Timer1_Intervals))
-	sbci r31,hi8(-(Timer1_Intervals))
-	std Z+1,r19
-	st Z,r18
+	lds r18,Timer1_HasLastCapture
+	cpse r18,__zero_reg__
+	rjmp .L34
 	sts Timer1_LastCapture+1,r25
 	sts Timer1_LastCapture,r24
-	lds r24,Timer1_RingIndex
-	subi r24,lo8(-(1))
-	andi r24,lo8(7)
-	sts Timer1_RingIndex,r24
-	lds r24,Timer1_CaptureCount
-	cpi r24,lo8(8)
-	brsh .L42
-	lds r24,Timer1_CaptureCount
-	subi r24,lo8(-(1))
-.L41:
-	sts Timer1_CaptureCount,r24
 	ldi r24,lo8(1)
-	sts Timer1_CaptureReady,r24
-	sts Timer1_OverflowCount+1,__zero_reg__
-	sts Timer1_OverflowCount,__zero_reg__
-	sts Timer1_Asystole,__zero_reg__
+	sts Timer1_HasLastCapture,r24
+.L33:
 /* epilogue start */
 	pop r31
 	pop r30
@@ -433,9 +388,39 @@ __vector_6:
 	pop r19
 	__gcc_isr 2
 	reti
-.L42:
-	ldi r24,lo8(8)
-	rjmp .L41
+.L34:
+	lds r18,Timer1_LastCapture
+	lds r19,Timer1_LastCapture+1
+	movw r20,r24
+	sub r20,r18
+	sbc r21,r19
+	sts Timer1_LastInterval+1,r21
+	sts Timer1_LastInterval,r20
+	lds r30,Timer1_RingIndex
+	ldi r31,0
+	lds r18,Timer1_LastInterval
+	lds r19,Timer1_LastInterval+1
+	lsl r30
+	rol r31
+	subi r30,lo8(-(Timer1_Intervals))
+	sbci r31,hi8(-(Timer1_Intervals))
+	std Z+1,r19
+	st Z,r18
+	sts Timer1_LastCapture+1,r25
+	sts Timer1_LastCapture,r24
+	lds r24,Timer1_RingIndex
+	subi r24,lo8(-(1))
+	sts Timer1_RingIndex,r24
+	lds r24,Timer1_RingIndex
+	cpi r24,lo8(8)
+	brlo .L36
+	sts Timer1_RingIndex,__zero_reg__
+.L36:
+	ldi r24,lo8(1)
+	sts Timer1_CaptureReady,r24
+	sts Timer1_OverflowCount,__zero_reg__
+	sts Timer1_Asystole,__zero_reg__
+	rjmp .L33
 	__gcc_isr 0,r18
 	.size	__vector_6, .-__vector_6
 	.section	.text.__vector_9,"ax",@progbits
@@ -443,35 +428,39 @@ __vector_6:
 	.type	__vector_9, @function
 __vector_9:
 	__gcc_isr 1
-	push r25
 /* prologue: Signal */
 /* frame size = 0 */
-/* stack size = 1...5 */
-.L__stack_usage = 1 + __gcc_isr.n_pushed
+/* stack size = 0...4 */
+.L__stack_usage = 0 + __gcc_isr.n_pushed
 	lds r24,Timer1_OverflowCount
-	lds r25,Timer1_OverflowCount+1
-	adiw r24,1
-	sts Timer1_OverflowCount+1,r25
+	subi r24,lo8(-(1))
 	sts Timer1_OverflowCount,r24
 	lds r24,Timer1_OverflowCount
-	lds r25,Timer1_OverflowCount+1
-	cpi r24,2
-	cpc r25,__zero_reg__
-	brlo .L43
+	cpi r24,lo8(2)
+	brlo .L37
 	ldi r24,lo8(1)
 	sts Timer1_Asystole,r24
-.L43:
+.L37:
 /* epilogue start */
-	pop r25
 	__gcc_isr 2
 	reti
 	__gcc_isr 0,r24
 	.size	__vector_9, .-__vector_9
+	.section	.bss.Timer1_LastInterval,"aw",@nobits
+	.type	Timer1_LastInterval, @object
+	.size	Timer1_LastInterval, 2
+Timer1_LastInterval:
+	.zero	2
+	.section	.bss.Timer1_HasLastCapture,"aw",@nobits
+	.type	Timer1_HasLastCapture, @object
+	.size	Timer1_HasLastCapture, 1
+Timer1_HasLastCapture:
+	.zero	1
 	.section	.bss.Timer1_OverflowCount,"aw",@nobits
 	.type	Timer1_OverflowCount, @object
-	.size	Timer1_OverflowCount, 2
+	.size	Timer1_OverflowCount, 1
 Timer1_OverflowCount:
-	.zero	2
+	.zero	1
 	.section	.bss.Timer1_Asystole,"aw",@nobits
 	.type	Timer1_Asystole, @object
 	.size	Timer1_Asystole, 1
@@ -481,11 +470,6 @@ Timer1_Asystole:
 	.type	Timer1_CaptureReady, @object
 	.size	Timer1_CaptureReady, 1
 Timer1_CaptureReady:
-	.zero	1
-	.section	.bss.Timer1_CaptureCount,"aw",@nobits
-	.type	Timer1_CaptureCount, @object
-	.size	Timer1_CaptureCount, 1
-Timer1_CaptureCount:
 	.zero	1
 	.section	.bss.Timer1_RingIndex,"aw",@nobits
 	.type	Timer1_RingIndex, @object

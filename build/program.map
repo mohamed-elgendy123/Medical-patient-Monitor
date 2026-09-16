@@ -11,7 +11,7 @@ C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Micros
 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/avr5\libgcc.a(_copy_data.o)
                               build/HAL/SevenSegment/SevenSegment.o (__do_copy_data)
 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/avr5\libgcc.a(_clear_bss.o)
-                              build/HAL/Annunciator/Annunciator_audio.o (__do_clear_bss)
+                              build/main.o (__do_clear_bss)
 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/../../../../avr/lib/avr5\libatmega32.a(init_sp.o)
                               C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/../../../../avr/lib/avr5/crtatmega32.o (__init_sp)
 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/../../../../avr/lib/avr5\libatmega32.a(call_main.o)
@@ -53,12 +53,8 @@ Discarded input sections
  .bss           0x00000000        0x0 build/HAL/HR_Capture/HR_Capture.o
  .text.HRC_OnOverflow
                 0x00000000       0x18 build/HAL/HR_Capture/HR_Capture.o
- .text.HRC_GetBpm
-                0x00000000        0xa build/HAL/HR_Capture/HR_Capture.o
  .text.HRC_GetHrvMs
                 0x00000000        0xa build/HAL/HR_Capture/HR_Capture.o
- .text.HRC_IsAsystole
-                0x00000000       0x1a build/HAL/HR_Capture/HR_Capture.o
  .text          0x00000000        0x0 build/HAL/KeyPad/KeyPad.o
  .data          0x00000000        0x0 build/HAL/KeyPad/KeyPad.o
  .bss           0x00000000        0x0 build/HAL/KeyPad/KeyPad.o
@@ -432,7 +428,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0xc04
+.text           0x00000000      0xc44
  *(.vectors)
  .vectors       0x00000000       0x54 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/../../../../avr/lib/avr5/crtatmega32.o
                 0x00000000                __vector_default
@@ -511,114 +507,114 @@ END GROUP
                 0x00000092                        . = ALIGN (0x2)
  *(.text.*)
  .text.startup.main
-                0x00000092      0x118 build/main.o
+                0x00000092      0x18a build/main.o
                 0x00000092                main
  .text.ANN_ResetPattern
-                0x000001aa       0x44 build/HAL/Annunciator/Annunciator_audio.o
+                0x0000021c       0x44 build/HAL/Annunciator/Annunciator_audio.o
  .text.ANN_Audio_Init
-                0x000001ee       0x34 build/HAL/Annunciator/Annunciator_audio.o
-                0x000001ee                ANN_Audio_Init
+                0x00000260       0x34 build/HAL/Annunciator/Annunciator_audio.o
+                0x00000260                ANN_Audio_Init
  .text.ANN_Audio_SetPriority
-                0x00000222       0x22 build/HAL/Annunciator/Annunciator_audio.o
-                0x00000222                ANN_Audio_SetPriority
+                0x00000294       0x22 build/HAL/Annunciator/Annunciator_audio.o
+                0x00000294                ANN_Audio_SetPriority
  .text.ANN_Audio_Tick
-                0x00000244      0x17e build/HAL/Annunciator/Annunciator_audio.o
-                0x00000244                ANN_Audio_Tick
+                0x000002b6      0x17e build/HAL/Annunciator/Annunciator_audio.o
+                0x000002b6                ANN_Audio_Tick
  .text.ANN_Audio_Mute
-                0x000003c2       0x18 build/HAL/Annunciator/Annunciator_audio.o
-                0x000003c2                ANN_Audio_Mute
+                0x00000434       0x18 build/HAL/Annunciator/Annunciator_audio.o
+                0x00000434                ANN_Audio_Mute
  .text.HRC_Init
-                0x000003da       0x52 build/HAL/HR_Capture/HR_Capture.o
-                0x000003da                HRC_Init
+                0x0000044c       0x56 build/HAL/HR_Capture/HR_Capture.o
+                0x0000044c                HRC_Init
  .text.HRC_OnCapture
-                0x0000042c       0x5a build/HAL/HR_Capture/HR_Capture.o
-                0x0000042c                HRC_OnCapture
+                0x000004a2       0x6c build/HAL/HR_Capture/HR_Capture.o
+                0x000004a2                HRC_OnCapture
+ .text.HRC_GetBpm
+                0x0000050e        0xa build/HAL/HR_Capture/HR_Capture.o
+                0x0000050e                HRC_GetBpm
+ .text.HRC_IsAsystole
+                0x00000518       0x1a build/HAL/HR_Capture/HR_Capture.o
+                0x00000518                HRC_IsAsystole
  .text.HRC_Process
-                0x00000486      0x1f0 build/HAL/HR_Capture/HR_Capture.o
-                0x00000486                HRC_Process
+                0x00000532      0x184 build/HAL/HR_Capture/HR_Capture.o
+                0x00000532                HRC_Process
  .text.HRC_ClearAsystole
-                0x00000676        0x8 build/HAL/HR_Capture/HR_Capture.o
-                0x00000676                HRC_ClearAsystole
+                0x000006b6        0x8 build/HAL/HR_Capture/HR_Capture.o
+                0x000006b6                HRC_ClearAsystole
  .text.GPIO_SetPinDirection
-                0x0000067e       0xe0 build/MCAL/GPIO/GPIO.o
-                0x0000067e                GPIO_SetPinDirection
+                0x000006be       0xe0 build/MCAL/GPIO/GPIO.o
+                0x000006be                GPIO_SetPinDirection
  .text.GPIO_SetPinValue
-                0x0000075e       0x78 build/MCAL/GPIO/GPIO.o
-                0x0000075e                GPIO_SetPinValue
+                0x0000079e       0x78 build/MCAL/GPIO/GPIO.o
+                0x0000079e                GPIO_SetPinValue
  .text.INTERRUPT_EnableGlobal
-                0x000007d6        0x8 build/MCAL/INTERRUPT/INTERRUPT.o
-                0x000007d6                INTERRUPT_EnableGlobal
+                0x00000816        0x8 build/MCAL/INTERRUPT/INTERRUPT.o
+                0x00000816                INTERRUPT_EnableGlobal
  .text.INTERRUPT_DisableGlobal
-                0x000007de        0x8 build/MCAL/INTERRUPT/INTERRUPT.o
-                0x000007de                INTERRUPT_DisableGlobal
+                0x0000081e        0x8 build/MCAL/INTERRUPT/INTERRUPT.o
+                0x0000081e                INTERRUPT_DisableGlobal
  .text.__vector_1
-                0x000007e6       0x5a build/MCAL/INTERRUPT/INTERRUPT.o
-                0x000007e6                __vector_1
+                0x00000826       0x5a build/MCAL/INTERRUPT/INTERRUPT.o
+                0x00000826                __vector_1
  .text.__vector_2
-                0x00000840       0x5a build/MCAL/INTERRUPT/INTERRUPT.o
-                0x00000840                __vector_2
+                0x00000880       0x5a build/MCAL/INTERRUPT/INTERRUPT.o
+                0x00000880                __vector_2
  .text.__vector_3
-                0x0000089a       0x5a build/MCAL/INTERRUPT/INTERRUPT.o
-                0x0000089a                __vector_3
+                0x000008da       0x5a build/MCAL/INTERRUPT/INTERRUPT.o
+                0x000008da                __vector_3
  .text.TIMER0_Init
-                0x000008f4       0x22 build/MCAL/TIMER/TIMER.o
-                0x000008f4                TIMER0_Init
+                0x00000934       0x22 build/MCAL/TIMER/TIMER.o
+                0x00000934                TIMER0_Init
  .text.TIMER0_IsTickPending
-                0x00000916        0xe build/MCAL/TIMER/TIMER.o
-                0x00000916                TIMER0_IsTickPending
+                0x00000956        0xe build/MCAL/TIMER/TIMER.o
+                0x00000956                TIMER0_IsTickPending
  .text.TIMER0_ClearTick
-                0x00000924        0x6 build/MCAL/TIMER/TIMER.o
-                0x00000924                TIMER0_ClearTick
+                0x00000964        0x6 build/MCAL/TIMER/TIMER.o
+                0x00000964                TIMER0_ClearTick
  .text.TIMER1_Init
-                0x0000092a       0x5e build/MCAL/TIMER/TIMER.o
-                0x0000092a                TIMER1_Init
+                0x0000096a       0x72 build/MCAL/TIMER/TIMER.o
+                0x0000096a                TIMER1_Init
  .text.TIMER1_IsCaptureReady
-                0x00000988        0xe build/MCAL/TIMER/TIMER.o
-                0x00000988                TIMER1_IsCaptureReady
+                0x000009dc        0xe build/MCAL/TIMER/TIMER.o
+                0x000009dc                TIMER1_IsCaptureReady
  .text.TIMER1_ClearCaptureFlag
-                0x00000996        0xa build/MCAL/TIMER/TIMER.o
-                0x00000996                TIMER1_ClearCaptureFlag
- .text.TIMER1_GetInterval
-                0x000009a0       0x1c build/MCAL/TIMER/TIMER.o
-                0x000009a0                TIMER1_GetInterval
- .text.TIMER1_GetCaptureCount
-                0x000009bc        0x6 build/MCAL/TIMER/TIMER.o
-                0x000009bc                TIMER1_GetCaptureCount
- .text.TIMER1_GetCaptureWriteIndex
-                0x000009c2        0x6 build/MCAL/TIMER/TIMER.o
-                0x000009c2                TIMER1_GetCaptureWriteIndex
+                0x000009ea        0x6 build/MCAL/TIMER/TIMER.o
+                0x000009ea                TIMER1_ClearCaptureFlag
+ .text.TIMER1_GetLastInterval
+                0x000009f0       0x1e build/MCAL/TIMER/TIMER.o
+                0x000009f0                TIMER1_GetLastInterval
  .text.TIMER1_IsAsystole
-                0x000009c8        0xe build/MCAL/TIMER/TIMER.o
-                0x000009c8                TIMER1_IsAsystole
+                0x00000a0e        0xe build/MCAL/TIMER/TIMER.o
+                0x00000a0e                TIMER1_IsAsystole
  .text.TIMER1_ClearAsystole
-                0x000009d6        0xe build/MCAL/TIMER/TIMER.o
-                0x000009d6                TIMER1_ClearAsystole
+                0x00000a1c        0xa build/MCAL/TIMER/TIMER.o
+                0x00000a1c                TIMER1_ClearAsystole
  .text.TIMER2_SetTone
-                0x000009e4       0x42 build/MCAL/TIMER/TIMER.o
-                0x000009e4                TIMER2_SetTone
+                0x00000a26       0x42 build/MCAL/TIMER/TIMER.o
+                0x00000a26                TIMER2_SetTone
  .text.TIMER2_Init
-                0x00000a26       0x18 build/MCAL/TIMER/TIMER.o
-                0x00000a26                TIMER2_Init
+                0x00000a68       0x18 build/MCAL/TIMER/TIMER.o
+                0x00000a68                TIMER2_Init
  .text.__vector_10
-                0x00000a3e       0x86 build/MCAL/TIMER/TIMER.o
-                0x00000a3e                __vector_10
+                0x00000a80       0x86 build/MCAL/TIMER/TIMER.o
+                0x00000a80                __vector_10
  .text.__vector_6
-                0x00000ac4       0x92 build/MCAL/TIMER/TIMER.o
-                0x00000ac4                __vector_6
+                0x00000b06       0xa8 build/MCAL/TIMER/TIMER.o
+                0x00000b06                __vector_6
  .text.__vector_9
-                0x00000b56       0x3e build/MCAL/TIMER/TIMER.o
-                0x00000b56                __vector_9
+                0x00000bae       0x26 build/MCAL/TIMER/TIMER.o
+                0x00000bae                __vector_9
  .text.libgcc.div
-                0x00000b94       0x28 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/avr5\libgcc.a(_udivmodhi4.o)
-                0x00000b94                __udivmodhi4
+                0x00000bd4       0x28 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/avr5\libgcc.a(_udivmodhi4.o)
+                0x00000bd4                __udivmodhi4
  .text.libgcc.div
-                0x00000bbc       0x44 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/avr5\libgcc.a(_udivmodsi4.o)
-                0x00000bbc                __udivmodsi4
-                0x00000c00                        . = ALIGN (0x2)
+                0x00000bfc       0x44 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/avr5\libgcc.a(_udivmodsi4.o)
+                0x00000bfc                __udivmodsi4
+                0x00000c40                        . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000c00        0x0 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/avr5\libgcc.a(_exit.o)
-                0x00000c00                _exit
-                0x00000c00                exit
+ .fini9         0x00000c40        0x0 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/avr5\libgcc.a(_exit.o)
+                0x00000c40                _exit
+                0x00000c40                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -637,18 +633,18 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000c00        0x4 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x00000c40        0x4 C:/Users/amazon/AppData/Local/Microsoft/WinGet/Packages/ZakKemble.avr-gcc_Microsoft.Winget.Source_8wekyb3d8bbwe/avr-gcc-16.1.0-x64-windows/bin/../lib/gcc/avr/16.1.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
  *(.hightext)
  *(.hightext*)
  *(.progmemx)
  *(.progmemx.*)
-                0x00000c04                        . = ALIGN (0x2)
+                0x00000c44                        . = ALIGN (0x2)
  *(.jumptables)
  *(.jumptables*)
-                0x00000c04                        _etext = .
+                0x00000c44                        _etext = .
 
-.data           0x00800060        0x0 load address 0x00000c04
+.data           0x00800060        0x0 load address 0x00000c44
                 0x00800060                        PROVIDE (__data_start = .)
  *(.data)
  *(.data*)
@@ -660,69 +656,75 @@ END GROUP
                 0x00800060                        _edata = .
                 0x00800060                        PROVIDE (__data_end = .)
 
-.bss            0x00800060       0x4c
+.bss            0x00800060       0x4f
                 0x00800060                        PROVIDE (__bss_start = .)
  *(.bss)
  *(.bss*)
+ .bss.Heartbeat_Counter
+                0x00800060        0x1 build/main.o
  .bss.Ann_Muted
-                0x00800060        0x1 build/HAL/Annunciator/Annunciator_audio.o
+                0x00800061        0x1 build/HAL/Annunciator/Annunciator_audio.o
  .bss.Ann_SilenceTicks
-                0x00800061        0x2 build/HAL/Annunciator/Annunciator_audio.o
+                0x00800062        0x2 build/HAL/Annunciator/Annunciator_audio.o
  .bss.Ann_CycleTicks
-                0x00800063        0x2 build/HAL/Annunciator/Annunciator_audio.o
+                0x00800064        0x2 build/HAL/Annunciator/Annunciator_audio.o
  .bss.Ann_PhaseTicks
-                0x00800065        0x2 build/HAL/Annunciator/Annunciator_audio.o
+                0x00800066        0x2 build/HAL/Annunciator/Annunciator_audio.o
  .bss.Ann_PulseCount
-                0x00800067        0x1 build/HAL/Annunciator/Annunciator_audio.o
- .bss.Ann_Phase
                 0x00800068        0x1 build/HAL/Annunciator/Annunciator_audio.o
- .bss.Ann_CurrentPriority
+ .bss.Ann_Phase
                 0x00800069        0x1 build/HAL/Annunciator/Annunciator_audio.o
+ .bss.Ann_CurrentPriority
+                0x0080006a        0x1 build/HAL/Annunciator/Annunciator_audio.o
  .bss.HRC_Asystole
-                0x0080006a        0x1 build/HAL/HR_Capture/HR_Capture.o
+                0x0080006b        0x1 build/HAL/HR_Capture/HR_Capture.o
  .bss.HRC_CurrentHrvMs
-                0x0080006b        0x2 build/HAL/HR_Capture/HR_Capture.o
+                0x0080006c        0x2 build/HAL/HR_Capture/HR_Capture.o
  .bss.HRC_CurrentBpm
-                0x0080006d        0x2 build/HAL/HR_Capture/HR_Capture.o
+                0x0080006e        0x2 build/HAL/HR_Capture/HR_Capture.o
  .bss.HRC_IntervalIndex
-                0x0080006f        0x1 build/HAL/HR_Capture/HR_Capture.o
- .bss.HRC_MedianIndex
                 0x00800070        0x1 build/HAL/HR_Capture/HR_Capture.o
+ .bss.HRC_MedianCount
+                0x00800071        0x1 build/HAL/HR_Capture/HR_Capture.o
+ .bss.HRC_MedianIndex
+                0x00800072        0x1 build/HAL/HR_Capture/HR_Capture.o
  .bss.HRC_Intervals
-                0x00800071       0x10 build/HAL/HR_Capture/HR_Capture.o
+                0x00800073       0x10 build/HAL/HR_Capture/HR_Capture.o
  .bss.HRC_MedianIntervals
-                0x00800081        0x6 build/HAL/HR_Capture/HR_Capture.o
- .bss.callback  0x00800087        0x6 build/MCAL/INTERRUPT/INTERRUPT.o
- .bss.Timer1_OverflowCount
-                0x0080008d        0x2 build/MCAL/TIMER/TIMER.o
- .bss.Timer1_Asystole
-                0x0080008f        0x1 build/MCAL/TIMER/TIMER.o
- .bss.Timer1_CaptureReady
-                0x00800090        0x1 build/MCAL/TIMER/TIMER.o
- .bss.Timer1_CaptureCount
+                0x00800083        0x6 build/HAL/HR_Capture/HR_Capture.o
+ .bss.callback  0x00800089        0x6 build/MCAL/INTERRUPT/INTERRUPT.o
+ .bss.Timer1_LastInterval
+                0x0080008f        0x2 build/MCAL/TIMER/TIMER.o
+ .bss.Timer1_HasLastCapture
                 0x00800091        0x1 build/MCAL/TIMER/TIMER.o
- .bss.Timer1_RingIndex
+ .bss.Timer1_OverflowCount
                 0x00800092        0x1 build/MCAL/TIMER/TIMER.o
+ .bss.Timer1_Asystole
+                0x00800093        0x1 build/MCAL/TIMER/TIMER.o
+ .bss.Timer1_CaptureReady
+                0x00800094        0x1 build/MCAL/TIMER/TIMER.o
+ .bss.Timer1_RingIndex
+                0x00800095        0x1 build/MCAL/TIMER/TIMER.o
  .bss.Timer1_LastCapture
-                0x00800093        0x2 build/MCAL/TIMER/TIMER.o
+                0x00800096        0x2 build/MCAL/TIMER/TIMER.o
  .bss.Timer1_Intervals
-                0x00800095       0x10 build/MCAL/TIMER/TIMER.o
+                0x00800098       0x10 build/MCAL/TIMER/TIMER.o
  .bss.Timer0_TickPending
-                0x008000a5        0x1 build/MCAL/TIMER/TIMER.o
+                0x008000a8        0x1 build/MCAL/TIMER/TIMER.o
  .bss.Timer0_Callback
-                0x008000a6        0x2 build/MCAL/TIMER/TIMER.o
+                0x008000a9        0x2 build/MCAL/TIMER/TIMER.o
  .bss.Timer0_Ticks
-                0x008000a8        0x4 build/MCAL/TIMER/TIMER.o
+                0x008000ab        0x4 build/MCAL/TIMER/TIMER.o
  *(COMMON)
-                0x008000ac                        PROVIDE (__bss_end = .)
-                0x00000c04                        __data_load_start = LOADADDR (.data)
-                0x00000c04                        __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x008000af                        PROVIDE (__bss_end = .)
+                0x00000c44                        __data_load_start = LOADADDR (.data)
+                0x00000c44                        __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x008000ac        0x0
+.noinit         0x008000af        0x0
                 [!provide]                        PROVIDE (__noinit_start = .)
  *(.noinit .noinit.* .gnu.linkonce.n.*)
                 [!provide]                        PROVIDE (__noinit_end = .)
-                0x008000ac                        _end = .
+                0x008000af                        _end = .
                 [!provide]                        PROVIDE (__heap_start = .)
                 0x00000000                        __flmap_init_label = DEFINED (__flmap_noinit_start)?__flmap_noinit_start:0x0
                 0x00000000                        __flmap = DEFINED (__flmap)?__flmap:0x0

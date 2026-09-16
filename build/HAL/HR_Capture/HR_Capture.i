@@ -48,9 +48,7 @@ void TIMER0_ClearTick(void);
 void TIMER1_Init(void);
 uint8 TIMER1_IsCaptureReady(void);
 void TIMER1_ClearCaptureFlag(void);
-uint16 TIMER1_GetInterval(uint8 Copy_u8Index);
-uint8 TIMER1_GetCaptureCount(void);
-uint8 TIMER1_GetCaptureWriteIndex(void);
+uint16 TIMER1_GetLastInterval(void);
 uint8 TIMER1_IsAsystole(void);
 void TIMER1_ClearAsystole(void);
 
@@ -77,6 +75,7 @@ static uint16 HRC_CalculateHrvMs(void);
 static volatile uint16 HRC_MedianIntervals[3U];
 static volatile uint16 HRC_Intervals[8U];
 static volatile uint8 HRC_MedianIndex;
+static volatile uint8 HRC_MedianCount;
 static volatile uint8 HRC_IntervalIndex;
 static volatile uint16 HRC_CurrentBpm;
 static volatile uint16 HRC_CurrentHrvMs;
@@ -87,6 +86,7 @@ void HRC_Init(void)
     uint8 Local_u8Index;
 
     HRC_MedianIndex = 0U;
+    HRC_MedianCount = 0U;
     HRC_IntervalIndex = 0U;
     HRC_CurrentBpm = 0U;
     HRC_CurrentHrvMs = 0U;
@@ -107,31 +107,31 @@ void HRC_Init(void)
 
 void HRC_Process(void)
 {
-    uint8 Local_u8CaptureCount;
-    uint8 Local_u8WriteIndex;
-    uint8 Local_u8ReadIndex;
-    uint8 Local_u8Index;
 
-    if ((TIMER1_IsAsystole() != 0U) || (HRC_Asystole != 0U))
+    if (TIMER1_IsAsystole() != 0U)
     {
+        HRC_Asystole = 1U;
         HRC_CurrentBpm = 0U;
         HRC_CurrentHrvMs = 0U;
-        HRC_Asystole = 1U;
         return;
     }
 
+
     if (TIMER1_IsCaptureReady() != 0U)
     {
-        Local_u8CaptureCount = TIMER1_GetCaptureCount();
-        Local_u8WriteIndex = TIMER1_GetCaptureWriteIndex();
-        for (Local_u8Index = 0U; Local_u8Index < Local_u8CaptureCount; Local_u8Index++)
+        uint16 Local_u16Interval = TIMER1_GetLastInterval();
+        if (Local_u16Interval > 0U)
         {
-            Local_u8ReadIndex = (uint8)((Local_u8WriteIndex + 8U -
-                                      Local_u8CaptureCount + Local_u8Index) %
-                                     8U);
-            HRC_OnCapture(TIMER1_GetInterval(Local_u8ReadIndex));
+            HRC_OnCapture(Local_u16Interval);
         }
         TIMER1_ClearCaptureFlag();
+    }
+
+    if (HRC_IsAsystole() != 0U)
+    {
+        HRC_CurrentBpm = 0U;
+        HRC_CurrentHrvMs = 0U;
+        return;
     }
 
     HRC_CurrentBpm = HRC_CalculateMedian();
@@ -147,6 +147,10 @@ void HRC_OnCapture(uint16 Copy_u16IntervalTicks)
         if (HRC_MedianIndex >= 3U)
         {
             HRC_MedianIndex = 0U;
+        }
+        if (HRC_MedianCount < 3U)
+        {
+            HRC_MedianCount++;
         }
 
         HRC_Intervals[HRC_IntervalIndex] = Copy_u16IntervalTicks;
@@ -199,66 +203,57 @@ void HRC_ClearAsystole(void)
 
 static uint16 HRC_CalculateMedian(void)
 {
-    uint16 Local_u16Arr[3U];
-    uint16 Local_u16LatestInterval = 0U;
-    uint16 Local_u16Bpm;
+    uint16 Local_u16Arr[3];
     uint16 Local_u16Temp;
-    uint8 Local_u8Index;
-    uint8 Local_u8HasEmpty = 0U;
 
-    for (Local_u8Index = 0U; Local_u8Index < 3U; Local_u8Index++)
-    {
-        Local_u16Arr[Local_u8Index] = HRC_MedianIntervals[Local_u8Index];
-        if (Local_u16Arr[Local_u8Index] == 0U)
-        {
-            Local_u8HasEmpty = 1U;
-        }
-        else if (Local_u8Index == ((HRC_MedianIndex + 3U - 1U) %
-                                   3U))
-        {
-            Local_u16LatestInterval = Local_u16Arr[Local_u8Index];
-        }
-    }
+    Local_u16Arr[0] = HRC_MedianIntervals[0];
+    Local_u16Arr[1] = HRC_MedianIntervals[1];
+    Local_u16Arr[2] = HRC_MedianIntervals[2];
 
-    if (Local_u16LatestInterval == 0U)
+    if ((HRC_MedianCount < 3U) ||
+        (Local_u16Arr[0] == 0U) || (Local_u16Arr[1] == 0U) ||
+        (Local_u16Arr[2] == 0U))
     {
         return 0U;
     }
 
-    if (Local_u8HasEmpty != 0U)
-    {
-        Local_u16Bpm = (uint16)(1875000UL / Local_u16LatestInterval);
-    }
-    else
-    {
-        if (Local_u16Arr[0] > Local_u16Arr[1])
-        {
-            Local_u16Temp = Local_u16Arr[0];
-            Local_u16Arr[0] = Local_u16Arr[1];
-            Local_u16Arr[1] = Local_u16Temp;
-        }
-        if (Local_u16Arr[1] > Local_u16Arr[2])
-        {
-            Local_u16Temp = Local_u16Arr[1];
-            Local_u16Arr[1] = Local_u16Arr[2];
-            Local_u16Arr[2] = Local_u16Temp;
-        }
-        if (Local_u16Arr[0] > Local_u16Arr[1])
-        {
-            Local_u16Temp = Local_u16Arr[0];
-            Local_u16Arr[0] = Local_u16Arr[1];
-            Local_u16Arr[1] = Local_u16Temp;
-        }
 
-        Local_u16Bpm = (uint16)(1875000UL / Local_u16Arr[1]);
+    if (Local_u16Arr[0] > Local_u16Arr[1])
+    {
+        Local_u16Temp = Local_u16Arr[0];
+        Local_u16Arr[0] = Local_u16Arr[1];
+        Local_u16Arr[1] = Local_u16Temp;
+    }
+    if (Local_u16Arr[1] > Local_u16Arr[2])
+    {
+        Local_u16Temp = Local_u16Arr[1];
+        Local_u16Arr[1] = Local_u16Arr[2];
+        Local_u16Arr[2] = Local_u16Temp;
+    }
+    if (Local_u16Arr[0] > Local_u16Arr[1])
+    {
+        Local_u16Temp = Local_u16Arr[0];
+        Local_u16Arr[0] = Local_u16Arr[1];
+        Local_u16Arr[1] = Local_u16Temp;
     }
 
-    if ((Local_u16Bpm < 30U) || (Local_u16Bpm > 250U))
+
+    uint16 Local_u16Median = Local_u16Arr[1];
+
+    if (Local_u16Median == 0U)
     {
         return 0U;
     }
 
-    return Local_u16Bpm;
+
+    uint32 Local_u32Bpm = (uint32)(1875000UL / Local_u16Median);
+
+    if ((Local_u32Bpm < 30U) || (Local_u32Bpm > 250U))
+    {
+        return 0U;
+    }
+
+    return (uint16)Local_u32Bpm;
 }
 
 static uint16 HRC_CalculateHrvMs(void)

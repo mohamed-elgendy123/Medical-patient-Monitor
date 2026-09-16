@@ -34,6 +34,10 @@ main:
 	ldi r24,lo8(2)
 	call GPIO_SetPinDirection
 	ldi r20,0
+	ldi r22,lo8(6)
+	ldi r24,lo8(3)
+	call GPIO_SetPinDirection
+	ldi r20,0
 	ldi r22,lo8(7)
 	ldi r24,lo8(2)
 	call GPIO_SetPinValue
@@ -93,7 +97,7 @@ main:
 	call HRC_ClearAsystole
 	call TIMER0_ClearTick
 	call INTERRUPT_EnableGlobal
-.L11:
+.L17:
 	ldi r28,0
 	ldi r29,0
 .L7:
@@ -106,13 +110,44 @@ main:
 	ldi r24,lo8(2)
 	call GPIO_SetPinValue
 	movw r24,r28
+	ldi r22,lo8(5)
+	ldi r23,0
+	call __udivmodhi4
+	sbiw r24,2
+	brne .L8
+	lds r24,Heartbeat_Counter
+	ldi r20,0
+	cpi r24,lo8(0)
+	breq .L34
+	subi r24,lo8(-(-1))
+	sts Heartbeat_Counter,r24
+	ldi r20,lo8(1)
+.L34:
+	ldi r22,lo8(3)
+	ldi r24,lo8(1)
+	call GPIO_SetPinValue
+.L8:
+	movw r24,r28
 	ldi r22,lo8(50)
 	ldi r23,0
 	call __udivmodhi4
 	sbiw r24,4
-	brne .L8
+	brne .L10
+	call TIMER1_IsCaptureReady
+	cpse r24,__zero_reg__
+	rjmp .L11
 	call HRC_Process
-.L8:
+.L12:
+	call HRC_IsAsystole
+	cpi r24,lo8(0)
+	breq .L13
+.L14:
+	ldi r20,lo8(1)
+.L35:
+	ldi r22,0
+	ldi r24,lo8(1)
+	call GPIO_SetPinValue
+.L10:
 	call ANN_Audio_Tick
 	ldi r20,0
 	ldi r22,lo8(7)
@@ -122,7 +157,30 @@ main:
 	cpi r28,-24
 	ldi r24,3
 	cpc r29,r24
-	brne .L7
-	rjmp .L11
+	breq .+2
+	rjmp .L7
+	rjmp .L17
+.L11:
+	call TIMER1_GetLastInterval
+	movw r16,r24
+	call HRC_Process
+	movw r24,r16
+	or r24,r25
+	breq .L12
+	ldi r24,lo8(2)
+	sts Heartbeat_Counter,r24
+	rjmp .L12
+.L13:
+	call HRC_GetBpm
+	or r24,r25
+	breq .L14
+	ldi r20,0
+	rjmp .L35
 	.size	main, .-main
+	.section	.bss.Heartbeat_Counter,"aw",@nobits
+	.type	Heartbeat_Counter, @object
+	.size	Heartbeat_Counter, 1
+Heartbeat_Counter:
+	.zero	1
 	.ident	"GCC: (GNU) 16.1.0"
+.global __do_clear_bss

@@ -34,6 +34,50 @@ static void Clear_TrendState(void);
 static void Application_ClearState(void);
 static void Application_SelfTest(void);
 static void Application_Init(void);
+/* متغير لتتبع وميض النبض */
+static u8 Heartbeat_Counter = 0U;
+
+static void Task_Timers(void)
+{
+  /* وميض ليد B3 لمدة 50ms فقط مع كل نبضة قلب */
+  if (Heartbeat_Counter > 0U)
+  {
+    Heartbeat_Counter--;
+    GPIO_SetPinValue(GPIO_PORTB, HEARTBEAT_LED_PIN, GPIO_HIGH);
+  }
+  else
+  {
+    GPIO_SetPinValue(GPIO_PORTB, HEARTBEAT_LED_PIN, GPIO_LOW);
+  }
+}
+
+static void Task_FastVitals(void)
+{
+  u16 Local_u16Interval = 0U;
+
+  if (TIMER1_IsCaptureReady() != 0U)
+  {
+    Local_u16Interval = TIMER1_GetLastInterval();
+  }
+
+  HRC_Process();
+
+  if (Local_u16Interval > 0U)
+  {
+    Heartbeat_Counter = 2U;
+  }
+
+  if ((HRC_IsAsystole() != 0U) || (HRC_GetBpm() == HRC_INVALID_HR))
+  {
+    /* توقف قلب حقيقي: أشعل الليد الأحمر */
+    GPIO_SetPinValue(GPIO_PORTB, HIGH_ALARM_LED_PIN, GPIO_HIGH);
+  }
+  else
+  {
+    /* القلب ينبض: أطفئ الليد الأحمر فوراً */
+    GPIO_SetPinValue(GPIO_PORTB, HIGH_ALARM_LED_PIN, GPIO_LOW);
+  }
+}
 
 static void Task_Panel(void)
 {
@@ -47,21 +91,12 @@ static void Task_Console(void)
 {
 }
 
-static void Task_Timers(void)
-{
-}
-
 static void Task_Alarms(void)
 {
 }
 
 static void Task_Lcd(void)
 {
-}
-
-static void Task_FastVitals(void)
-{
-  HRC_Process();
 }
 
 static void Task_OneHz(void)
@@ -132,6 +167,7 @@ static void Application_Init(void)
   GPIO_SetPinDirection(GPIO_PORTB, LOW_ALARM_LED_PIN, GPIO_OUTPUT);
   GPIO_SetPinDirection(GPIO_PORTB, HEARTBEAT_LED_PIN, GPIO_OUTPUT);
   GPIO_SetPinDirection(CPU_LOAD_PORT, CPU_LOAD_PIN, GPIO_OUTPUT);
+  GPIO_SetPinDirection(GPIO_PORTD, GPIO_PIN6, GPIO_INPUT);
 
   GPIO_SetPinValue(CPU_LOAD_PORT, CPU_LOAD_PIN, GPIO_LOW);
   TIMER0_Init();

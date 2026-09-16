@@ -238,9 +238,7 @@ void TIMER0_ClearTick(void);
 void TIMER1_Init(void);
 uint8 TIMER1_IsCaptureReady(void);
 void TIMER1_ClearCaptureFlag(void);
-uint16 TIMER1_GetInterval(uint8 Copy_u8Index);
-uint8 TIMER1_GetCaptureCount(void);
-uint8 TIMER1_GetCaptureWriteIndex(void);
+uint16 TIMER1_GetLastInterval(void);
 uint8 TIMER1_IsAsystole(void);
 void TIMER1_ClearAsystole(void);
 
@@ -249,6 +247,39 @@ void TIMER2_SetTone(uint8 Copy_u8Tone);
 # 5 "MCAL/TIMER/TIMER.c" 2
 # 1 "MCAL/TIMER/TIMER_private.h" 1
 # 6 "MCAL/TIMER/TIMER.c" 2
+# 1 "MCAL/INTERRUPT/INTERRUPT_interface.h" 1
+# 28 "MCAL/INTERRUPT/INTERRUPT_interface.h"
+STD_ReturnType INTERRUPT_EnableGlobal(void);
+
+
+
+
+STD_ReturnType INTERRUPT_DisableGlobal(void);
+
+
+
+
+
+STD_ReturnType EXTI_SetSense(uint8 Copy_u8Int, uint8 Copy_u8Sense);
+
+
+
+
+
+STD_ReturnType EXTI_Enable(uint8 Copy_u8Int);
+
+
+
+
+STD_ReturnType EXTI_Disable(uint8 Copy_u8Int);
+
+
+
+
+STD_ReturnType EXTI_ClearFlag(uint8 Copy_u8Int);
+# 65 "MCAL/INTERRUPT/INTERRUPT_interface.h"
+STD_ReturnType EXTI_SetCallback(uint8 Copy_u8Int, void (*Copy_pfCallback)(void));
+# 7 "MCAL/TIMER/TIMER.c" 2
 
 
 static volatile uint32 Timer0_Ticks;
@@ -258,10 +289,11 @@ static volatile uint8 Timer0_TickPending = 0U;
 static volatile uint16 Timer1_Intervals[8U];
 static volatile uint16 Timer1_LastCapture = 0U;
 static volatile uint8 Timer1_RingIndex = 0U;
-static volatile uint8 Timer1_CaptureCount = 0U;
 static volatile uint8 Timer1_CaptureReady = 0U;
 static volatile uint8 Timer1_Asystole = 0U;
-static volatile uint16 Timer1_OverflowCount = 0U;
+static volatile uint8 Timer1_OverflowCount = 0U;
+static volatile uint8 Timer1_HasLastCapture = 0U;
+static volatile uint16 Timer1_LastInterval = 0U;
 
 
 
@@ -328,12 +360,15 @@ void TIMER1_Init(void)
 
     (*(volatile uint8 *)0x4FU) = 0U;
     (*(volatile uint8 *)0x4EU) = 0U;
+    (*(volatile uint16 *)0x4CU) = 0U;
+
+
+    (((*(volatile uint8 *)0x58U)) |= (uint8)(1U << (5U)));
+    (((*(volatile uint8 *)0x58U)) |= (uint8)(1U << (2U)));
 
 
     (((*(volatile uint8 *)0x4EU)) |= (uint8)(1U << (7U)));
     (((*(volatile uint8 *)0x4EU)) |= (uint8)(1U << (6U)));
-
-
     (((*(volatile uint8 *)0x4EU)) |= (uint8)(1U << (2U)));
 
 
@@ -346,68 +381,40 @@ void TIMER1_Init(void)
         Timer1_Intervals[Local_u8Idx] = 0U;
     }
 
-
-    Local_u8Idx = 0U;
-    do
-    {
-        Timer1_LastCapture = 0U;
-        Timer1_RingIndex = 0U;
-        Timer1_CaptureCount = 0U;
-        Timer1_CaptureReady = 0U;
-        Timer1_Asystole = 0U;
-        Timer1_OverflowCount = 0U;
-        Local_u8Idx++;
-    } while (Local_u8Idx < 1U);
+    Timer1_LastCapture = 0U;
+    Timer1_RingIndex = 0U;
+    Timer1_CaptureReady = 0U;
+    Timer1_Asystole = 0U;
+    Timer1_OverflowCount = 0U;
+    Timer1_HasLastCapture = 0U;
+    Timer1_LastInterval = 0U;
 }
 
 uint8 TIMER1_IsCaptureReady(void)
 {
-    if (Timer1_CaptureReady == 1U)
-    {
-        return 1U;
-    }
-    return 0U;
+    return (Timer1_CaptureReady != 0U) ? 1U : 0U;
 }
 
 void TIMER1_ClearCaptureFlag(void)
 {
     Timer1_CaptureReady = 0U;
-    Timer1_CaptureCount = 0U;
 }
 
-uint16 TIMER1_GetInterval(uint8 Copy_u8Index)
+uint16 TIMER1_GetLastInterval(void)
 {
+    uint16 Local_u16Val;
 
-    if (Copy_u8Index < 8U)
-    {
-        return Timer1_Intervals[Copy_u8Index];
-    }
-    else
-    {
-        return 0U;
-    }
-}
 
-uint8 TIMER1_GetCaptureCount(void)
-{
-    return Timer1_CaptureCount;
-}
+    (void)INTERRUPT_DisableGlobal();
+    Local_u16Val = Timer1_LastInterval;
+    (void)INTERRUPT_EnableGlobal();
 
-uint8 TIMER1_GetCaptureWriteIndex(void)
-{
-    return Timer1_RingIndex;
+    return Local_u16Val;
 }
 
 uint8 TIMER1_IsAsystole(void)
 {
-    if (Timer1_Asystole != 0U)
-    {
-        return 1U;
-    }
-    else
-    {
-        return 0U;
-    }
+    return (Timer1_Asystole != 0U) ? 1U : 0U;
 }
 
 void TIMER1_ClearAsystole(void)
@@ -478,10 +485,10 @@ void TIMER2_SetTone(uint8 Copy_u8Tone)
 
 
 
-# 234 "MCAL/TIMER/TIMER.c" 3
+# 211 "MCAL/TIMER/TIMER.c" 3
 void __vector_10 (void) __attribute__ ((__signal__,__used__, __externally_visible__)) ; void __vector_10 (void)
 
-# 235 "MCAL/TIMER/TIMER.c"
+# 212 "MCAL/TIMER/TIMER.c"
 {
     Timer0_Ticks++;
     Timer0_TickPending = 1U;
@@ -493,26 +500,40 @@ void __vector_10 (void) __attribute__ ((__signal__,__used__, __externally_visibl
 }
 
 
-# 245 "MCAL/TIMER/TIMER.c" 3
+# 222 "MCAL/TIMER/TIMER.c" 3
 void __vector_6 (void) __attribute__ ((__signal__,__used__, __externally_visible__)) ; void __vector_6 (void)
 
-# 246 "MCAL/TIMER/TIMER.c"
+# 223 "MCAL/TIMER/TIMER.c"
 {
     uint16 Local_u16Capture = (*(volatile uint16 *)0x46U);
-    Timer1_Intervals[Timer1_RingIndex] = (uint16)(Local_u16Capture - Timer1_LastCapture);
+
+    if (Timer1_HasLastCapture == 0U)
+    {
+        Timer1_LastCapture = Local_u16Capture;
+        Timer1_HasLastCapture = 1U;
+        return;
+    }
+
+    Timer1_LastInterval = (uint16)(Local_u16Capture - Timer1_LastCapture);
+    Timer1_Intervals[Timer1_RingIndex] = Timer1_LastInterval;
     Timer1_LastCapture = Local_u16Capture;
-    Timer1_RingIndex = (uint8)((Timer1_RingIndex + 1U) & 7U);
-    Timer1_CaptureCount = (Timer1_CaptureCount < 8U) ? (uint8)(Timer1_CaptureCount + 1U) : 8U;
+
+    Timer1_RingIndex++;
+    if (Timer1_RingIndex >= 8U)
+    {
+        Timer1_RingIndex = 0U;
+    }
+
     Timer1_CaptureReady = 1U;
     Timer1_OverflowCount = 0U;
     Timer1_Asystole = 0U;
 }
 
 
-# 257 "MCAL/TIMER/TIMER.c" 3
+# 248 "MCAL/TIMER/TIMER.c" 3
 void __vector_9 (void) __attribute__ ((__signal__,__used__, __externally_visible__)) ; void __vector_9 (void)
 
-# 258 "MCAL/TIMER/TIMER.c"
+# 249 "MCAL/TIMER/TIMER.c"
 {
     Timer1_OverflowCount++;
 

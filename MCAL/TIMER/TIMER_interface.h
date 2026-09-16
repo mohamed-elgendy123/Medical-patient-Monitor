@@ -28,9 +28,7 @@ void TIMER0_ClearTick(void);
 void TIMER1_Init(void);
 u8 TIMER1_IsCaptureReady(void);
 void TIMER1_ClearCaptureFlag(void);
-u16 TIMER1_GetInterval(u8 Copy_u8Index);
-u8 TIMER1_GetCaptureCount(void);
-u8 TIMER1_GetCaptureWriteIndex(void);
+u16 TIMER1_GetLastInterval(void);
 u8 TIMER1_IsAsystole(void);
 void TIMER1_ClearAsystole(void);
 
