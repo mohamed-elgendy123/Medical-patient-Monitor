@@ -1,202 +1,45 @@
+#ifndef F_CPU
 #define F_CPU 8000000UL
+#endif
 
-#include "STD_TYPES.h"
-#include "TIMER_interface.h"
-#include "INTERRUPT_interface.h"
-#include "GPIO_interface.h"
-#include "HR_Capture_interface.h"
-#include "Annunciator_interface.h"
+#include "LIB/STD_TYPES.h"
+#include "MCAL/GPIO/GPIO_interface.h"
+#include "MCAL/SPI/SPI_interface.h"
+#include "HAL/ShiftReg/ShiftReg_interface.h"
+#include "HAL/NurseCall/NurseCall_interface.h"
 
-#define CPU_LOAD_PORT GPIO_PORTC
-#define CPU_LOAD_PIN GPIO_PIN7
-
-#define HIGH_ALARM_LED_PIN GPIO_PIN0
-#define MEDIUM_ALARM_LED_PIN GPIO_PIN1
-#define LOW_ALARM_LED_PIN GPIO_PIN2
-#define HEARTBEAT_LED_PIN GPIO_PIN3
-
-#define SELF_TEST_TICKS 300U
-#define SELF_TEST_TONE_TICKS 50U
-#define SCHEDULER_CYCLE_TICKS 1000U
-
-static void Task_Panel(void);
-static void Task_Fsm(void);
-static void Task_Console(void);
-static void Task_Timers(void);
-static void Task_Alarms(void);
-static void Task_Lcd(void);
-static void Task_FastVitals(void);
-static void Task_OneHz(void);
-static void Task_Report(void);
-static void Task_Trend(void);
-static void Clear_AlarmState(void);
-static void Clear_TrendState(void);
-static void Application_ClearState(void);
-static void Application_SelfTest(void);
-static void Application_Init(void);
-
-static void Task_Panel(void)
+/* دالة تأخير بسيطة للاختبار الميداني */
+static void delay_ms(uint32 Copy_u32Time)
 {
-}
-
-static void Task_Fsm(void)
-{
-}
-
-static void Task_Console(void)
-{
-}
-
-static void Task_Timers(void)
-{
-}
-
-static void Task_Alarms(void)
-{
-}
-
-static void Task_Lcd(void)
-{
-}
-
-static void Task_FastVitals(void)
-{
-  HRC_Process();
-}
-
-static void Task_OneHz(void)
-{
-}
-
-static void Task_Report(void)
-{
-}
-
-static void Task_Trend(void)
-{
-}
-
-static void Clear_AlarmState(void)
-{
-}
-
-static void Clear_TrendState(void)
-{
-}
-
-static void Application_ClearState(void)
-{
-  Clear_AlarmState();
-  Clear_TrendState();
-  ANN_Audio_SetPriority(ANN_PRI_NONE);
-  HRC_ClearAsystole();
-}
-
-static void Application_SelfTest(void)
-{
-  u16 Local_u16Ticks = 0U;
-
-  GPIO_SetPinValue(GPIO_PORTB, HIGH_ALARM_LED_PIN, GPIO_HIGH);
-  GPIO_SetPinValue(GPIO_PORTB, MEDIUM_ALARM_LED_PIN, GPIO_HIGH);
-  GPIO_SetPinValue(GPIO_PORTB, LOW_ALARM_LED_PIN, GPIO_HIGH);
-  ANN_Audio_SetPriority(ANN_PRI_MEDIUM);
-
-  (void)INTERRUPT_EnableGlobal();
-  while (Local_u16Ticks < SELF_TEST_TICKS)
-  {
-    if (TIMER0_IsTickPending() != 0U)
+    uint32 i;
+    for(i = 0; i < (Copy_u32Time * 500u); i++)
     {
-      TIMER0_ClearTick();
-      Local_u16Ticks++;
-      ANN_Audio_Tick();
-      if (Local_u16Ticks == SELF_TEST_TONE_TICKS)
-      {
-        ANN_Audio_Mute();
-      }
+        asm("NOP");
     }
-  }
-  (void)INTERRUPT_DisableGlobal();
-
-  GPIO_SetPinValue(GPIO_PORTB, HIGH_ALARM_LED_PIN, GPIO_LOW);
-  GPIO_SetPinValue(GPIO_PORTB, MEDIUM_ALARM_LED_PIN, GPIO_LOW);
-  GPIO_SetPinValue(GPIO_PORTB, LOW_ALARM_LED_PIN, GPIO_LOW);
-  ANN_Audio_Init();
-  Application_ClearState();
-  TIMER0_ClearTick();
-}
-
-static void Application_Init(void)
-{
-  GPIO_SetPinDirection(GPIO_PORTB, HIGH_ALARM_LED_PIN, GPIO_OUTPUT);
-  GPIO_SetPinDirection(GPIO_PORTB, MEDIUM_ALARM_LED_PIN, GPIO_OUTPUT);
-  GPIO_SetPinDirection(GPIO_PORTB, LOW_ALARM_LED_PIN, GPIO_OUTPUT);
-  GPIO_SetPinDirection(GPIO_PORTB, HEARTBEAT_LED_PIN, GPIO_OUTPUT);
-  GPIO_SetPinDirection(CPU_LOAD_PORT, CPU_LOAD_PIN, GPIO_OUTPUT);
-
-  GPIO_SetPinValue(CPU_LOAD_PORT, CPU_LOAD_PIN, GPIO_LOW);
-  TIMER0_Init();
-  HRC_Init();
-  ANN_Audio_Init();
-  Application_SelfTest();
-  (void)INTERRUPT_EnableGlobal();
 }
 
 int main(void)
 {
-  u16 Local_u16Phase = 0U;
+    /* 1. Initialize HAL Drivers for Student 2 */
+    ShiftReg_voidInit();
+    NurseCall_voidInit();
 
-  Application_Init();
-
-  while (1)
-  {
-    if (TIMER0_IsTickPending() != 0U)
+    while (1)
     {
-      TIMER0_ClearTick();
-      GPIO_SetPinValue(CPU_LOAD_PORT, CPU_LOAD_PIN, GPIO_HIGH);
+        /* Test Pattern 1: High Alarm State */
+        ShiftReg_voidWriteByte(0xFF);  /* 8 LEDs ON */
+        NurseCall_voidEnable();        /* Nurse Call Active */
+        delay_ms(1000);
 
-      if ((Local_u16Phase % 2U) == 1U)
-      {
-        Task_Console();
-      }
-      if ((Local_u16Phase % 5U) == 2U)
-      {
-        Task_Timers();
-      }
-      if ((Local_u16Phase % 10U) == 3U)
-      {
-        Task_Alarms();
-      }
-      if ((Local_u16Phase % 25U) == 5U)
-      {
-        Task_Lcd();
-      }
-      if ((Local_u16Phase % 50U) == 4U)
-      {
-        Task_FastVitals();
-      }
-      if ((Local_u16Phase % 100U) == 6U)
-      {
-        Task_OneHz();
-      }
-      if ((Local_u16Phase % 200U) == 7U)
-      {
-        Task_Report();
-      }
-      if ((Local_u16Phase % 1000U) == 8U)
-      {
-        Task_Trend();
-      }
+        /* Test Pattern 2: Normal State */
+        ShiftReg_voidWriteByte(0x00);  /* 8 LEDs OFF */
+        NurseCall_voidDisable();       /* Nurse Call Idle */
+        delay_ms(1000);
 
-      Task_Panel();
-      Task_Fsm();
-      ANN_Audio_Tick();
-
-      GPIO_SetPinValue(CPU_LOAD_PORT, CPU_LOAD_PIN, GPIO_LOW);
-      Local_u16Phase++;
-      if (Local_u16Phase >= SCHEDULER_CYCLE_TICKS)
-      {
-        Local_u16Phase = 0U;
-      }
+        /* Test Pattern 3: Alternating Pattern */
+        ShiftReg_voidWriteByte(0xAA);
+        delay_ms(1000);
     }
-  }
+
+    return 0;
 }
