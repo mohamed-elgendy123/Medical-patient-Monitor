@@ -14,6 +14,7 @@ HRC_Init:
 /* stack size = 0 */
 .L__stack_usage = 0
 	sts HRC_MedianIndex,__zero_reg__
+	sts HRC_MedianCount,__zero_reg__
 	sts HRC_IntervalIndex,__zero_reg__
 	sts HRC_CurrentBpm+1,__zero_reg__
 	sts HRC_CurrentBpm,__zero_reg__
@@ -68,6 +69,13 @@ HRC_OnCapture:
 	brlo .L6
 	sts HRC_MedianIndex,__zero_reg__
 .L6:
+	lds r18,HRC_MedianCount
+	cpi r18,lo8(3)
+	brsh .L7
+	lds r18,HRC_MedianCount
+	subi r18,lo8(-(1))
+	sts HRC_MedianCount,r18
+.L7:
 	lds r30,HRC_IntervalIndex
 	ldi r31,0
 	lsl r30
@@ -81,274 +89,14 @@ HRC_OnCapture:
 	sts HRC_IntervalIndex,r24
 	lds r24,HRC_IntervalIndex
 	cpi r24,lo8(8)
-	brlo .L7
+	brlo .L8
 	sts HRC_IntervalIndex,__zero_reg__
-.L7:
+.L8:
 	sts HRC_Asystole,__zero_reg__
 .L4:
 /* epilogue start */
 	ret
 	.size	HRC_OnCapture, .-HRC_OnCapture
-	.section	.text.HRC_Process,"ax",@progbits
-.global	HRC_Process
-	.type	HRC_Process, @function
-HRC_Process:
-	push r13
-	push r14
-	push r15
-	push r16
-	push r17
-	push r28
-	push r29
-	rcall .
-	rcall .
-	rcall .
-	in r28,__SP_L__
-	in r29,__SP_H__
-/* prologue: function */
-/* frame size = 6 */
-/* stack size = 13 */
-.L__stack_usage = 13
-	call TIMER1_IsAsystole
-	cpse r24,__zero_reg__
-	rjmp .L12
-	lds r13,HRC_Asystole
-	cp r13, __zero_reg__
-	breq .L13
-.L12:
-	sts HRC_CurrentBpm+1,__zero_reg__
-	sts HRC_CurrentBpm,__zero_reg__
-	sts HRC_CurrentHrvMs+1,__zero_reg__
-	sts HRC_CurrentHrvMs,__zero_reg__
-	ldi r24,lo8(1)
-	sts HRC_Asystole,r24
-.L11:
-/* epilogue start */
-	pop __tmp_reg__
-	pop __tmp_reg__
-	pop __tmp_reg__
-	pop __tmp_reg__
-	pop __tmp_reg__
-	pop __tmp_reg__
-	pop r29
-	pop r28
-	pop r17
-	pop r16
-	pop r15
-	pop r14
-	pop r13
-	ret
-.L13:
-	call TIMER1_IsCaptureReady
-	cp r24, __zero_reg__
-	breq .L15
-	call TIMER1_GetCaptureCount
-	mov r17,r24
-	call TIMER1_GetCaptureWriteIndex
-	mov r16,r24
-	mov r18,r24
-	sub r18,r17
-	mov r17,r18
-.L16:
-	cpse r16,r17
-	rjmp .L17
-	call TIMER1_ClearCaptureFlag
-.L15:
-	movw r14,r28
-	ldi r24,-1
-	sub r14,r24
-	sbc r15,r24
-	ldi r30,0
-	ldi r31,0
-	movw r18,r30
-.L19:
-	movw r26,r30
-	lsl r26
-	rol r27
-	subi r26,lo8(-(HRC_MedianIntervals))
-	sbci r27,hi8(-(HRC_MedianIntervals))
-	ld r16,X+
-	ld r17,X+
-	movw r26,r14
-	st X+,r16
-	st X+,r17
-	movw r14,r26
-	cp r16,__zero_reg__
-	cpc r17,__zero_reg__
-	breq .L30
-	lds r24,HRC_MedianIndex
-	ldi r25,0
-	adiw r24,2
-	ldi r22,lo8(3)
-	ldi r23,0
-	call __udivmodhi4
-	cp r24,r30
-	cpc r25,r31
-	brne .L18
-	movw r18,r16
-	rjmp .L18
-.L17:
-	mov r24,r17
-	andi r24,lo8(7)
-	call TIMER1_GetInterval
-	call HRC_OnCapture
-	subi r17,lo8(-(1))
-	rjmp .L16
-.L30:
-	clr r13
-	inc r13
-.L18:
-	adiw r30,1
-	cpi r30,3
-	cpc r31,__zero_reg__
-	brne .L19
-	cp r18,__zero_reg__
-	cpc r19,__zero_reg__
-	breq .L20
-	cp r13, __zero_reg__
-	brne .+2
-	rjmp .L21
-.L25:
-	ldi r20,0
-	ldi r21,0
-	ldi r22,lo8(56)
-	ldi r23,lo8(-100)
-	ldi r24,lo8(28)
-	ldi r25,0
-	call __udivmodsi4
-	movw r24,r18
-	sbiw r24,30
-	cpi r24,-35
-	cpc r25,__zero_reg__
-	brlo .L20
-	ldi r18,0
-	ldi r19,0
-.L20:
-	sts HRC_CurrentBpm+1,r19
-	sts HRC_CurrentBpm,r18
-	ldi r20,0
-	ldi r21,0
-	movw r22,r20
-	movw r24,r20
-.L29:
-	movw r30,r20
-	subi r20,-1
-	sbci r21,-1
-	movw r26,r20
-	lsl r26
-	rol r27
-	subi r26,lo8(-(HRC_Intervals))
-	sbci r27,hi8(-(HRC_Intervals))
-	ld r18,X+
-	ld r19,X+
-	sbiw r26,2
-	cp r18,__zero_reg__
-	cpc r19,__zero_reg__
-	breq .L26
-	lsl r30
-	rol r31
-	subi r30,lo8(-(HRC_Intervals))
-	sbci r31,hi8(-(HRC_Intervals))
-	ld r18,Z
-	ldd r19,Z+1
-	cp r18,__zero_reg__
-	cpc r19,__zero_reg__
-	breq .L26
-	ld r18,X+
-	ld r19,X+
-	sbiw r26,2
-	ld r16,Z
-	ldd r17,Z+1
-	cp r18,r16
-	cpc r19,r17
-	brsh .+2
-	rjmp .L27
-	ld __tmp_reg__,X+
-	ld r27,X
-	mov r26,__tmp_reg__
-	ld r18,Z
-	ldd r19,Z+1
-	movw r30,r26
-	sub r30,r18
-	sbc r31,r19
-	movw r18,r30
-.L28:
-	add r22,r18
-	adc r23,r19
-	adc r24,__zero_reg__
-	adc r25,__zero_reg__
-	cpi r20,7
-	cpc r21,__zero_reg__
-	brne .L29
-	ldi r18,lo8(7)
-	ldi r19,0
-	ldi r20,0
-	ldi r21,0
-	call __udivmodsi4
-	movw r22,r18
-	movw r24,r20
-	ldi r18,5
-	1:
-	lsl r22
-	rol r23
-	rol r24
-	rol r25
-	dec r18
-	brne 1b
-	ldi r18,lo8(-1)
-	ldi r19,lo8(-1)
-	cpi r24,-24
-	ldi r27,3
-	cpc r25,r27
-	brsh .L26
-	ldi r18,lo8(-24)
-	ldi r19,lo8(3)
-	ldi r20,0
-	ldi r21,0
-	call __udivmodsi4
-.L26:
-	sts HRC_CurrentHrvMs+1,r19
-	sts HRC_CurrentHrvMs,r18
-	rjmp .L11
-.L21:
-	ldd r20,Y+1
-	ldd r21,Y+2
-	ldd r24,Y+3
-	ldd r25,Y+4
-	cp r24,r20
-	cpc r25,r21
-	brlo .L23
-	mov r19,r20
-	mov r18,r21
-	movw r20,r24
-	mov r24,r19
-	mov r25,r18
-.L23:
-	ldd r18,Y+5
-	ldd r19,Y+6
-	cp r20,r18
-	cpc r21,r19
-	brsh .L24
-	movw r18,r20
-.L24:
-	cp r18,r24
-	cpc r19,r25
-	brlo .+2
-	rjmp .L25
-	movw r18,r24
-	rjmp .L25
-.L27:
-	ld __tmp_reg__,Z+
-	ld r31,Z
-	mov r30,__tmp_reg__
-	ld r18,X+
-	ld r19,X+
-	movw r26,r30
-	sub r26,r18
-	sbc r27,r19
-	movw r18,r26
-	rjmp .L28
-	.size	HRC_Process, .-HRC_Process
 	.section	.text.HRC_OnOverflow,"ax",@progbits
 .global	HRC_OnOverflow
 	.type	HRC_OnOverflow, @function
@@ -359,12 +107,12 @@ HRC_OnOverflow:
 .L__stack_usage = 0
 	call TIMER1_IsAsystole
 	cp r24, __zero_reg__
-	breq .L46
+	breq .L12
 	ldi r24,lo8(1)
 	sts HRC_Asystole,r24
 	sts HRC_CurrentBpm+1,__zero_reg__
 	sts HRC_CurrentBpm,__zero_reg__
-.L46:
+.L12:
 /* epilogue start */
 	ret
 	.size	HRC_OnOverflow, .-HRC_OnOverflow
@@ -404,19 +152,218 @@ HRC_IsAsystole:
 .L__stack_usage = 0
 	call TIMER1_IsAsystole
 	cpse r24,__zero_reg__
-	rjmp .L56
+	rjmp .L22
 	lds r25,HRC_Asystole
 	ldi r24,lo8(1)
 	cpse r25,__zero_reg__
-	rjmp .L53
+	rjmp .L19
 	ldi r24,0
 	ret
-.L56:
+.L22:
 	ldi r24,lo8(1)
-.L53:
+.L19:
 /* epilogue start */
 	ret
 	.size	HRC_IsAsystole, .-HRC_IsAsystole
+	.section	.text.HRC_Process,"ax",@progbits
+.global	HRC_Process
+	.type	HRC_Process, @function
+HRC_Process:
+	push r14
+	push r15
+/* prologue: function */
+/* frame size = 0 */
+/* stack size = 2 */
+.L__stack_usage = 2
+	call TIMER1_IsAsystole
+	cp r24, __zero_reg__
+	breq .L24
+	ldi r24,lo8(1)
+	sts HRC_Asystole,r24
+.L58:
+	sts HRC_CurrentBpm+1,__zero_reg__
+	sts HRC_CurrentBpm,__zero_reg__
+	sts HRC_CurrentHrvMs+1,__zero_reg__
+	sts HRC_CurrentHrvMs,__zero_reg__
+.L23:
+/* epilogue start */
+	pop r15
+	pop r14
+	ret
+.L24:
+	call TIMER1_IsCaptureReady
+	cp r24, __zero_reg__
+	breq .L26
+	call TIMER1_GetLastInterval
+	sbiw r24,0
+	breq .L27
+	call HRC_OnCapture
+.L27:
+	call TIMER1_ClearCaptureFlag
+.L26:
+	call HRC_IsAsystole
+	cpse r24,__zero_reg__
+	rjmp .L58
+	lds r18,HRC_MedianIntervals
+	lds r19,HRC_MedianIntervals+1
+	lds r20,HRC_MedianIntervals+2
+	lds r21,HRC_MedianIntervals+2+1
+	lds r24,HRC_MedianIntervals+4
+	lds r25,HRC_MedianIntervals+4+1
+	lds r22,HRC_MedianCount
+	cpi r22,lo8(3)
+	brsh .+2
+	rjmp .L40
+	cp r18,__zero_reg__
+	cpc r19,__zero_reg__
+	breq .L29
+	cp r20,__zero_reg__
+	cpc r21,__zero_reg__
+	brne .+2
+	rjmp .L40
+	sbiw r24,0
+	brne .+2
+	rjmp .L40
+	cp r20,r18
+	cpc r21,r19
+	brlo .L30
+	mov r23,r20
+	mov r22,r21
+	movw r20,r18
+	mov r18,r23
+	mov r19,r22
+.L30:
+	cp r18,r24
+	cpc r19,r25
+	brsh .L31
+	movw r24,r18
+.L31:
+	cp r24,r20
+	cpc r25,r21
+	brsh .L32
+	movw r24,r20
+.L32:
+	movw r18,r24
+	ldi r20,0
+	ldi r21,0
+	ldi r22,lo8(56)
+	ldi r23,lo8(-100)
+	ldi r24,lo8(28)
+	ldi r25,0
+	call __udivmodsi4
+	movw r24,r18
+	movw r26,r20
+	sbiw r24,30
+	sbc r26,__zero_reg__
+	sbc r27,__zero_reg__
+	cpi r24,-35
+	cpc r25,__zero_reg__
+	cpc r26,__zero_reg__
+	cpc r27,__zero_reg__
+	brlo .+2
+	rjmp .L40
+.L29:
+	sts HRC_CurrentBpm+1,r19
+	sts HRC_CurrentBpm,r18
+	ldi r20,0
+	ldi r21,0
+	movw r22,r20
+	movw r24,r20
+.L36:
+	movw r30,r20
+	subi r20,-1
+	sbci r21,-1
+	movw r26,r20
+	lsl r26
+	rol r27
+	subi r26,lo8(-(HRC_Intervals))
+	sbci r27,hi8(-(HRC_Intervals))
+	ld r18,X+
+	ld r19,X+
+	sbiw r26,2
+	cp r18,__zero_reg__
+	cpc r19,__zero_reg__
+	breq .L33
+	lsl r30
+	rol r31
+	subi r30,lo8(-(HRC_Intervals))
+	sbci r31,hi8(-(HRC_Intervals))
+	ld r18,Z
+	ldd r19,Z+1
+	cp r18,__zero_reg__
+	cpc r19,__zero_reg__
+	breq .L33
+	ld r18,X+
+	ld r19,X+
+	sbiw r26,2
+	ld r14,Z
+	ldd r15,Z+1
+	cp r18,r14
+	cpc r19,r15
+	brlo .L34
+	ld __tmp_reg__,X+
+	ld r27,X
+	mov r26,__tmp_reg__
+	ld r18,Z
+	ldd r19,Z+1
+	movw r30,r26
+	sub r30,r18
+	sbc r31,r19
+	movw r18,r30
+.L35:
+	add r22,r18
+	adc r23,r19
+	adc r24,__zero_reg__
+	adc r25,__zero_reg__
+	cpi r20,7
+	cpc r21,__zero_reg__
+	brne .L36
+	ldi r18,lo8(7)
+	ldi r19,0
+	ldi r20,0
+	ldi r21,0
+	call __udivmodsi4
+	movw r22,r18
+	movw r24,r20
+	ldi r18,5
+	1:
+	lsl r22
+	rol r23
+	rol r24
+	rol r25
+	dec r18
+	brne 1b
+	ldi r18,lo8(-1)
+	ldi r19,lo8(-1)
+	cpi r24,-24
+	ldi r27,3
+	cpc r25,r27
+	brsh .L33
+	ldi r18,lo8(-24)
+	ldi r19,lo8(3)
+	ldi r20,0
+	ldi r21,0
+	call __udivmodsi4
+.L33:
+	sts HRC_CurrentHrvMs+1,r19
+	sts HRC_CurrentHrvMs,r18
+	rjmp .L23
+.L40:
+	ldi r18,0
+	ldi r19,0
+	rjmp .L29
+.L34:
+	ld __tmp_reg__,Z+
+	ld r31,Z
+	mov r30,__tmp_reg__
+	ld r18,X+
+	ld r19,X+
+	movw r26,r30
+	sub r26,r18
+	sbc r27,r19
+	movw r18,r26
+	rjmp .L35
+	.size	HRC_Process, .-HRC_Process
 	.section	.text.HRC_ClearAsystole,"ax",@progbits
 .global	HRC_ClearAsystole
 	.type	HRC_ClearAsystole, @function
@@ -447,6 +394,11 @@ HRC_CurrentBpm:
 	.type	HRC_IntervalIndex, @object
 	.size	HRC_IntervalIndex, 1
 HRC_IntervalIndex:
+	.zero	1
+	.section	.bss.HRC_MedianCount,"aw",@nobits
+	.type	HRC_MedianCount, @object
+	.size	HRC_MedianCount, 1
+HRC_MedianCount:
 	.zero	1
 	.section	.bss.HRC_MedianIndex,"aw",@nobits
 	.type	HRC_MedianIndex, @object

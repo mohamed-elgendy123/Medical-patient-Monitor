@@ -3,6 +3,7 @@
 #include "STD_TYPES.h"
 #include "TIMER_interface.h"
 #include "TIMER_private.h"
+#include "INTERRUPT_interface.h"
 
 /* Static variables to hold system states */
 static volatile u32 Timer0_Ticks;
@@ -12,10 +13,11 @@ static volatile u8 Timer0_TickPending = 0U;
 static volatile u16 Timer1_Intervals[TIMER1_CAPTURE_RING_SIZE];
 static volatile u16 Timer1_LastCapture = 0U;
 static volatile u8 Timer1_RingIndex = 0U;
-static volatile u8 Timer1_CaptureCount = 0U;
 static volatile u8 Timer1_CaptureReady = 0U;
 static volatile u8 Timer1_Asystole = 0U;
-static volatile u16 Timer1_OverflowCount = 0U;
+static volatile u8 Timer1_OverflowCount = 0U;
+static volatile u8 Timer1_HasLastCapture = 0U;
+static volatile u16 Timer1_LastInterval = 0U;
 
 /* ========================================================================= */
 /*                               TIMER 0                                     */
@@ -79,89 +81,64 @@ void TIMER1_Init(void)
 {
     u8 Local_u8Idx = 0U;
 
-    /* Reset Timer1 Control Registers to Normal Mode (16-bit) */
+    /* 1. ضبط مسجلات التحكم والعداد على النمط الطبيعي Normal Mode */
     TIMER1_TCCR1A = 0U;
     TIMER1_TCCR1B = 0U;
+    TIMER1_TCNT1 = 0U;
 
-    /* Enable Input Capture Noise Canceler and Rising Edge Trigger */
+    /* 2. مسح أي رايات مقاطعة معلقة في TIFR بكتابة 1 منطقي */
+    SET_BIT(TIMER_TIFR, TIMER1_ICF1);
+    SET_BIT(TIMER_TIFR, TIMER1_TOV1);
+
+    /* 3. تفعيل مانع الضوضاء ICNC1، والحافة الصاعدة ICES1، والمقسم 256 */
     SET_BIT(TIMER1_TCCR1B, TIMER1_ICNC1);
     SET_BIT(TIMER1_TCCR1B, TIMER1_ICES1);
-
-    /* Prescaler 256 (32us tick @ 8MHz) -> CS12 = 1 */
     SET_BIT(TIMER1_TCCR1B, TIMER1_CS12);
 
-    /* Enable Capture and Overflow Interrupts */
+    /* 4. تفعيل مقاطعة الالتقاط والفيضان في TIMSK */
     SET_BIT(TIMER_TIMSK, TIMER1_TICIE1);
     SET_BIT(TIMER_TIMSK, TIMER1_TOIE1);
 
-    /* Clear the intervals ring buffer using a for loop */
+    /* 5. تصفير مصفوفة العينات الدائرية */
     for (Local_u8Idx = 0U; Local_u8Idx < TIMER1_CAPTURE_RING_SIZE; Local_u8Idx++)
     {
         Timer1_Intervals[Local_u8Idx] = 0U;
     }
 
-    /* Reset internal tracking variables using do...while */
-    Local_u8Idx = 0U;
-    do
-    {
-        Timer1_LastCapture = 0U;
-        Timer1_RingIndex = 0U;
-        Timer1_CaptureCount = 0U;
-        Timer1_CaptureReady = 0U;
-        Timer1_Asystole = 0U;
-        Timer1_OverflowCount = 0U;
-        Local_u8Idx++;
-    } while (Local_u8Idx < 1U);
+    Timer1_LastCapture = 0U;
+    Timer1_RingIndex = 0U;
+    Timer1_CaptureReady = 0U;
+    Timer1_Asystole = 0U;
+    Timer1_OverflowCount = 0U;
+    Timer1_HasLastCapture = 0U;
+    Timer1_LastInterval = 0U;
 }
 
-uint8 TIMER1_IsCaptureReady(void)
+u8 TIMER1_IsCaptureReady(void)
 {
-    if (Timer1_CaptureReady == 1U)
-    {
-        return 1U;
-    }
-    return 0U;
+    return (Timer1_CaptureReady != 0U) ? 1U : 0U;
 }
 
 void TIMER1_ClearCaptureFlag(void)
 {
     Timer1_CaptureReady = 0U;
-    Timer1_CaptureCount = 0U;
 }
 
-uint16 TIMER1_GetInterval(uint8 Copy_u8Index)
+u16 TIMER1_GetLastInterval(void)
 {
-    /* Bounds checking */
-    if (Copy_u8Index < TIMER1_CAPTURE_RING_SIZE)
-    {
-        return Timer1_Intervals[Copy_u8Index];
-    }
-    else
-    {
-        return 0U;
-    }
+    u16 Local_u16Val;
+
+    /* قراءة ذرية آمنة لمتغير 16-بت تمنع المقاطعة أثناء نقل البايتين */
+    (void)INTERRUPT_DisableGlobal();
+    Local_u16Val = Timer1_LastInterval;
+    (void)INTERRUPT_EnableGlobal();
+
+    return Local_u16Val;
 }
 
-uint8 TIMER1_GetCaptureCount(void)
+u8 TIMER1_IsAsystole(void)
 {
-    return Timer1_CaptureCount;
-}
-
-uint8 TIMER1_GetCaptureWriteIndex(void)
-{
-    return Timer1_RingIndex;
-}
-
-uint8 TIMER1_IsAsystole(void)
-{
-    if (Timer1_Asystole != 0U)
-    {
-        return 1U;
-    }
-    else
-    {
-        return 0U;
-    }
+    return (Timer1_Asystole != 0U) ? 1U : 0U;
 }
 
 void TIMER1_ClearAsystole(void)
@@ -245,13 +222,27 @@ ISR(TIMER0_COMP_vect)
 ISR(TIMER1_CAPT_vect)
 {
     u16 Local_u16Capture = TIMER1_ICR1;
-    Timer1_Intervals[Timer1_RingIndex] = (u16)(Local_u16Capture - Timer1_LastCapture);
+
+    if (Timer1_HasLastCapture == 0U)
+    {
+        Timer1_LastCapture = Local_u16Capture;
+        Timer1_HasLastCapture = 1U;
+        return;
+    }
+
+    Timer1_LastInterval = (u16)(Local_u16Capture - Timer1_LastCapture);
+    Timer1_Intervals[Timer1_RingIndex] = Timer1_LastInterval;
     Timer1_LastCapture = Local_u16Capture;
-    Timer1_RingIndex = (u8)((Timer1_RingIndex + 1U) & 7U);
-    Timer1_CaptureCount = (Timer1_CaptureCount < TIMER1_CAPTURE_RING_SIZE) ? (u8)(Timer1_CaptureCount + 1U) : TIMER1_CAPTURE_RING_SIZE;
+
+    Timer1_RingIndex++;
+    if (Timer1_RingIndex >= TIMER1_CAPTURE_RING_SIZE)
+    {
+        Timer1_RingIndex = 0U;
+    }
+
     Timer1_CaptureReady = 1U;
     Timer1_OverflowCount = 0U;
-    Timer1_Asystole = 0U;
+    Timer1_Asystole = 0U; /* إلغاء توقف القلب فور التقاط النبضة */
 }
 
 ISR(TIMER1_OVF_vect)

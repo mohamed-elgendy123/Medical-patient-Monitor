@@ -11,6 +11,7 @@
 static volatile u16 HRC_MedianIntervals[MEDIAN_WINDOW_SIZE];
 static volatile u16 HRC_Intervals[HRV_WINDOW];
 static volatile u8 HRC_MedianIndex;
+static volatile u8 HRC_MedianCount;
 static volatile u8 HRC_IntervalIndex;
 static volatile u16 HRC_CurrentBpm;
 static volatile u16 HRC_CurrentHrvMs;
@@ -21,6 +22,7 @@ void HRC_Init(void)
     u8 Local_u8Index;
 
     HRC_MedianIndex = 0U;
+    HRC_MedianCount = 0U;
     HRC_IntervalIndex = 0U;
     HRC_CurrentBpm = HRC_INVALID_HR;
     HRC_CurrentHrvMs = 0U;
@@ -41,31 +43,31 @@ void HRC_Init(void)
 
 void HRC_Process(void)
 {
-    u8 Local_u8CaptureCount;
-    u8 Local_u8WriteIndex;
-    u8 Local_u8ReadIndex;
-    u8 Local_u8Index;
-
-    if ((TIMER1_IsAsystole() != 0U) || (HRC_Asystole != 0U))
+    /* فحص حالة توقف القلب أولاً */
+    if (TIMER1_IsAsystole() != 0U)
     {
+        HRC_Asystole = 1U;
         HRC_CurrentBpm = HRC_INVALID_HR;
         HRC_CurrentHrvMs = 0U;
-        HRC_Asystole = 1U;
         return;
     }
 
+    /* Consume exactly the interval published by the Timer1 interface. */
     if (TIMER1_IsCaptureReady() != 0U)
     {
-        Local_u8CaptureCount = TIMER1_GetCaptureCount();
-        Local_u8WriteIndex = TIMER1_GetCaptureWriteIndex();
-        for (Local_u8Index = 0U; Local_u8Index < Local_u8CaptureCount; Local_u8Index++)
+        u16 Local_u16Interval = TIMER1_GetLastInterval();
+        if (Local_u16Interval > 0U)
         {
-            Local_u8ReadIndex = (u8)((Local_u8WriteIndex + HRV_WINDOW -
-                                      Local_u8CaptureCount + Local_u8Index) %
-                                     HRV_WINDOW);
-            HRC_OnCapture(TIMER1_GetInterval(Local_u8ReadIndex));
+            HRC_OnCapture(Local_u16Interval);
         }
         TIMER1_ClearCaptureFlag();
+    }
+
+    if (HRC_IsAsystole() != 0U)
+    {
+        HRC_CurrentBpm = HRC_INVALID_HR;
+        HRC_CurrentHrvMs = 0U;
+        return;
     }
 
     HRC_CurrentBpm = HRC_CalculateMedian();
@@ -81,6 +83,10 @@ void HRC_OnCapture(u16 Copy_u16IntervalTicks)
         if (HRC_MedianIndex >= MEDIAN_WINDOW_SIZE)
         {
             HRC_MedianIndex = 0U;
+        }
+        if (HRC_MedianCount < MEDIAN_WINDOW_SIZE)
+        {
+            HRC_MedianCount++;
         }
 
         HRC_Intervals[HRC_IntervalIndex] = Copy_u16IntervalTicks;
@@ -133,66 +139,57 @@ void HRC_ClearAsystole(void)
 
 static u16 HRC_CalculateMedian(void)
 {
-    u16 Local_u16Arr[MEDIAN_WINDOW_SIZE];
-    u16 Local_u16LatestInterval = 0U;
-    u16 Local_u16Bpm;
+    u16 Local_u16Arr[3];
     u16 Local_u16Temp;
-    u8 Local_u8Index;
-    u8 Local_u8HasEmpty = 0U;
 
-    for (Local_u8Index = 0U; Local_u8Index < MEDIAN_WINDOW_SIZE; Local_u8Index++)
-    {
-        Local_u16Arr[Local_u8Index] = HRC_MedianIntervals[Local_u8Index];
-        if (Local_u16Arr[Local_u8Index] == 0U)
-        {
-            Local_u8HasEmpty = 1U;
-        }
-        else if (Local_u8Index == ((HRC_MedianIndex + MEDIAN_WINDOW_SIZE - 1U) %
-                                   MEDIAN_WINDOW_SIZE))
-        {
-            Local_u16LatestInterval = Local_u16Arr[Local_u8Index];
-        }
-    }
+    Local_u16Arr[0] = HRC_MedianIntervals[0];
+    Local_u16Arr[1] = HRC_MedianIntervals[1];
+    Local_u16Arr[2] = HRC_MedianIntervals[2];
 
-    if (Local_u16LatestInterval == 0U)
+    if ((HRC_MedianCount < MEDIAN_WINDOW_SIZE) ||
+        (Local_u16Arr[0] == 0U) || (Local_u16Arr[1] == 0U) ||
+        (Local_u16Arr[2] == 0U))
     {
         return HRC_INVALID_HR;
     }
 
-    if (Local_u8HasEmpty != 0U)
+    /* ترتيب العينات الثلاث للحصول على الوسيط */
+    if (Local_u16Arr[0] > Local_u16Arr[1])
     {
-        Local_u16Bpm = (u16)(HR_NUM / Local_u16LatestInterval);
+        Local_u16Temp = Local_u16Arr[0];
+        Local_u16Arr[0] = Local_u16Arr[1];
+        Local_u16Arr[1] = Local_u16Temp;
     }
-    else
+    if (Local_u16Arr[1] > Local_u16Arr[2])
     {
-        if (Local_u16Arr[0] > Local_u16Arr[1])
-        {
-            Local_u16Temp = Local_u16Arr[0];
-            Local_u16Arr[0] = Local_u16Arr[1];
-            Local_u16Arr[1] = Local_u16Temp;
-        }
-        if (Local_u16Arr[1] > Local_u16Arr[2])
-        {
-            Local_u16Temp = Local_u16Arr[1];
-            Local_u16Arr[1] = Local_u16Arr[2];
-            Local_u16Arr[2] = Local_u16Temp;
-        }
-        if (Local_u16Arr[0] > Local_u16Arr[1])
-        {
-            Local_u16Temp = Local_u16Arr[0];
-            Local_u16Arr[0] = Local_u16Arr[1];
-            Local_u16Arr[1] = Local_u16Temp;
-        }
-
-        Local_u16Bpm = (u16)(HR_NUM / Local_u16Arr[1]);
+        Local_u16Temp = Local_u16Arr[1];
+        Local_u16Arr[1] = Local_u16Arr[2];
+        Local_u16Arr[2] = Local_u16Temp;
+    }
+    if (Local_u16Arr[0] > Local_u16Arr[1])
+    {
+        Local_u16Temp = Local_u16Arr[0];
+        Local_u16Arr[0] = Local_u16Arr[1];
+        Local_u16Arr[1] = Local_u16Temp;
     }
 
-    if ((Local_u16Bpm < HRC_MIN_BPM) || (Local_u16Bpm > HRC_MAX_BPM))
+    /* أخذ العينة الوسطى */
+    u16 Local_u16Median = Local_u16Arr[1];
+
+    if (Local_u16Median == 0U)
     {
         return HRC_INVALID_HR;
     }
 
-    return Local_u16Bpm;
+    /* حساب النبض بأمان تام */
+    u32 Local_u32Bpm = (u32)(HR_NUM / Local_u16Median);
+
+    if ((Local_u32Bpm < HRC_MIN_BPM) || (Local_u32Bpm > HRC_MAX_BPM))
+    {
+        return HRC_INVALID_HR;
+    }
+
+    return (u16)Local_u32Bpm;
 }
 
 static u16 HRC_CalculateHrvMs(void)

@@ -40,9 +40,7 @@ void TIMER0_ClearTick(void);
 void TIMER1_Init(void);
 uint8 TIMER1_IsCaptureReady(void);
 void TIMER1_ClearCaptureFlag(void);
-uint16 TIMER1_GetInterval(uint8 Copy_u8Index);
-uint8 TIMER1_GetCaptureCount(void);
-uint8 TIMER1_GetCaptureWriteIndex(void);
+uint16 TIMER1_GetLastInterval(void);
 uint8 TIMER1_IsAsystole(void);
 void TIMER1_ClearAsystole(void);
 
@@ -182,7 +180,65 @@ void NurseCall_voidEnable(void);
 
 void NurseCall_voidDisable(void);
 # 11 "main.c" 2
-# 24 "main.c"
+# 1 "Logic/AlarmManager/Alarm_mgr.h" 1
+
+
+
+# 1 "Logic/AlarmManager/../../LIB/STD_TYPES.h" 1
+# 5 "Logic/AlarmManager/Alarm_mgr.h" 2
+
+
+typedef uint8 uint8;
+typedef uint16 uint16;
+typedef uint32 uint32;
+
+typedef enum {
+    ALARM_PRIO_NONE = 0,
+    ALARM_PRIO_LOW,
+    ALARM_PRIO_MEDIUM,
+    ALARM_PRIO_HIGH
+} Alarm_Priority_t;
+
+typedef enum {
+    ALARM_ASYSTOLE = 0,
+    ALARM_VFIB_VTAC,
+    ALARM_HR_CRIT_HIGH,
+    ALARM_HR_CRIT_LOW,
+    ALARM_SPO2_CRIT_LOW,
+    ALARM_RR_CRIT_HIGH,
+    ALARM_RR_CRIT_LOW,
+    ALARM_HR_WARN_HIGH,
+    ALARM_HR_WARN_LOW,
+    ALARM_SPO2_WARN_LOW,
+    ALARM_TEMP_HIGH,
+    ALARM_TEMP_LOW,
+    ALARM_BP_HIGH,
+    ALARM_BP_LOW,
+    ALARM_SENSOR_DISCONNECT,
+    ALARM_LEAD_OFF,
+    ALARM_BATTERY_LOW,
+    ALARM_COUNT
+} Alarm_ID_t;
+
+typedef struct {
+    uint16 heartRate;
+    uint8 spO2;
+    uint8 respRate;
+    uint16 tempC_x10;
+    uint16 sysBP;
+    uint16 diaBP;
+    uint8 sensorConnected;
+    uint8 leadStatus;
+} PatientVitals_t;
+
+void Alarm_Init(void);
+void Alarm_UpdateVitals(const PatientVitals_t* vitals);
+void Alarm_Process(void);
+Alarm_Priority_t Alarm_GetActivePriority(void);
+uint16 Alarm_GetActiveFlags(void);
+void Alarm_Acknowledge(void);
+# 12 "main.c" 2
+# 25 "main.c"
 static void Task_Panel(void);
 static void Task_Fsm(void);
 static void Task_Console(void);
@@ -199,6 +255,51 @@ static void Application_ClearState(void);
 static void Application_SelfTest(void);
 static void Application_Init(void);
 
+
+static uint8 Heartbeat_Counter = 0U;
+
+static void Task_Timers(void)
+{
+
+    if (Heartbeat_Counter > 0U)
+    {
+        Heartbeat_Counter--;
+        GPIO_SetPinValue(1u, 3u, 1u);
+    }
+    else
+    {
+        GPIO_SetPinValue(1u, 3u, 0u);
+    }
+}
+
+static void Task_FastVitals(void)
+{
+    uint16 Local_u16Interval = 0U;
+
+    if (TIMER1_IsCaptureReady() != 0U)
+    {
+        Local_u16Interval = TIMER1_GetLastInterval();
+    }
+
+    HRC_Process();
+
+    if (Local_u16Interval > 0U)
+    {
+        Heartbeat_Counter = 2U;
+    }
+
+    if ((HRC_IsAsystole() != 0U) || (HRC_GetBpm() == 0U))
+    {
+
+        GPIO_SetPinValue(1u, 0u, 1u);
+    }
+    else
+    {
+
+        GPIO_SetPinValue(1u, 0u, 0u);
+    }
+}
+
 static void Task_Panel(void)
 {
 }
@@ -211,25 +312,30 @@ static void Task_Console(void)
 {
 }
 
-static void Task_Timers(void)
-{
-}
-
 static void Task_Alarms(void)
 {
+    Alarm_Process();
 }
 
 static void Task_Lcd(void)
 {
 }
 
-static void Task_FastVitals(void)
-{
-  HRC_Process();
-}
-
 static void Task_OneHz(void)
 {
+
+    PatientVitals_t testVitals = {
+        .heartRate = 160,
+        .spO2 = 82,
+        .respRate = 18,
+        .tempC_x10 = 370,
+        .sysBP = 120,
+        .diaBP = 80,
+        .sensorConnected = 1,
+        .leadStatus = 1
+    };
+
+    Alarm_UpdateVitals(&testVitals);
 }
 
 static void Task_Report(void)
@@ -250,132 +356,127 @@ static void Clear_TrendState(void)
 
 static void Application_ClearState(void)
 {
-  Clear_AlarmState();
-  Clear_TrendState();
-  ANN_Audio_SetPriority(0U);
-  ANN_Visual_SetPriority(0U);
-
-  NurseCall_voidDisable();
-
-  HRC_ClearAsystole();
+    Clear_AlarmState();
+    Clear_TrendState();
+    ANN_Audio_SetPriority(0U);
+    ANN_Visual_SetPriority(0U);
+    NurseCall_voidDisable();
+    HRC_ClearAsystole();
 }
 
 static void Application_SelfTest(void)
 {
-  uint16 Local_u16Ticks = 0U;
+    uint16 Local_u16Ticks = 0U;
 
 
-  ANN_Audio_SetPriority(2U);
-  ANN_Visual_SetPriority(3U);
+    ANN_Audio_SetPriority(2U);
+    ANN_Visual_SetPriority(3U);
+    NurseCall_voidEnable();
+    ShiftReg_voidWriteByte(0xFF);
 
-  NurseCall_voidEnable();
-  ShiftReg_voidWriteByte(0xFF);
-
-  (void)INTERRUPT_EnableGlobal();
-  while (Local_u16Ticks < 300U)
-  {
-    if (TIMER0_IsTickPending() != 0U)
+    (void)INTERRUPT_EnableGlobal();
+    while (Local_u16Ticks < 300U)
     {
-      TIMER0_ClearTick();
-      Local_u16Ticks++;
-      ANN_Audio_Tick();
-      ANN_Visual_Tick();
+        if (TIMER0_IsTickPending() != 0U)
+        {
+            TIMER0_ClearTick();
+            Local_u16Ticks++;
+            ANN_Audio_Tick();
+            ANN_Visual_Tick();
 
-      if (Local_u16Ticks == 50U)
-      {
-        ANN_Audio_Mute();
-      }
+            if (Local_u16Ticks == 50U)
+            {
+                ANN_Audio_Mute();
+            }
+        }
     }
-  }
-  (void)INTERRUPT_DisableGlobal();
+    (void)INTERRUPT_DisableGlobal();
 
-  ANN_Audio_Init();
-  ANN_Visual_Init();
-
-  NurseCall_voidDisable();
-  ShiftReg_voidWriteByte(0x00);
-  Application_ClearState();
-  TIMER0_ClearTick();
+    ANN_Audio_Init();
+    ANN_Visual_Init();
+    NurseCall_voidDisable();
+    ShiftReg_voidWriteByte(0x00);
+    Application_ClearState();
+    TIMER0_ClearTick();
 }
 
 static void Application_Init(void)
 {
-  GPIO_SetPinDirection(2u, 7u, 1u);
-  GPIO_SetPinValue(2u, 7u, 0u);
+    GPIO_SetPinDirection(2u, 7u, 1u);
+    GPIO_SetPinValue(2u, 7u, 0u);
 
-  TIMER0_Init();
-  HRC_Init();
+    TIMER0_Init();
+    HRC_Init();
 
 
-  ShiftReg_voidInit();
+    ShiftReg_voidInit();
+    NurseCall_voidInit();
+    ANN_Audio_Init();
+    ANN_Visual_Init();
 
-  NurseCall_voidInit();
-  ANN_Audio_Init();
-  ANN_Visual_Init();
-
-  Application_SelfTest();
-  (void)INTERRUPT_EnableGlobal();
+    Application_SelfTest();
+    (void)INTERRUPT_EnableGlobal();
 }
 
 int main(void)
 {
-  uint16 Local_u16Phase = 0U;
+    uint16 Local_u16Phase = 0U;
 
-  Application_Init();
+    Application_Init();
 
-  while (1)
-  {
-    if (TIMER0_IsTickPending() != 0U)
+    while (1)
     {
-      TIMER0_ClearTick();
-      GPIO_SetPinValue(2u, 7u, 1u);
+        if (TIMER0_IsTickPending() != 0U)
+        {
+            TIMER0_ClearTick();
+            GPIO_SetPinValue(2u, 7u, 1u);
 
-      if ((Local_u16Phase % 2U) == 1U)
-      {
-        Task_Console();
-      }
-      if ((Local_u16Phase % 5U) == 2U)
-      {
-        Task_Timers();
-      }
-      if ((Local_u16Phase % 10U) == 3U)
-      {
-        Task_Alarms();
-      }
-      if ((Local_u16Phase % 25U) == 5U)
-      {
-        Task_Lcd();
-      }
-      if ((Local_u16Phase % 50U) == 4U)
-      {
-        Task_FastVitals();
-      }
-      if ((Local_u16Phase % 100U) == 6U)
-      {
-        Task_OneHz();
-      }
-      if ((Local_u16Phase % 200U) == 7U)
-      {
-        Task_Report();
-      }
-      if ((Local_u16Phase % 1000U) == 8U)
-      {
-        Task_Trend();
-      }
+            if ((Local_u16Phase % 2U) == 1U)
+            {
+                Task_Console();
+            }
+            if ((Local_u16Phase % 5U) == 2U)
+            {
+                Task_Timers();
+            }
+            if ((Local_u16Phase % 10U) == 3U)
+            {
+                Task_Alarms();
+            }
+            if ((Local_u16Phase % 25U) == 5U)
+            {
+                Task_Lcd();
+            }
+            if ((Local_u16Phase % 50U) == 4U)
+            {
+                Task_FastVitals();
+            }
+            if ((Local_u16Phase % 100U) == 6U)
+            {
+                Task_OneHz();
+            }
+            if ((Local_u16Phase % 200U) == 7U)
+            {
+                Task_Report();
+            }
+            if ((Local_u16Phase % 1000U) == 8U)
+            {
+                Task_Trend();
+            }
 
-      Task_Panel();
-      Task_Fsm();
+            Task_Panel();
+            Task_Fsm();
 
 
-      ANN_Audio_Tick();
-      ANN_Visual_Tick();
+            ANN_Audio_Tick();
+            ANN_Visual_Tick();
 
-      GPIO_SetPinValue(2u, 7u, 0u);
-      Local_u16Phase++;
-      if (Local_u16Phase >= 1000U)
-      {
-        Local_u16Phase = 0U;
-      }
+            GPIO_SetPinValue(2u, 7u, 0u);
+            Local_u16Phase++;
+            if (Local_u16Phase >= 1000U)
+            {
+                Local_u16Phase = 0U;
+            }
+        }
     }
-  }
 }
