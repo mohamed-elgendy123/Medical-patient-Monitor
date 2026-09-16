@@ -62,6 +62,12 @@ void ANN_Audio_SetPriority(uint8 Copy_u8Priority);
 void ANN_Audio_Tick(void);
 void ANN_Audio_Mute(void);
 void ANN_Audio_Unmute(void);
+
+
+void ANN_Visual_Init(void);
+void ANN_Visual_SetPriority(uint8 Copy_u8Priority);
+void ANN_Visual_Tick(void);
+void ANN_Visual_TriggerHeartbeat(void);
 # 9 "HAL/Annunciator/Annunciator_audio.c" 2
 # 1 "HAL/Annunciator/Annunciator_private.h" 1
 # 10 "HAL/Annunciator/Annunciator_audio.c" 2

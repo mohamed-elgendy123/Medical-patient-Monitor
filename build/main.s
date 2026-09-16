@@ -14,22 +14,6 @@ main:
 /* stack size = 0 */
 .L__stack_usage = 0
 	ldi r20,lo8(1)
-	ldi r22,0
-	ldi r24,lo8(1)
-	call GPIO_SetPinDirection
-	ldi r20,lo8(1)
-	ldi r22,lo8(1)
-	ldi r24,lo8(1)
-	call GPIO_SetPinDirection
-	ldi r20,lo8(1)
-	ldi r22,lo8(2)
-	ldi r24,lo8(1)
-	call GPIO_SetPinDirection
-	ldi r20,lo8(1)
-	ldi r22,lo8(3)
-	ldi r24,lo8(1)
-	call GPIO_SetPinDirection
-	ldi r20,lo8(1)
 	ldi r22,lo8(7)
 	ldi r24,lo8(2)
 	call GPIO_SetPinDirection
@@ -43,21 +27,17 @@ main:
 	call GPIO_SetPinValue
 	call TIMER0_Init
 	call HRC_Init
+	call ShiftReg_voidInit
+	call NurseCall_voidInit
 	call ANN_Audio_Init
-	ldi r20,lo8(1)
-	ldi r22,0
-	ldi r24,lo8(1)
-	call GPIO_SetPinValue
-	ldi r20,lo8(1)
-	ldi r22,lo8(1)
-	ldi r24,lo8(1)
-	call GPIO_SetPinValue
-	ldi r20,lo8(1)
-	ldi r22,lo8(2)
-	ldi r24,lo8(1)
-	call GPIO_SetPinValue
+	call ANN_Visual_Init
 	ldi r24,lo8(2)
 	call ANN_Audio_SetPriority
+	ldi r24,lo8(3)
+	call ANN_Visual_SetPriority
+	call NurseCall_voidEnable
+	ldi r24,lo8(-1)
+	call ShiftReg_voidWriteByte
 	call INTERRUPT_EnableGlobal
 	ldi r28,0
 	ldi r29,0
@@ -68,6 +48,7 @@ main:
 	call TIMER0_ClearTick
 	adiw r28,1
 	call ANN_Audio_Tick
+	call ANN_Visual_Tick
 	cpi r28,50
 	cpc r29,__zero_reg__
 	brne .L4
@@ -79,21 +60,16 @@ main:
 	cpc r29,r24
 	brne .L3
 	call INTERRUPT_DisableGlobal
-	ldi r20,0
-	ldi r22,0
-	ldi r24,lo8(1)
-	call GPIO_SetPinValue
-	ldi r20,0
-	ldi r22,lo8(1)
-	ldi r24,lo8(1)
-	call GPIO_SetPinValue
-	ldi r20,0
-	ldi r22,lo8(2)
-	ldi r24,lo8(1)
-	call GPIO_SetPinValue
 	call ANN_Audio_Init
+	call ANN_Visual_Init
+	call NurseCall_voidDisable
+	ldi r24,0
+	call ShiftReg_voidWriteByte
 	ldi r24,0
 	call ANN_Audio_SetPriority
+	ldi r24,0
+	call ANN_Visual_SetPriority
+	call NurseCall_voidDisable
 	call HRC_ClearAsystole
 	call TIMER0_ClearTick
 	call INTERRUPT_EnableGlobal
@@ -149,6 +125,7 @@ main:
 	call GPIO_SetPinValue
 .L10:
 	call ANN_Audio_Tick
+	call ANN_Visual_Tick
 	ldi r20,0
 	ldi r22,lo8(7)
 	ldi r24,lo8(2)

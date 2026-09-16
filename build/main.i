@@ -137,8 +137,50 @@ void ANN_Audio_SetPriority(uint8 Copy_u8Priority);
 void ANN_Audio_Tick(void);
 void ANN_Audio_Mute(void);
 void ANN_Audio_Unmute(void);
+
+
+void ANN_Visual_Init(void);
+void ANN_Visual_SetPriority(uint8 Copy_u8Priority);
+void ANN_Visual_Tick(void);
+void ANN_Visual_TriggerHeartbeat(void);
 # 9 "main.c" 2
-# 22 "main.c"
+# 1 "HAL/ShiftReg/ShiftReg_interface.h" 1
+
+
+
+# 1 "HAL/ShiftReg/../../LIB/STD_TYPES.h" 1
+# 5 "HAL/ShiftReg/ShiftReg_interface.h" 2
+
+
+
+
+
+void ShiftReg_voidInit(void);
+
+
+
+
+
+void ShiftReg_voidWriteByte(uint8 Copy_u8Data);
+# 10 "main.c" 2
+# 1 "HAL/NurseCall/NurseCall_interface.h" 1
+
+
+
+
+# 1 "HAL/NurseCall/../../LIB/STD_TYPES.h" 1
+# 6 "HAL/NurseCall/NurseCall_interface.h" 2
+
+
+void NurseCall_voidInit(void);
+
+
+void NurseCall_voidEnable(void);
+
+
+void NurseCall_voidDisable(void);
+# 11 "main.c" 2
+# 24 "main.c"
 static void Task_Panel(void);
 static void Task_Fsm(void);
 static void Task_Console(void);
@@ -244,6 +286,10 @@ static void Application_ClearState(void)
   Clear_AlarmState();
   Clear_TrendState();
   ANN_Audio_SetPriority(0U);
+  ANN_Visual_SetPriority(0U);
+
+  NurseCall_voidDisable();
+
   HRC_ClearAsystole();
 }
 
@@ -251,10 +297,12 @@ static void Application_SelfTest(void)
 {
   uint16 Local_u16Ticks = 0U;
 
-  GPIO_SetPinValue(1u, 0u, 1u);
-  GPIO_SetPinValue(1u, 1u, 1u);
-  GPIO_SetPinValue(1u, 2u, 1u);
+
   ANN_Audio_SetPriority(2U);
+  ANN_Visual_SetPriority(3U);
+
+  NurseCall_voidEnable();
+  ShiftReg_voidWriteByte(0xFF);
 
   (void)INTERRUPT_EnableGlobal();
   while (Local_u16Ticks < 300U)
@@ -264,6 +312,8 @@ static void Application_SelfTest(void)
       TIMER0_ClearTick();
       Local_u16Ticks++;
       ANN_Audio_Tick();
+      ANN_Visual_Tick();
+
       if (Local_u16Ticks == 50U)
       {
         ANN_Audio_Mute();
@@ -272,27 +322,31 @@ static void Application_SelfTest(void)
   }
   (void)INTERRUPT_DisableGlobal();
 
-  GPIO_SetPinValue(1u, 0u, 0u);
-  GPIO_SetPinValue(1u, 1u, 0u);
-  GPIO_SetPinValue(1u, 2u, 0u);
   ANN_Audio_Init();
+  ANN_Visual_Init();
+
+  NurseCall_voidDisable();
+  ShiftReg_voidWriteByte(0x00);
   Application_ClearState();
   TIMER0_ClearTick();
 }
 
 static void Application_Init(void)
 {
-  GPIO_SetPinDirection(1u, 0u, 1u);
-  GPIO_SetPinDirection(1u, 1u, 1u);
-  GPIO_SetPinDirection(1u, 2u, 1u);
-  GPIO_SetPinDirection(1u, 3u, 1u);
   GPIO_SetPinDirection(2u, 7u, 1u);
   GPIO_SetPinDirection(3u, 6u, 0u);
-
   GPIO_SetPinValue(2u, 7u, 0u);
+
   TIMER0_Init();
   HRC_Init();
+
+
+  ShiftReg_voidInit();
+
+  NurseCall_voidInit();
   ANN_Audio_Init();
+  ANN_Visual_Init();
+
   Application_SelfTest();
   (void)INTERRUPT_EnableGlobal();
 }
@@ -345,7 +399,10 @@ int main(void)
 
       Task_Panel();
       Task_Fsm();
+
+
       ANN_Audio_Tick();
+      ANN_Visual_Tick();
 
       GPIO_SetPinValue(2u, 7u, 0u);
       Local_u16Phase++;

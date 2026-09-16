@@ -6,6 +6,8 @@
 #include "GPIO_interface.h"
 #include "HR_Capture_interface.h"
 #include "Annunciator_interface.h"
+#include "ShiftReg_interface.h"
+#include "NurseCall_interface.h"
 
 #define CPU_LOAD_PORT GPIO_PORTC
 #define CPU_LOAD_PIN GPIO_PIN7
@@ -124,6 +126,10 @@ static void Application_ClearState(void)
   Clear_AlarmState();
   Clear_TrendState();
   ANN_Audio_SetPriority(ANN_PRI_NONE);
+  ANN_Visual_SetPriority(ANN_PRI_NONE);
+  // NurseCall_Disable();
+  NurseCall_voidDisable();
+
   HRC_ClearAsystole();
 }
 
@@ -131,10 +137,12 @@ static void Application_SelfTest(void)
 {
   u16 Local_u16Ticks = 0U;
 
-  GPIO_SetPinValue(GPIO_PORTB, HIGH_ALARM_LED_PIN, GPIO_HIGH);
-  GPIO_SetPinValue(GPIO_PORTB, MEDIUM_ALARM_LED_PIN, GPIO_HIGH);
-  GPIO_SetPinValue(GPIO_PORTB, LOW_ALARM_LED_PIN, GPIO_HIGH);
+  /* Test Audio & Visual Annunciators during Self-Test */
   ANN_Audio_SetPriority(ANN_PRI_MEDIUM);
+  ANN_Visual_SetPriority(ANN_PRI_HIGH);
+  // NurseCall_Enable();
+  NurseCall_voidEnable();
+  ShiftReg_voidWriteByte(0xFF); /* Turn ON Vital Status LEDs */
 
   (void)INTERRUPT_EnableGlobal();
   while (Local_u16Ticks < SELF_TEST_TICKS)
@@ -144,6 +152,8 @@ static void Application_SelfTest(void)
       TIMER0_ClearTick();
       Local_u16Ticks++;
       ANN_Audio_Tick();
+      ANN_Visual_Tick();
+
       if (Local_u16Ticks == SELF_TEST_TONE_TICKS)
       {
         ANN_Audio_Mute();
@@ -152,27 +162,31 @@ static void Application_SelfTest(void)
   }
   (void)INTERRUPT_DisableGlobal();
 
-  GPIO_SetPinValue(GPIO_PORTB, HIGH_ALARM_LED_PIN, GPIO_LOW);
-  GPIO_SetPinValue(GPIO_PORTB, MEDIUM_ALARM_LED_PIN, GPIO_LOW);
-  GPIO_SetPinValue(GPIO_PORTB, LOW_ALARM_LED_PIN, GPIO_LOW);
   ANN_Audio_Init();
+  ANN_Visual_Init();
+  // NurseCall_Disable();
+  NurseCall_voidDisable();
+  ShiftReg_voidWriteByte(0x00);
   Application_ClearState();
   TIMER0_ClearTick();
 }
 
 static void Application_Init(void)
 {
-  GPIO_SetPinDirection(GPIO_PORTB, HIGH_ALARM_LED_PIN, GPIO_OUTPUT);
-  GPIO_SetPinDirection(GPIO_PORTB, MEDIUM_ALARM_LED_PIN, GPIO_OUTPUT);
-  GPIO_SetPinDirection(GPIO_PORTB, LOW_ALARM_LED_PIN, GPIO_OUTPUT);
-  GPIO_SetPinDirection(GPIO_PORTB, HEARTBEAT_LED_PIN, GPIO_OUTPUT);
   GPIO_SetPinDirection(CPU_LOAD_PORT, CPU_LOAD_PIN, GPIO_OUTPUT);
   GPIO_SetPinDirection(GPIO_PORTD, GPIO_PIN6, GPIO_INPUT);
-
   GPIO_SetPinValue(CPU_LOAD_PORT, CPU_LOAD_PIN, GPIO_LOW);
+
   TIMER0_Init();
   HRC_Init();
+
+  /* Initialize Student 2 HAL Drivers */
+  ShiftReg_voidInit();
+  // NurseCall_Init();
+  NurseCall_voidInit();
   ANN_Audio_Init();
+  ANN_Visual_Init();
+
   Application_SelfTest();
   (void)INTERRUPT_EnableGlobal();
 }
@@ -225,7 +239,10 @@ int main(void)
 
       Task_Panel();
       Task_Fsm();
+
+      /* Executive Ticks */
       ANN_Audio_Tick();
+      ANN_Visual_Tick();
 
       GPIO_SetPinValue(CPU_LOAD_PORT, CPU_LOAD_PIN, GPIO_LOW);
       Local_u16Phase++;

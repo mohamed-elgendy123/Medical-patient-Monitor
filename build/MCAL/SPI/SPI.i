@@ -2,8 +2,6 @@
 # 0 "<built-in>"
 # 0 "<command-line>"
 # 1 "MCAL/SPI/SPI.c"
-
-
 # 1 "MCAL/SPI/../../LIB/STD_TYPES.h" 1
 # 13 "MCAL/SPI/../../LIB/STD_TYPES.h"
 typedef unsigned char uint8;
@@ -22,8 +20,8 @@ typedef enum
     E_PORT_Not_valid = 2,
     E_PIN_Not_valid = 3,
 } STD_ReturnType;
-# 4 "MCAL/SPI/SPI.c" 2
-# 17 "MCAL/SPI/SPI.c"
+# 2 "MCAL/SPI/SPI.c" 2
+# 15 "MCAL/SPI/SPI.c"
 # 1 "MCAL/SPI/../GPIO/GPIO_interface.h" 1
 # 42 "MCAL/SPI/../GPIO/GPIO_interface.h"
 STD_ReturnType GPIO_SetPinDirection(uint8 Copy_u8Port, uint8 Copy_u8Pin, uint8 Copy_u8Direction);
@@ -57,7 +55,7 @@ STD_ReturnType GPIO_SetPortValue(uint8 Copy_u8Port, uint8 Copy_u8Value);
 
 
 STD_ReturnType GPIO_GetPortValue(uint8 Copy_u8Port, uint8 *Copy_pu8Value);
-# 18 "MCAL/SPI/SPI.c" 2
+# 16 "MCAL/SPI/SPI.c" 2
 # 1 "MCAL/SPI/SPI_interface.h" 1
 # 30 "MCAL/SPI/SPI_interface.h"
 STD_ReturnType SPI_InitMaster(uint8 Copy_u8Prescaler);
@@ -84,9 +82,9 @@ STD_ReturnType SPI_Transceive(uint8 Copy_u8Sent, uint8 *Copy_pu8Received);
 
 STD_ReturnType SPI_SelectSlave(uint8 Copy_u8Port, uint8 Copy_u8Pin);
 STD_ReturnType SPI_ReleaseSlave(uint8 Copy_u8Port, uint8 Copy_u8Pin);
-# 19 "MCAL/SPI/SPI.c" 2
+# 17 "MCAL/SPI/SPI.c" 2
 # 1 "MCAL/SPI/SPI_private.h" 1
-# 20 "MCAL/SPI/SPI.c" 2
+# 18 "MCAL/SPI/SPI.c" 2
 
 STD_ReturnType SPI_InitMaster(uint8 Copy_u8Prescaler)
 {
@@ -110,7 +108,7 @@ STD_ReturnType SPI_InitMaster(uint8 Copy_u8Prescaler)
         GPIO_SetPinDirection(1u, 7u, 1u);
 
 
-        GPIO_SetPinValue(1u, 4u, 1u);
+        GPIO_SetPinValue(1u, 4u, 0u);
 
 
         (*((volatile uint8*)0x2D)) = (1u << 6u) | (1u << 4u) | (Copy_u8Prescaler & 0x03u);
