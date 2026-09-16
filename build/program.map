@@ -14,6 +14,10 @@ C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_copy_data.o)
                               build/main.o (__do_copy_data)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_clear_bss.o)
                               build/HAL/Annunciator/Annunciator_audio.o (__do_clear_bss)
+C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strncmp.o)
+                              build/Logic/console/console.o (strncmp)
+C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strstr.o)
+                              build/Logic/console/console.o (strstr)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(itoa_ncheck.o)
                               build/main.o (__itoa_ncheck)
 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(utoa_ncheck.o)
@@ -132,6 +136,58 @@ Discarded input sections
  .text.KeyPad_GetPressedKey
                 0x00000000       0xc8 build/HAL/KeyPad/KeyPad.o
  .comment       0x00000000       0x13 build/HAL/KeyPad/KeyPad.o
+ .text          0x00000000        0x0 build/HAL/LCD_I2C/LCD_I2C.o
+ .data          0x00000000        0x0 build/HAL/LCD_I2C/LCD_I2C.o
+ .bss           0x00000000        0x0 build/HAL/LCD_I2C/LCD_I2C.o
+ .text.PCF8574_Write
+                0x00000000       0x36 build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_PulseNibble
+                0x00000000       0x20 build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_WriteByte
+                0x00000000       0x36 build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_I2C_Init
+                0x00000000       0xba build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_I2C_Clear
+                0x00000000       0x16 build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_I2C_Home
+                0x00000000       0x16 build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_I2C_SetCursor
+                0x00000000       0x20 build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_I2C_WriteChar
+                0x00000000        0x6 build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_I2C_WriteString
+                0x00000000       0x2c build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_I2C_WriteStringAt
+                0x00000000       0x34 build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_I2C_WriteNumber
+                0x00000000       0xb2 build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_I2C_BacklightOn
+                0x00000000        0xa build/HAL/LCD_I2C/LCD_I2C.o
+ .text.LCD_I2C_BacklightOff
+                0x00000000        0xa build/HAL/LCD_I2C/LCD_I2C.o
+ .data.g_u8Backlight
+                0x00000000        0x1 build/HAL/LCD_I2C/LCD_I2C.o
+ .comment       0x00000000       0x13 build/HAL/LCD_I2C/LCD_I2C.o
+ .text          0x00000000        0x0 build/HAL/Panel/Panel.o
+ .data          0x00000000        0x0 build/HAL/Panel/Panel.o
+ .bss           0x00000000        0x0 build/HAL/Panel/Panel.o
+ .text.Panel_Init
+                0x00000000       0x76 build/HAL/Panel/Panel.o
+ .text.Panel_Update
+                0x00000000       0xbc build/HAL/Panel/Panel.o
+ .text.Panel_IsPressed
+                0x00000000       0x16 build/HAL/Panel/Panel.o
+ .text.Panel_IsSilenceActive
+                0x00000000       0x12 build/HAL/Panel/Panel.o
+ .bss.g_u16SilenceTimer
+                0x00000000        0x2 build/HAL/Panel/Panel.o
+ .bss.g_au8Pressed
+                0x00000000        0x5 build/HAL/Panel/Panel.o
+ .bss.g_au8Stable
+                0x00000000        0x5 build/HAL/Panel/Panel.o
+ .bss.g_au8Debounce
+                0x00000000        0x5 build/HAL/Panel/Panel.o
+ .comment       0x00000000       0x13 build/HAL/Panel/Panel.o
  .text          0x00000000        0x0 build/HAL/SevenSegment/SevenSegment.o
  .data          0x00000000        0x0 build/HAL/SevenSegment/SevenSegment.o
  .bss           0x00000000        0x0 build/HAL/SevenSegment/SevenSegment.o
@@ -158,6 +214,22 @@ Discarded input sections
  .text.Vitals_Read
                 0x00000000      0x188 build/HAL/Vitals/vitals.o
  .comment       0x00000000       0x13 build/HAL/Vitals/vitals.o
+ .text          0x00000000        0x0 build/Logic/console/console.o
+ .data          0x00000000        0x0 build/Logic/console/console.o
+ .bss           0x00000000        0x0 build/Logic/console/console.o
+ .text.CONSOLE_Init
+                0x00000000       0x18 build/Logic/console/console.o
+ .rodata.CONSOLE_Task.str1.1
+                0x00000000       0xa0 build/Logic/console/console.o
+ .text.CONSOLE_Task
+                0x00000000      0x14c build/Logic/console/console.o
+ .bss.overflow_flag
+                0x00000000        0x1 build/Logic/console/console.o
+ .bss.line_length
+                0x00000000        0x1 build/Logic/console/console.o
+ .bss.line_buffer
+                0x00000000       0x29 build/Logic/console/console.o
+ .comment       0x00000000       0x13 build/Logic/console/console.o
  .text          0x00000000        0x0 build/Logic/trends/trends.o
  .data          0x00000000        0x0 build/Logic/trends/trends.o
  .bss           0x00000000        0x0 build/Logic/trends/trends.o
@@ -196,6 +268,22 @@ Discarded input sections
  .text          0x00000000        0x0 build/MCAL/I2C/I2C.o
  .data          0x00000000        0x0 build/MCAL/I2C/I2C.o
  .bss           0x00000000        0x0 build/MCAL/I2C/I2C.o
+ .text.I2C_InitMaster
+                0x00000000       0x54 build/MCAL/I2C/I2C.o
+ .text.I2C_SendStart
+                0x00000000       0x2e build/MCAL/I2C/I2C.o
+ .text.I2C_SendRepeatedStart
+                0x00000000       0x2e build/MCAL/I2C/I2C.o
+ .text.I2C_SendStop
+                0x00000000       0x1a build/MCAL/I2C/I2C.o
+ .text.I2C_SendSlaveAddressWithWrite
+                0x00000000       0x38 build/MCAL/I2C/I2C.o
+ .text.I2C_SendSlaveAddressWithRead
+                0x00000000       0x3a build/MCAL/I2C/I2C.o
+ .text.I2C_SendByte
+                0x00000000       0x30 build/MCAL/I2C/I2C.o
+ .text.I2C_ReceiveByte
+                0x00000000       0x68 build/MCAL/I2C/I2C.o
  .comment       0x00000000       0x13 build/MCAL/I2C/I2C.o
  .text          0x00000000        0x0 build/MCAL/INTERRUPT/INTERRUPT.o
  .data          0x00000000        0x0 build/MCAL/INTERRUPT/INTERRUPT.o
@@ -401,6 +489,16 @@ Discarded input sections
                 0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_clear_bss.o)
  .text.libgcc.fixed
                 0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/avr5\libgcc.a(_clear_bss.o)
+ .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strncmp.o)
+ .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strncmp.o)
+ .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strncmp.o)
+ .text.avr-libc
+                0x00000000       0x1c C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strncmp.o)
+ .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strstr.o)
+ .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strstr.o)
+ .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strstr.o)
+ .text.avr-libc
+                0x00000000       0x34 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(strstr.o)
  .text          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(itoa_ncheck.o)
  .data          0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(itoa_ncheck.o)
  .bss           0x00000000        0x0 C:/avr-gcc/bin/../lib/gcc/avr/15.2.0/../../../../avr/lib/avr5\libc.a(itoa_ncheck.o)
@@ -491,9 +589,12 @@ LOAD build/LIB/ring_buffer.o
 LOAD build/HAL/Annunciator/Annunciator_audio.o
 LOAD build/HAL/HR_Capture/HR_Capture.o
 LOAD build/HAL/KeyPad/KeyPad.o
+LOAD build/HAL/LCD_I2C/LCD_I2C.o
+LOAD build/HAL/Panel/Panel.o
 LOAD build/HAL/SevenSegment/SevenSegment.o
 LOAD build/HAL/ShiftReg/ShiftReg.o
 LOAD build/HAL/Vitals/vitals.o
+LOAD build/Logic/console/console.o
 LOAD build/Logic/trends/trends.o
 LOAD build/MCAL/ADC/ADC.o
 LOAD build/MCAL/GPIO/GPIO.o
