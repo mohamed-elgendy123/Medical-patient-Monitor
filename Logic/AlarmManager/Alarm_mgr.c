@@ -126,6 +126,7 @@ void Alarm_Process(void)
         NurseCall_voidDisable();
     }
 
+<<<<<<< HEAD
     /* Visual LEDs always reflect highest active alarm (IEC 60601-1-8 / TC-26) */
     ANN_Visual_SetPriority((u8)g_highestPriority);
 
@@ -144,6 +145,9 @@ void Alarm_Process(void)
     if (flags & (1UL << ALARM_LEAD_OFF))          shiftByte |= (1u << 6);
     if (flags & (1UL << ALARM_SENSOR_DISCONNECT)) shiftByte |= (1u << 7);
     ShiftReg_voidWriteByte(shiftByte);
+=======
+    ShiftReg_voidWriteByte((uint8)(flags & 0xFF));
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 }
 
 Alarm_Priority_t Alarm_GetActivePriority(void) { return g_highestPriority; }

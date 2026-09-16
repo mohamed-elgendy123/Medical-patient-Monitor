@@ -16,8 +16,8 @@ RingBuffer_Init:
 	movw r30,r24
 	or r24,r25
 	breq .L1
-	cpi r22,0
-	cpc r23,r22
+	cp r22,__zero_reg__
+	cpc r23,__zero_reg__
 	breq .L1
 	st Z,r22
 	std Z+1,r23
@@ -43,7 +43,7 @@ RingBuffer_IsFull:
 .L__stack_usage = 0
 	movw r30,r24
 	or r24,r25
-	breq .L14
+	breq .L12
 	ldi r24,lo8(1)
 	ldd r20,Z+8
 	ldd r21,Z+9
@@ -51,10 +51,10 @@ RingBuffer_IsFull:
 	ldd r19,Z+7
 	cp r20,r18
 	cpc r21,r19
-	breq .L11
-.L14:
+	breq .L9
+.L12:
 	ldi r24,0
-.L11:
+.L9:
 /* epilogue start */
 	ret
 	.size	RingBuffer_IsFull, .-RingBuffer_IsFull
@@ -62,57 +62,72 @@ RingBuffer_IsFull:
 .global	RingBuffer_Push
 	.type	RingBuffer_Push, @function
 RingBuffer_Push:
-	push r16
-	push r17
 	push r28
 	push r29
+	rcall .
+	rcall .
+	in r28,__SP_L__
+	in r29,__SP_H__
 /* prologue: function */
-/* frame size = 0 */
-/* stack size = 4 */
-.L__stack_usage = 4
-	movw r28,r24
-	movw r16,r22
+/* frame size = 4 */
+/* stack size = 6 */
+.L__stack_usage = 6
+	std Y+3,r24
+	std Y+4,r25
+	std Y+1,r22
+	std Y+2,r23
 	sbiw r24,0
-	brne .L17
-.L19:
-	ldi r24,0
-.L16:
-/* epilogue start */
-	pop r29
-	pop r28
-	pop r17
-	pop r16
-	ret
-.L17:
+	breq .L16
 	call RingBuffer_IsFull
 	cpse r24,__zero_reg__
-	rjmp .L19
-	ldd r24,Y+2
-	ldd r25,Y+3
+	rjmp .L16
+	ldd r26,Y+3
+	ldd r27,Y+4
+	adiw r26,2
+	ld r24,X+
+	ld r25,X+
+	sbiw r26,4
 	lsl r24
 	rol r25
-	ld r30,Y
-	ldd r31,Y+1
+	ld r30,X+
+	ld r31,X+
 	add r30,r24
 	adc r31,r25
-	movw r24,r16
-	st Z,r16
+	ldd r24,Y+1
+	ldd r25,Y+2
+	st Z,r24
 	std Z+1,r25
-	ldd r24,Y+2
-	ldd r25,Y+3
+	ld r24,X+
+	ld r25,X+
 	adiw r24,1
-	ldd r22,Y+6
-	ldd r23,Y+7
+	adiw r26,2
+	ld r22,X+
+	ld r23,X+
 	call __udivmodhi4
-	std Y+2,r24
-	std Y+3,r25
-	ldd r24,Y+8
-	ldd r25,Y+9
+	ldd r26,Y+3
+	ldd r27,Y+4
+	adiw r26,2
+	st X+,r24
+	st X+,r25
+	adiw r26,4
+	ld r24,X+
+	ld r25,X+
 	adiw r24,1
-	std Y+8,r24
-	std Y+9,r25
+	st -X,r25
+	st -X,r24
 	ldi r24,lo8(1)
-	rjmp .L16
+.L13:
+/* epilogue start */
+	pop __tmp_reg__
+	pop __tmp_reg__
+	pop __tmp_reg__
+	pop __tmp_reg__
+	pop r29
+	pop r28
+	ret
+.L16:
+	ldi r24,0
+	rjmp .L13
 	.size	RingBuffer_Push, .-RingBuffer_Push
 	.section	.text.RingBuffer_IsEmpty,"ax",@progbits
 .global	RingBuffer_IsEmpty
@@ -125,14 +140,14 @@ RingBuffer_IsEmpty:
 	movw r30,r24
 	ldi r24,lo8(1)
 	sbiw r30,0
-	breq .L20
+	breq .L17
 	ldd r18,Z+8
 	ldd r19,Z+9
 	or r18,r19
-	breq .L20
+	breq .L17
 	ldi r24,0
 	ret
-.L20:
+.L17:
 /* epilogue start */
 	ret
 	.size	RingBuffer_IsEmpty, .-RingBuffer_IsEmpty
@@ -151,22 +166,12 @@ RingBuffer_Pop:
 	movw r28,r24
 	movw r16,r22
 	sbiw r24,0
-	brne .L29
-.L31:
-	ldi r24,0
-.L28:
-/* epilogue start */
-	pop r29
-	pop r28
-	pop r17
-	pop r16
-	ret
-.L29:
+	breq .L28
 	or r22,r23
-	breq .L31
+	breq .L28
 	call RingBuffer_IsEmpty
 	cpse r24,__zero_reg__
-	rjmp .L31
+	rjmp .L28
 	ldd r24,Y+4
 	ldd r25,Y+5
 	lsl r24
@@ -194,6 +199,15 @@ RingBuffer_Pop:
 	std Y+8,r24
 	std Y+9,r25
 	ldi r24,lo8(1)
-	rjmp .L28
+.L24:
+/* epilogue start */
+	pop r29
+	pop r28
+	pop r17
+	pop r16
+	ret
+.L28:
+	ldi r24,0
+	rjmp .L24
 	.size	RingBuffer_Pop, .-RingBuffer_Pop
-	.ident	"GCC: (GNU) 16.1.0"
+	.ident	"GCC: (GNU) 15.2.0"

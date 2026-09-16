@@ -907,7 +907,11 @@ void NurseCall_voidEnable(void);
 
 
 void NurseCall_voidDisable(void);
+<<<<<<< HEAD
 # 17 "main.c" 2
+=======
+# 11 "main.c" 2
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 # 1 "Logic/AlarmManager/Alarm_mgr.h" 1
 
 
@@ -965,6 +969,7 @@ void Alarm_Process(void);
 Alarm_Priority_t Alarm_GetActivePriority(void);
 uint16 Alarm_GetActiveFlags(void);
 void Alarm_Acknowledge(void);
+<<<<<<< HEAD
 # 18 "main.c" 2
 # 1 "MCAL/I2C/I2C_interface.h" 1
 # 32 "MCAL/I2C/I2C_interface.h"
@@ -1200,12 +1205,17 @@ STD_ReturnType ADC_GetResult(uint16 *Copy_pu16Reading);
 STD_ReturnType ADC_SetInterrupt(uint8 Copy_u8State);
 # 25 "main.c" 2
 # 33 "main.c"
+=======
+# 12 "main.c" 2
+# 25 "main.c"
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 static void Task_Panel(void);
 static void Task_Timers(void);
 static void Task_FastVitals(void);
 static void Task_Alarms(void);
 static void Task_Lcd(void);
 static void Application_Init(void);
+
 
 static uint8 Heartbeat_Counter = 0U;
 static uint16 g_schedulerPhase = 0U;
@@ -1294,6 +1304,7 @@ static void Task_Panel(void)
 
 static void Task_Alarms(void)
 {
+<<<<<<< HEAD
     PatientVitals_t Local_stPatientVitals;
 
     if (g_standbyActive != 0U)
@@ -1344,10 +1355,14 @@ static void Task_Alarms(void)
     {
         ANN_Audio_Mute();
     }
+=======
+  Alarm_Process();
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 }
 
 static void Task_Lcd(void)
 {
+<<<<<<< HEAD
     char currentLine0[21];
     char currentLine1[21];
     static uint8 s_lcdBannerPhase = 0U;
@@ -1355,6 +1370,62 @@ static void Task_Lcd(void)
 
     (void)Vitals_Read(&g_vitals);
 
+=======
+}
+
+static void Task_OneHz(void)
+{
+
+  PatientVitals_t testVitals = {
+      .heartRate = 160,
+      .spO2 = 82,
+      .respRate = 18,
+      .tempC_x10 = 370,
+      .sysBP = 120,
+      .diaBP = 80,
+      .sensorConnected = 1,
+      .leadStatus = 1
+  };
+
+  Alarm_UpdateVitals(&testVitals);
+}
+
+static void Task_Report(void)
+{
+}
+
+static void Task_Trend(void)
+{
+}
+
+static void Clear_AlarmState(void)
+{
+}
+
+static void Clear_TrendState(void)
+{
+}
+
+static void Application_ClearState(void)
+{
+  Clear_AlarmState();
+  Clear_TrendState();
+  ANN_Audio_SetPriority(0U);
+  ANN_Visual_SetPriority(0U);
+  NurseCall_voidDisable();
+  HRC_ClearAsystole();
+}
+
+static void Application_SelfTest(void)
+{
+  uint16 Local_u16Ticks = 0U;
+
+
+  ANN_Audio_SetPriority(2U);
+  ANN_Visual_SetPriority(3U);
+  NurseCall_voidEnable();
+  ShiftReg_voidWriteByte(0xFF);
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 
     if (Menu_IsInDashboard() == 0U)
     {
@@ -1363,6 +1434,7 @@ static void Task_Lcd(void)
         return;
     }
 
+<<<<<<< HEAD
     if (g_standbyActive != 0U)
     {
         snprintf(currentLine0, sizeof(currentLine0), "STANDBY MODE    ");
@@ -1527,10 +1599,23 @@ static void Task_Lcd(void)
         strncpy(g_lastLine1, currentLine1, sizeof(g_lastLine1) - 1U);
         g_lastLine1[sizeof(g_lastLine1) - 1U] = '\0';
     }
+=======
+  ANN_Audio_Init();
+  ANN_Visual_Init();
+  NurseCall_voidDisable();
+  ShiftReg_voidWriteByte(0x00);
+  Application_ClearState();
+  TIMER0_ClearTick();
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 }
 
 static void Application_Init(void)
 {
+<<<<<<< HEAD
+=======
+  GPIO_SetPinDirection(2u, 7u, 1u);
+  GPIO_SetPinValue(2u, 7u, 0u);
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 
     
 # 325 "main.c" 3
@@ -1544,6 +1629,7 @@ static void Application_Init(void)
           |= (1u << 7);
 
 
+<<<<<<< HEAD
     
 # 329 "main.c" 3
    (*(volatile uint8_t *)((0x14) + 0x20)) 
@@ -1555,6 +1641,12 @@ static void Application_Init(void)
 # 330 "main.c"
          |= 0x7Cu;
 
+=======
+  ShiftReg_voidInit();
+  NurseCall_voidInit();
+  ANN_Audio_Init();
+  ANN_Visual_Init();
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 
     
 # 333 "main.c" 3

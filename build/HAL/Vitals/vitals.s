@@ -33,9 +33,12 @@ Vitals_Init:
 .global	Vitals_Read
 	.type	Vitals_Read, @function
 Vitals_Read:
+<<<<<<< HEAD
 	push r11
 	push r12
 	push r13
+=======
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 	push r14
 	push r15
 	push r16
@@ -43,20 +46,26 @@ Vitals_Read:
 	push r28
 	push r29
 	rcall .
+	push __tmp_reg__
 	in r28,__SP_L__
 	in r29,__SP_H__
 /* prologue: function */
+<<<<<<< HEAD
 /* frame size = 2 */
 /* stack size = 11 */
 .L__stack_usage = 11
+=======
+/* frame size = 3 */
+/* stack size = 9 */
+.L__stack_usage = 9
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 	movw r16,r24
 	std Y+1,__zero_reg__
 	std Y+2,__zero_reg__
 	ldi r24,lo8(1)
-	mov r14,r24
-	mov r15,__zero_reg__
-	cpi r16,0
-	cpc r17,r16
+	ldi r25,0
+	cp r16,__zero_reg__
+	cpc r17,__zero_reg__
 	brne .+2
 	rjmp .L2
 	in r25,0x10
@@ -92,6 +101,7 @@ Vitals_Read:
 	movw r22,r12
 	ldi r24,0
 	call ADC_ReadChannel
+<<<<<<< HEAD
 	movw r14,r24
 	mov r11,r12
 	or r24,r25
@@ -105,20 +115,125 @@ Vitals_Read:
 	ldi r20,lo8(1)
 	mov r14,r20
 	mov r15,__zero_reg__
+=======
+	std Y+3,r14
+	or r24,r25
+	brne .L4
+	ldd r18,Y+1
+	ldd r19,Y+2
+	cp r18,__zero_reg__
+	cpc r19,__zero_reg__
+	breq .L5
+	cpi r18,-1
+	ldi r30,3
+	cpc r19,r30
+	breq .+2
+	rjmp .L6
+.L5:
+	ldi r24,lo8(1)
+	movw r30,r16
+	std Z+16,r24
+	std Z+17,__zero_reg__
+.L4:
+	ldd r22,Y+3
+	mov r23,r15
+	ldi r24,lo8(1)
+	call ADC_ReadChannel
+	or r24,r25
+	brne .L7
+	ldd r18,Y+1
+	ldd r19,Y+2
+	cp r18,__zero_reg__
+	cpc r19,__zero_reg__
+	breq .L8
+	cpi r18,-1
+	ldi r31,3
+	cpc r19,r31
+	brne .L9
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 .L8:
 	movw r30,r16
+<<<<<<< HEAD
 	std Z+16,r14
 	std Z+17,r15
 	mov r22,r11
 	mov r23,r13
 	ldi r24,lo8(1)
+=======
+	std Z+18,r24
+	std Z+19,__zero_reg__
+.L7:
+	ldd r22,Y+3
+	mov r23,r15
+	ldi r24,lo8(2)
 	call ADC_ReadChannel
-	movw r14,r24
 	or r24,r25
+	brne .L10
+	ldd r18,Y+1
+	ldd r19,Y+2
+	cp r18,__zero_reg__
+	cpc r19,__zero_reg__
+	breq .L11
+	cpi r18,-1
+	ldi r31,3
+	cpc r19,r31
+	brne .L12
+.L11:
+	ldi r24,lo8(1)
+	movw r30,r16
+	std Z+20,r24
+	std Z+21,__zero_reg__
+.L10:
+	ldd r22,Y+3
+	mov r23,r15
+	ldi r24,lo8(3)
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
+	call ADC_ReadChannel
+	or r24,r25
+<<<<<<< HEAD
 	breq .+2
 	rjmp .L13
 	ldd r18,Y+1
 	ldd r19,Y+2
+=======
+	brne .+2
+	rjmp .L13
+.L16:
+	ldi r24,0
+	ldi r25,0
+.L2:
+/* epilogue start */
+	pop __tmp_reg__
+	pop __tmp_reg__
+	pop __tmp_reg__
+	pop r29
+	pop r28
+	pop r17
+	pop r16
+	pop r15
+	pop r14
+	ret
+.L6:
+	movw r30,r16
+	std Z+16,__zero_reg__
+	std Z+17,__zero_reg__
+	ldi r26,lo8(30)
+	ldi r27,0
+	call __umulhisi3
+	ldi r18,lo8(-1)
+	ldi r19,lo8(3)
+	ldi r20,0
+	ldi r21,0
+	call __udivmodsi4
+	subi r18,lo8(-(70))
+	movw r30,r16
+	std Z+4,r18
+	rjmp .L4
+.L9:
+	movw r30,r16
+	std Z+18,__zero_reg__
+	std Z+19,__zero_reg__
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 	ldi r26,lo8(-106)
 	ldi r27,0
 	call __umulhisi3
@@ -165,7 +280,28 @@ Vitals_Read:
 	ldi r23,0
 	call __udivmodhi4
 	std Z+8,r22
+<<<<<<< HEAD
 .L10:
+=======
+	rjmp .L10
+.L13:
+	ldd r18,Y+1
+	ldd r19,Y+2
+	cp r18,__zero_reg__
+	cpc r19,__zero_reg__
+	breq .L14
+	cpi r18,-1
+	ldi r31,3
+	cpc r19,r31
+	brne .L15
+.L14:
+	ldi r24,lo8(1)
+	movw r30,r16
+	std Z+22,r24
+	std Z+23,__zero_reg__
+	rjmp .L16
+.L15:
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 	movw r30,r16
 	std Z+20,r14
 	std Z+21,r15
@@ -188,6 +324,7 @@ Vitals_Read:
 	call __udivmodsi4
 	movw r30,r16
 	std Z+9,r18
+<<<<<<< HEAD
 	std Z+22,__zero_reg__
 	std Z+23,__zero_reg__
 .L2:
@@ -243,5 +380,8 @@ Vitals_Read:
 	mov r14,__zero_reg__
 	mov r15,__zero_reg__
 	rjmp .L2
+=======
+	rjmp .L16
+>>>>>>> d9c22b66226e0b37b25c4d23605075309880d886
 	.size	Vitals_Read, .-Vitals_Read
-	.ident	"GCC: (GNU) 16.1.0"
+	.ident	"GCC: (GNU) 15.2.0"
