@@ -15,7 +15,7 @@ INTERRUPT_EnableGlobal:
 .L__stack_usage = 0
 /* #APP */
  ;  34 "MCAL/INTERRUPT/INTERRUPT.c" 1
-	sei ; [[len=1]]
+	sei
  ;  0 "" 2
 /* #NOAPP */
 	ldi r24,0
@@ -33,7 +33,7 @@ INTERRUPT_DisableGlobal:
 .L__stack_usage = 0
 /* #APP */
  ;  39 "MCAL/INTERRUPT/INTERRUPT.c" 1
-	cli ; [[len=1]]
+	cli
  ;  0 "" 2
 /* #NOAPP */
 	ldi r24,0
@@ -82,50 +82,49 @@ EXTI_SetSense:
 /* stack size = 0 */
 .L__stack_usage = 0
 	cpi r24,lo8(3)
-	brlo .L11
-.L13:
-	ldi r24,lo8(1)
-	ldi r25,0
-	ret
-.L11:
+	brsh .L18
 	cpi r22,lo8(4)
-	brsh .L13
+	brsh .L18
 	cpi r24,lo8(1)
-	breq .L14
+	breq .L12
 	cpi r24,lo8(2)
-	breq .L15
+	breq .L13
 	in r25,0x35
 	andi r25,lo8(-4)
 	or r25,r22
 	out 0x35,r25
-.L16:
+.L14:
 	call EXTI_ClearFlag
 	ldi r24,0
 	ldi r25,0
-/* epilogue start */
 	ret
-.L14:
+.L12:
 	in r25,0x35
 	andi r25,lo8(-13)
 	lsl r22
 	lsl r22
 	or r22,r25
 	out 0x35,r22
-	rjmp .L16
-.L15:
+	rjmp .L14
+.L13:
 	cpi r22,lo8(2)
-	brne .L17
+	brne .L15
 	in r25,0x34
 	andi r25,lo8(-65)
-.L18:
+.L19:
 	out 0x34,r25
-	rjmp .L16
-.L17:
+	rjmp .L14
+.L15:
 	cpi r22,lo8(3)
-	brne .L13
+	brne .L18
 	in r25,0x34
 	ori r25,lo8(64)
-	rjmp .L18
+	rjmp .L19
+.L18:
+	ldi r24,lo8(1)
+	ldi r25,0
+/* epilogue start */
+	ret
 	.size	EXTI_SetSense, .-EXTI_SetSense
 	.section	.text.EXTI_Enable,"ax",@progbits
 .global	EXTI_Enable
@@ -140,29 +139,29 @@ EXTI_Enable:
 	ldi r24,lo8(1)
 	ldi r25,0
 	cpi r28,lo8(3)
-	brsh .L19
+	brsh .L20
 	mov r24,r28
 	call EXTI_ClearFlag
 	in r24,0x3b
 	cpi r28,lo8(1)
-	breq .L21
-	cpi r28,lo8(2)
 	breq .L22
+	cpi r28,lo8(2)
+	breq .L23
 	ori r24,lo8(64)
-.L25:
+.L26:
 	out 0x3b,r24
 	ldi r24,0
 	ldi r25,0
-.L19:
+.L20:
 /* epilogue start */
 	pop r28
 	ret
-.L21:
-	ori r24,lo8(-128)
-	rjmp .L25
 .L22:
+	ori r24,lo8(-128)
+	rjmp .L26
+.L23:
 	ori r24,lo8(32)
-	rjmp .L25
+	rjmp .L26
 	.size	EXTI_Enable, .-EXTI_Enable
 	.section	.text.EXTI_Disable,"ax",@progbits
 .global	EXTI_Disable
@@ -173,27 +172,27 @@ EXTI_Disable:
 /* stack size = 0 */
 .L__stack_usage = 0
 	cpi r24,lo8(3)
-	brsh .L31
+	brsh .L32
 	cpi r24,lo8(1)
-	breq .L28
-	cpi r24,lo8(2)
 	breq .L29
+	cpi r24,lo8(2)
+	breq .L30
 	in r24,0x3b
 	andi r24,lo8(-65)
-.L32:
+.L33:
 	out 0x3b,r24
 	ldi r24,0
 	ldi r25,0
 	ret
-.L28:
-	in r24,0x3b
-	andi r24,lo8(127)
-	rjmp .L32
 .L29:
 	in r24,0x3b
+	andi r24,lo8(127)
+	rjmp .L33
+.L30:
+	in r24,0x3b
 	andi r24,lo8(-33)
-	rjmp .L32
-.L31:
+	rjmp .L33
+.L32:
 	ldi r24,lo8(1)
 	ldi r25,0
 /* epilogue start */
@@ -208,15 +207,10 @@ EXTI_SetCallback:
 /* stack size = 0 */
 .L__stack_usage = 0
 	cpi r24,lo8(3)
-	brlo .L34
-.L36:
-	ldi r24,lo8(1)
-	ldi r25,0
-	ret
-.L34:
-	cpi r22,0
-	cpc r23,r22
-	breq .L36
+	brsh .L37
+	cp r22,__zero_reg__
+	cpc r23,__zero_reg__
+	breq .L37
 	mov r30,r24
 	ldi r31,0
 	lsl r30
@@ -226,6 +220,10 @@ EXTI_SetCallback:
 	std Z+1,r23
 	st Z,r22
 	ldi r24,0
+	ldi r25,0
+	ret
+.L37:
+	ldi r24,lo8(1)
 	ldi r25,0
 /* epilogue start */
 	ret
@@ -258,11 +256,11 @@ __vector_1:
 	lds r24,callback
 	lds r25,callback+1
 	or r24,r25
-	breq .L41
+	breq .L38
 	lds r30,callback
 	lds r31,callback+1
 	icall
-.L41:
+.L38:
 /* epilogue start */
 	pop r31
 	pop r30
@@ -310,11 +308,11 @@ __vector_2:
 	lds r24,callback+2
 	lds r25,callback+2+1
 	or r24,r25
-	breq .L47
+	breq .L43
 	lds r30,callback+2
 	lds r31,callback+2+1
 	icall
-.L47:
+.L43:
 /* epilogue start */
 	pop r31
 	pop r30
@@ -362,11 +360,11 @@ __vector_3:
 	lds r24,callback+4
 	lds r25,callback+4+1
 	or r24,r25
-	breq .L53
+	breq .L48
 	lds r30,callback+4
 	lds r31,callback+4+1
 	icall
-.L53:
+.L48:
 /* epilogue start */
 	pop r31
 	pop r30
@@ -391,5 +389,5 @@ __vector_3:
 	.size	callback, 6
 callback:
 	.zero	6
-	.ident	"GCC: (GNU) 16.1.0"
+	.ident	"GCC: (GNU) 15.2.0"
 .global __do_clear_bss

@@ -141,9 +141,9 @@ TIMER1_IsCaptureReady:
 	lds r25,Timer1_CaptureReady
 	ldi r24,lo8(1)
 	cpi r25,lo8(1)
-	breq .L13
+	breq .L12
 	ldi r24,0
-.L13:
+.L12:
 /* epilogue start */
 	ret
 	.size	TIMER1_IsCaptureReady, .-TIMER1_IsCaptureReady
@@ -169,7 +169,7 @@ TIMER1_GetInterval:
 /* stack size = 0 */
 .L__stack_usage = 0
 	cpi r24,lo8(8)
-	brsh .L20
+	brsh .L19
 	mov r30,r24
 	ldi r31,0
 	lsl r30
@@ -179,7 +179,7 @@ TIMER1_GetInterval:
 	ld r24,Z
 	ldd r25,Z+1
 	ret
-.L20:
+.L19:
 	ldi r24,0
 	ldi r25,0
 /* epilogue start */
@@ -220,9 +220,9 @@ TIMER1_IsAsystole:
 	lds r25,Timer1_Asystole
 	ldi r24,lo8(1)
 	cpse r25,__zero_reg__
-	rjmp .L24
+	rjmp .L23
 	ldi r24,0
-.L24:
+.L23:
 /* epilogue start */
 	ret
 	.size	TIMER1_IsAsystole, .-TIMER1_IsAsystole
@@ -258,7 +258,7 @@ TIMER2_SetTone:
 	andi r25,lo8(-2)
 	out 0x25,r25
 	cpi r24,lo8(1)
-	brne .L27
+	brne .L26
 	ldi r24,lo8(-127)
 	out 0x23,r24
 	in r24,0x25
@@ -266,24 +266,24 @@ TIMER2_SetTone:
 	out 0x25,r24
 	in r24,0x25
 	ori r24,lo8(1)
-.L31:
+.L30:
 	out 0x25,r24
 	ret
-.L27:
+.L26:
 	cpi r24,lo8(2)
-	brne .L29
+	brne .L28
 	ldi r24,lo8(97)
-.L32:
+.L31:
 	out 0x23,r24
 	in r24,0x25
 	ori r24,lo8(4)
+	rjmp .L30
+.L28:
+	cpi r24,lo8(3)
+	brne .L29
+	ldi r24,lo8(-127)
 	rjmp .L31
 .L29:
-	cpi r24,lo8(3)
-	brne .L30
-	ldi r24,lo8(-127)
-	rjmp .L32
-.L30:
 	out 0x23,__zero_reg__
 /* epilogue start */
 	ret
@@ -349,11 +349,11 @@ __vector_10:
 	lds r24,Timer0_Callback
 	lds r25,Timer0_Callback+1
 	or r24,r25
-	breq .L34
+	breq .L33
 	lds r30,Timer0_Callback
 	lds r31,Timer0_Callback+1
 	icall
-.L34:
+.L33:
 /* epilogue start */
 	pop r31
 	pop r30
@@ -413,10 +413,10 @@ __vector_6:
 	sts Timer1_RingIndex,r24
 	lds r24,Timer1_CaptureCount
 	cpi r24,lo8(8)
-	brsh .L42
+	brsh .L40
 	lds r24,Timer1_CaptureCount
 	subi r24,lo8(-(1))
-.L41:
+.L39:
 	sts Timer1_CaptureCount,r24
 	ldi r24,lo8(1)
 	sts Timer1_CaptureReady,r24
@@ -433,9 +433,9 @@ __vector_6:
 	pop r19
 	__gcc_isr 2
 	reti
-.L42:
+.L40:
 	ldi r24,lo8(8)
-	rjmp .L41
+	rjmp .L39
 	__gcc_isr 0,r18
 	.size	__vector_6, .-__vector_6
 	.section	.text.__vector_9,"ax",@progbits
@@ -457,10 +457,10 @@ __vector_9:
 	lds r25,Timer1_OverflowCount+1
 	cpi r24,2
 	cpc r25,__zero_reg__
-	brlo .L43
+	brlo .L41
 	ldi r24,lo8(1)
 	sts Timer1_Asystole,r24
-.L43:
+.L41:
 /* epilogue start */
 	pop r25
 	__gcc_isr 2
@@ -517,5 +517,5 @@ Timer0_Callback:
 	.size	Timer0_Ticks, 4
 Timer0_Ticks:
 	.zero	4
-	.ident	"GCC: (GNU) 16.1.0"
+	.ident	"GCC: (GNU) 15.2.0"
 .global __do_clear_bss

@@ -2,323 +2,803 @@
 # 0 "<built-in>"
 # 0 "<command-line>"
 # 1 "main.c"
+# 210 "main.c"
+# 1 "C:/avr-gcc/avr/include/avr/io.h" 1 3
+# 99 "C:/avr-gcc/avr/include/avr/io.h" 3
+# 1 "C:/avr-gcc/avr/include/avr/sfr_defs.h" 1 3
+# 126 "C:/avr-gcc/avr/include/avr/sfr_defs.h" 3
+# 1 "C:/avr-gcc/avr/include/inttypes.h" 1 3
+# 37 "C:/avr-gcc/avr/include/inttypes.h" 3
+# 1 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdint.h" 1 3 4
+# 9 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdint.h" 3 4
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+# 1 "C:/avr-gcc/avr/include/stdint.h" 1 3 4
+# 125 "C:/avr-gcc/avr/include/stdint.h" 3 4
+typedef signed int int8_t __attribute__((__mode__(__QI__)));
+typedef unsigned int uint8_t __attribute__((__mode__(__QI__)));
+typedef signed int int16_t __attribute__ ((__mode__ (__HI__)));
+typedef unsigned int uint16_t __attribute__ ((__mode__ (__HI__)));
+typedef signed int int32_t __attribute__ ((__mode__ (__SI__)));
+typedef unsigned int uint32_t __attribute__ ((__mode__ (__SI__)));
+
+typedef signed int int64_t __attribute__((__mode__(__DI__)));
+typedef unsigned int uint64_t __attribute__((__mode__(__DI__)));
+# 146 "C:/avr-gcc/avr/include/stdint.h" 3 4
+typedef int16_t intptr_t;
 
 
-# 1 "LIB/STD_TYPES.h" 1
-# 13 "LIB/STD_TYPES.h"
-typedef unsigned char uint8;
-typedef unsigned short uint16;
-typedef unsigned long uint32;
-typedef signed char sint8;
-typedef signed short sint16;
-typedef signed long sint32;
 
-typedef unsigned char uint8_h;
 
-typedef enum
+typedef uint16_t uintptr_t;
+# 163 "C:/avr-gcc/avr/include/stdint.h" 3 4
+typedef int8_t int_least8_t;
+
+
+
+
+typedef uint8_t uint_least8_t;
+
+
+
+
+typedef int16_t int_least16_t;
+
+
+
+
+typedef uint16_t uint_least16_t;
+
+
+
+
+typedef int32_t int_least32_t;
+
+
+
+
+typedef uint32_t uint_least32_t;
+
+
+
+
+
+
+
+typedef int64_t int_least64_t;
+
+
+
+
+
+
+typedef uint64_t uint_least64_t;
+# 217 "C:/avr-gcc/avr/include/stdint.h" 3 4
+typedef int8_t int_fast8_t;
+
+
+
+
+typedef uint8_t uint_fast8_t;
+
+
+
+
+typedef int16_t int_fast16_t;
+
+
+
+
+typedef uint16_t uint_fast16_t;
+
+
+
+
+typedef int32_t int_fast32_t;
+
+
+
+
+typedef uint32_t uint_fast32_t;
+
+
+
+
+
+
+
+typedef int64_t int_fast64_t;
+
+
+
+
+
+
+typedef uint64_t uint_fast64_t;
+# 277 "C:/avr-gcc/avr/include/stdint.h" 3 4
+typedef int64_t intmax_t;
+
+
+
+
+typedef uint64_t uintmax_t;
+# 12 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdint.h" 2 3 4
+#pragma GCC diagnostic pop
+# 38 "C:/avr-gcc/avr/include/inttypes.h" 2 3
+# 77 "C:/avr-gcc/avr/include/inttypes.h" 3
+typedef int32_t int_farptr_t;
+
+
+
+
+
+typedef uint32_t uint_farptr_t;
+# 127 "C:/avr-gcc/avr/include/avr/sfr_defs.h" 2 3
+# 100 "C:/avr-gcc/avr/include/avr/io.h" 2 3
+# 230 "C:/avr-gcc/avr/include/avr/io.h" 3
+# 1 "C:/avr-gcc/avr/include/avr/iom32.h" 1 3
+# 720 "C:/avr-gcc/avr/include/avr/iom32.h" 3
+       
+# 721 "C:/avr-gcc/avr/include/avr/iom32.h" 3
+
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+       
+# 231 "C:/avr-gcc/avr/include/avr/io.h" 2 3
+# 785 "C:/avr-gcc/avr/include/avr/io.h" 3
+# 1 "C:/avr-gcc/avr/include/avr/portpins.h" 1 3
+# 786 "C:/avr-gcc/avr/include/avr/io.h" 2 3
+
+# 1 "C:/avr-gcc/avr/include/avr/common.h" 1 3
+# 788 "C:/avr-gcc/avr/include/avr/io.h" 2 3
+
+# 1 "C:/avr-gcc/avr/include/avr/version.h" 1 3
+# 790 "C:/avr-gcc/avr/include/avr/io.h" 2 3
+
+
+
+
+
+
+# 1 "C:/avr-gcc/avr/include/avr/fuse.h" 1 3
+# 248 "C:/avr-gcc/avr/include/avr/fuse.h" 3
+typedef struct
 {
-    E_OK = 0,
-    E_NOK = 1,
-    E_PORT_Not_valid = 2,
-    E_PIN_Not_valid = 3,
-} STD_ReturnType;
-# 4 "main.c" 2
-# 1 "MCAL/TIMER/TIMER_interface.h" 1
-# 16 "MCAL/TIMER/TIMER_interface.h"
-typedef void (*TIMER_CallbackType)(void);
+    unsigned char low;
+    unsigned char high;
+} __fuse_t;
+# 797 "C:/avr-gcc/avr/include/avr/io.h" 2 3
 
 
-
-
-
-
-void TIMER0_Init(void);
-void TIMER0_SetCallback(TIMER_CallbackType Copy_pvCallback);
-uint8 TIMER0_IsTickPending(void);
-void TIMER0_ClearTick(void);
-
-void TIMER1_Init(void);
-uint8 TIMER1_IsCaptureReady(void);
-void TIMER1_ClearCaptureFlag(void);
-uint16 TIMER1_GetInterval(uint8 Copy_u8Index);
-uint8 TIMER1_GetCaptureCount(void);
-uint8 TIMER1_GetCaptureWriteIndex(void);
-uint8 TIMER1_IsAsystole(void);
-void TIMER1_ClearAsystole(void);
-
-void TIMER2_Init(void);
-void TIMER2_SetTone(uint8 Copy_u8Tone);
-# 5 "main.c" 2
-# 1 "MCAL/INTERRUPT/INTERRUPT_interface.h" 1
-# 28 "MCAL/INTERRUPT/INTERRUPT_interface.h"
-STD_ReturnType INTERRUPT_EnableGlobal(void);
-
-
-
-
-STD_ReturnType INTERRUPT_DisableGlobal(void);
-
-
-
-
-
-STD_ReturnType EXTI_SetSense(uint8 Copy_u8Int, uint8 Copy_u8Sense);
-
-
-
-
-
-STD_ReturnType EXTI_Enable(uint8 Copy_u8Int);
-
-
-
-
-STD_ReturnType EXTI_Disable(uint8 Copy_u8Int);
-
-
-
-
-STD_ReturnType EXTI_ClearFlag(uint8 Copy_u8Int);
-# 65 "MCAL/INTERRUPT/INTERRUPT_interface.h"
-STD_ReturnType EXTI_SetCallback(uint8 Copy_u8Int, void (*Copy_pfCallback)(void));
-# 6 "main.c" 2
-# 1 "MCAL/GPIO/GPIO_interface.h" 1
-# 42 "MCAL/GPIO/GPIO_interface.h"
-STD_ReturnType GPIO_SetPinDirection(uint8 Copy_u8Port, uint8 Copy_u8Pin, uint8 Copy_u8Direction);
-
-
-
-
-STD_ReturnType GPIO_SetPinValue(uint8 Copy_u8Port, uint8 Copy_u8Pin, uint8 Copy_u8Value);
-
-
-
-
-STD_ReturnType GPIO_GetPinValue(uint8 Copy_u8Port, uint8 Copy_u8Pin, uint8 *Copy_pu8Value);
-
-
-
-
-STD_ReturnType GPIO_TogglePinValue(uint8 Copy_u8Port, uint8 Copy_u8Pin);
-
-
-
-
-STD_ReturnType GPIO_SetPortDirection(uint8 Copy_u8Port, uint8 Copy_u8Direction);
-
-
-
-
-STD_ReturnType GPIO_SetPortValue(uint8 Copy_u8Port, uint8 Copy_u8Value);
-
-
-
-
-STD_ReturnType GPIO_GetPortValue(uint8 Copy_u8Port, uint8 *Copy_pu8Value);
-# 7 "main.c" 2
-# 1 "HAL/HR_Capture/HR_Capture_interface.h" 1
-
-
-
-# 1 "./LIB/STD_TYPES.h" 1
-# 5 "HAL/HR_Capture/HR_Capture_interface.h" 2
-# 20 "HAL/HR_Capture/HR_Capture_interface.h"
-void HRC_Init(void);
-void HRC_Process(void);
-void HRC_OnCapture(uint16 Copy_u16IntervalTicks);
-void HRC_OnOverflow(void);
-uint16 HRC_GetBpm(void);
-uint16 HRC_GetHrvMs(void);
-uint8 HRC_IsAsystole(void);
-void HRC_ClearAsystole(void);
-# 8 "main.c" 2
-# 1 "HAL/Annunciator/Annunciator_interface.h" 1
-# 21 "HAL/Annunciator/Annunciator_interface.h"
-void ANN_Audio_Init(void);
-void ANN_Audio_SetPriority(uint8 Copy_u8Priority);
-void ANN_Audio_Tick(void);
-void ANN_Audio_Mute(void);
-void ANN_Audio_Unmute(void);
-# 9 "main.c" 2
-# 22 "main.c"
-static void Task_Panel(void);
-static void Task_Fsm(void);
-static void Task_Console(void);
-static void Task_Timers(void);
-static void Task_Alarms(void);
-static void Task_Lcd(void);
-static void Task_FastVitals(void);
-static void Task_OneHz(void);
-static void Task_Report(void);
-static void Task_Trend(void);
-static void Clear_AlarmState(void);
-static void Clear_TrendState(void);
-static void Application_ClearState(void);
-static void Application_SelfTest(void);
-static void Application_Init(void);
-
-static void Task_Panel(void)
+# 1 "C:/avr-gcc/avr/include/avr/lock.h" 1 3
+# 800 "C:/avr-gcc/avr/include/avr/io.h" 2 3
+# 211 "main.c" 2
+# 1 "C:/avr-gcc/avr/include/util/delay.h" 1 3
+# 50 "C:/avr-gcc/avr/include/util/delay.h" 3
+# 1 "C:/avr-gcc/avr/include/util/delay_basic.h" 1 3
+# 40 "C:/avr-gcc/avr/include/util/delay_basic.h" 3
+static __inline__ void _delay_loop_1(uint8_t __count) __attribute__((__always_inline__));
+static __inline__ void _delay_loop_2(uint16_t __count) __attribute__((__always_inline__));
+# 80 "C:/avr-gcc/avr/include/util/delay_basic.h" 3
+void
+_delay_loop_1(uint8_t __count)
 {
+ __asm__ volatile (
+  "1: dec %0" "\n\t"
+  "brne 1b"
+  : "=r" (__count)
+  : "0" (__count)
+ );
+}
+# 102 "C:/avr-gcc/avr/include/util/delay_basic.h" 3
+void
+_delay_loop_2(uint16_t __count)
+{
+# 113 "C:/avr-gcc/avr/include/util/delay_basic.h" 3
+ __asm__ volatile (
+  "1: sbiw %0,1" "\n\t"
+  "brne 1b"
+  : "+w" (__count)
+ );
+
+}
+# 51 "C:/avr-gcc/avr/include/util/delay.h" 2 3
+# 151 "C:/avr-gcc/avr/include/util/delay.h" 3
+static __inline__ __attribute__((__always_inline__)) void _delay_ms(double __ms);
+
+void
+_delay_ms(double __ms)
+{
+ double __tmp ;
+
+
+ uint32_t __ticks_dc;
+ extern void __builtin_avr_delay_cycles(uint32_t);
+ __tmp = ((
+# 161 "C:/avr-gcc/avr/include/util/delay.h"
+          16000000UL
+# 161 "C:/avr-gcc/avr/include/util/delay.h" 3
+               ) / 1e3) * __ms;
+# 171 "C:/avr-gcc/avr/include/util/delay.h" 3
+  __ticks_dc = (uint32_t)(__builtin_ceil(__builtin_fabs(__tmp)));
+
+
+ __builtin_avr_delay_cycles(__ticks_dc);
+# 197 "C:/avr-gcc/avr/include/util/delay.h" 3
+}
+# 234 "C:/avr-gcc/avr/include/util/delay.h" 3
+static __inline__ __attribute__((__always_inline__)) void _delay_us(double __us);
+
+void
+_delay_us(double __us)
+{
+ double __tmp ;
+
+
+ uint32_t __ticks_dc;
+ extern void __builtin_avr_delay_cycles(uint32_t);
+ __tmp = ((
+# 244 "C:/avr-gcc/avr/include/util/delay.h"
+          16000000UL
+# 244 "C:/avr-gcc/avr/include/util/delay.h" 3
+               ) / 1e6) * __us;
+# 254 "C:/avr-gcc/avr/include/util/delay.h" 3
+  __ticks_dc = (uint32_t)(__builtin_ceil(__builtin_fabs(__tmp)));
+
+
+ __builtin_avr_delay_cycles(__ticks_dc);
+# 281 "C:/avr-gcc/avr/include/util/delay.h" 3
+}
+# 212 "main.c" 2
+# 1 "C:/avr-gcc/avr/include/stdlib.h" 1 3
+# 48 "C:/avr-gcc/avr/include/stdlib.h" 3
+# 1 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stddef.h" 1 3 4
+# 229 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stddef.h" 3 4
+typedef unsigned int size_t;
+# 344 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stddef.h" 3 4
+typedef int wchar_t;
+# 49 "C:/avr-gcc/avr/include/stdlib.h" 2 3
+# 71 "C:/avr-gcc/avr/include/stdlib.h" 3
+typedef struct {
+ int quot;
+ int rem;
+} div_t;
+
+
+typedef struct {
+ long quot;
+ long rem;
+} ldiv_t;
+
+
+typedef int (*__compar_fn_t)(const void *, const void *);
+# 121 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern void abort(void) __attribute__((__noreturn__));
+
+
+static __inline__ __attribute__((__always_inline__))
+int abs (int __i)
+{
+    return __builtin_abs (__i);
 }
 
-static void Task_Fsm(void)
+
+
+
+extern int abs(int __i) __attribute__((__const__));
+
+
+static __inline__ __attribute__((__always_inline__))
+long labs (long __i)
 {
+    return __builtin_labs (__i);
 }
 
-static void Task_Console(void)
+
+
+
+
+extern long labs(long __i) __attribute__((__const__));
+# 166 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern void *bsearch(const void *__key, const void *__base, size_t __nmemb,
+       size_t __size, int (*__compar)(const void *, const void *));
+
+
+
+
+
+
+
+extern div_t div(int __num, int __denom) __asm__("__divmodhi4") __attribute__((__const__));
+
+
+
+
+
+extern ldiv_t ldiv(long __num, long __denom) __asm__("__divmodsi4") __attribute__((__const__));
+# 198 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern void qsort(void *__base, size_t __nmemb, size_t __size,
+    __compar_fn_t __compar);
+# 231 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern long strtol(const char *__nptr, char **__endptr, int __base);
+# 265 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern unsigned long strtoul(const char *__nptr, char **__endptr, int __base);
+# 277 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern long atol(const char *__s) __attribute__((__pure__));
+# 289 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern int atoi(const char *__s) __attribute__((__pure__));
+# 301 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern void exit(int __status) __attribute__((__noreturn__));
+# 313 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern void *malloc(size_t __size) __attribute__((__malloc__));
+
+
+
+
+
+
+extern void free(void *__ptr);
+
+
+
+
+extern size_t __malloc_margin;
+
+
+
+
+extern char *__malloc_heap_start;
+
+
+
+
+extern char *__malloc_heap_end;
+
+
+
+
+
+
+extern void *calloc(size_t __nele, size_t __size) __attribute__((__malloc__));
+# 361 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern void *realloc(void *__ptr, size_t __size) __attribute__((__malloc__));
+
+extern float strtof(const char *__nptr, char **__endptr);
+
+
+
+
+
+extern double strtod(const char *__nptr, char **__endptr);
+
+
+
+
+
+
+extern long double strtold(const char *__nptr, char **__endptr);
+
+
+
+
+
+
+
+extern int atexit(void (*func)(void));
+# 394 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern float atoff(const char *__nptr);
+# 403 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern double atof(const char *__nptr);
+# 412 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern long double atofl(const char *__nptr);
+# 434 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern int rand(void);
+
+
+
+extern void srand(unsigned int __seed);
+
+
+
+
+
+
+extern int rand_r(unsigned long *__ctx);
+# 479 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern __inline__ __attribute__((__gnu_inline__))
+char *itoa (int __val, char *__s, int __radix)
 {
-}
-
-static void Task_Timers(void)
-{
-}
-
-static void Task_Alarms(void)
-{
-}
-
-static void Task_Lcd(void)
-{
-}
-
-static void Task_FastVitals(void)
-{
-  HRC_Process();
-}
-
-static void Task_OneHz(void)
-{
-}
-
-static void Task_Report(void)
-{
-}
-
-static void Task_Trend(void)
-{
-}
-
-static void Clear_AlarmState(void)
-{
-}
-
-static void Clear_TrendState(void)
-{
-}
-
-static void Application_ClearState(void)
-{
-  Clear_AlarmState();
-  Clear_TrendState();
-  ANN_Audio_SetPriority(0U);
-  HRC_ClearAsystole();
-}
-
-static void Application_SelfTest(void)
-{
-  uint16 Local_u16Ticks = 0U;
-
-  GPIO_SetPinValue(1u, 0u, 1u);
-  GPIO_SetPinValue(1u, 1u, 1u);
-  GPIO_SetPinValue(1u, 2u, 1u);
-  ANN_Audio_SetPriority(2U);
-
-  (void)INTERRUPT_EnableGlobal();
-  while (Local_u16Ticks < 300U)
-  {
-    if (TIMER0_IsTickPending() != 0U)
-    {
-      TIMER0_ClearTick();
-      Local_u16Ticks++;
-      ANN_Audio_Tick();
-      if (Local_u16Ticks == 50U)
-      {
-        ANN_Audio_Mute();
-      }
+    if (!__builtin_constant_p (__radix)) {
+ extern char *__itoa (int, char *, int);
+ return __itoa (__val, __s, __radix);
+    } else if (__radix < 2 || __radix > 36) {
+ *__s = 0;
+ return __s;
+    } else {
+ extern char *__itoa_ncheck (int, char *, unsigned char);
+ return __itoa_ncheck (__val, __s, __radix);
     }
-  }
-  (void)INTERRUPT_DisableGlobal();
-
-  GPIO_SetPinValue(1u, 0u, 0u);
-  GPIO_SetPinValue(1u, 1u, 0u);
-  GPIO_SetPinValue(1u, 2u, 0u);
-  ANN_Audio_Init();
-  Application_ClearState();
-  TIMER0_ClearTick();
 }
-
-static void Application_Init(void)
+# 524 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern __inline__ __attribute__((__gnu_inline__))
+char *ltoa (long __val, char *__s, int __radix)
 {
-  GPIO_SetPinDirection(1u, 0u, 1u);
-  GPIO_SetPinDirection(1u, 1u, 1u);
-  GPIO_SetPinDirection(1u, 2u, 1u);
-  GPIO_SetPinDirection(1u, 3u, 1u);
-  GPIO_SetPinDirection(2u, 7u, 1u);
-
-  GPIO_SetPinValue(2u, 7u, 0u);
-  TIMER0_Init();
-  HRC_Init();
-  ANN_Audio_Init();
-  Application_SelfTest();
-  (void)INTERRUPT_EnableGlobal();
-}
-
-int main(void)
-{
-  uint16 Local_u16Phase = 0U;
-
-  Application_Init();
-
-  while (1)
-  {
-    if (TIMER0_IsTickPending() != 0U)
+    if (!__builtin_constant_p (__radix))
     {
-      TIMER0_ClearTick();
-      GPIO_SetPinValue(2u, 7u, 1u);
-
-      if ((Local_u16Phase % 2U) == 1U)
-      {
-        Task_Console();
-      }
-      if ((Local_u16Phase % 5U) == 2U)
-      {
-        Task_Timers();
-      }
-      if ((Local_u16Phase % 10U) == 3U)
-      {
-        Task_Alarms();
-      }
-      if ((Local_u16Phase % 25U) == 5U)
-      {
-        Task_Lcd();
-      }
-      if ((Local_u16Phase % 50U) == 4U)
-      {
-        Task_FastVitals();
-      }
-      if ((Local_u16Phase % 100U) == 6U)
-      {
-        Task_OneHz();
-      }
-      if ((Local_u16Phase % 200U) == 7U)
-      {
-        Task_Report();
-      }
-      if ((Local_u16Phase % 1000U) == 8U)
-      {
-        Task_Trend();
-      }
-
-      Task_Panel();
-      Task_Fsm();
-      ANN_Audio_Tick();
-
-      GPIO_SetPinValue(2u, 7u, 0u);
-      Local_u16Phase++;
-      if (Local_u16Phase >= 1000U)
-      {
-        Local_u16Phase = 0U;
-      }
+ extern char *__ltoa (long, char *, int);
+ return __ltoa (__val, __s, __radix);
     }
-  }
+    else if (__radix < 2 || __radix > 36)
+    {
+ *__s = 0;
+ return __s;
+    }
+    else
+    {
+ extern char *__ltoa_ncheck (long, char *, unsigned char);
+ return __ltoa_ncheck (__val, __s, __radix);
+    }
+}
+# 572 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern __inline__ __attribute__((__gnu_inline__))
+char *utoa (unsigned int __val, char *__s, int __radix)
+{
+    if (!__builtin_constant_p (__radix))
+    {
+ extern char *__utoa (unsigned int, char *, int);
+ return __utoa (__val, __s, __radix);
+    }
+    else if (__radix < 2 || __radix > 36)
+    {
+ *__s = 0;
+ return __s;
+    }
+    else
+    {
+ extern char *__utoa_ncheck (unsigned int, char *, unsigned char);
+ return __utoa_ncheck (__val, __s, __radix);
+    }
+}
+# 619 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern __inline__ __attribute__((__gnu_inline__))
+char *ultoa (unsigned long __val, char *__s, int __radix)
+{
+    if (!__builtin_constant_p (__radix)) {
+ extern char *__ultoa (unsigned long, char *, int);
+ return __ultoa (__val, __s, __radix);
+    } else if (__radix < 2 || __radix > 36) {
+ *__s = 0;
+ return __s;
+    } else {
+ extern char *__ultoa_ncheck (unsigned long, char *, unsigned char);
+ return __ultoa_ncheck (__val, __s, __radix);
+    }
+}
+# 651 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern long random(void);
+
+
+
+
+extern void srandom(unsigned long __seed);
+
+
+
+
+
+
+
+extern long random_r(unsigned long *__ctx);
+# 708 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern char *ftostre(float __val, char *__s, unsigned char __prec,
+                     unsigned char __flags);
+
+
+
+
+
+
+extern char *dtostre(double __val, char *__s, unsigned char __prec,
+       unsigned char __flags);
+
+
+
+
+
+
+
+extern char *ldtostre(long double __val, char *__s, unsigned char __prec,
+       unsigned char __flags);
+# 742 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern char *ftostrf(float __val, signed char __width,
+                     unsigned char __prec, char *__s);
+
+
+
+
+
+
+extern char *dtostrf(double __val, signed char __width,
+                     unsigned char __prec, char *__s);
+
+
+
+
+
+
+
+extern char *ldtostrf(long double __val, signed char __width,
+                      unsigned char __prec, char *__s);
+# 778 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern int system (const char *);
+extern char *getenv (const char *);
+# 213 "main.c" 2
+# 1 "Logic/trends/trends.h" 1
+
+
+
+
+
+
+
+
+# 8 "Logic/trends/trends.h"
+typedef struct {
+    uint16_t channels[4];
+} TrendSample_t;
+
+void Trends_Init(void);
+void Task_Trend(void);
+uint8_t Trends_GetCount(void);
+void Trends_GetSampleLine(uint8_t index, char *dest);
+# 214 "main.c" 2
+
+
+void UART_init(void) {
+    uint16_t ubrr_value = 103;
+    
+# 218 "main.c" 3
+   (*(volatile uint8_t *)((0x20) + 0x20)) 
+# 218 "main.c"
+         = (uint8_t)(ubrr_value >> 8);
+    
+# 219 "main.c" 3
+   (*(volatile uint8_t *)((0x09) + 0x20)) 
+# 219 "main.c"
+         = (uint8_t)(ubrr_value);
+    
+# 220 "main.c" 3
+   (*(volatile uint8_t *)((0x0A) + 0x20)) 
+# 220 "main.c"
+         = (1 << 
+# 220 "main.c" 3
+                 3
+# 220 "main.c"
+                     ) | (1 << 
+# 220 "main.c" 3
+                               4
+# 220 "main.c"
+                                   );
+    
+# 221 "main.c" 3
+   (*(volatile uint8_t *)((0x20) + 0x20)) 
+# 221 "main.c"
+         = (1 << 
+# 221 "main.c" 3
+                 7
+# 221 "main.c"
+                      ) | (1 << 
+# 221 "main.c" 3
+                                2
+# 221 "main.c"
+                                     ) | (1 << 
+# 221 "main.c" 3
+                                               1
+# 221 "main.c"
+                                                    );
+}
+
+void UART_sendChar(char data) {
+    while (!(
+# 225 "main.c" 3
+            (*(volatile uint8_t *)((0x0B) + 0x20)) 
+# 225 "main.c"
+                  & (1 << 
+# 225 "main.c" 3
+                          5
+# 225 "main.c"
+                              )));
+    
+# 226 "main.c" 3
+   (*(volatile uint8_t *)((0x0C) + 0x20)) 
+# 226 "main.c"
+       = data;
+}
+
+void UART_sendString(char *str) {
+    while (*str) {
+        UART_sendChar(*str++);
+    }
+}
+
+void UART_sendNumber(uint16_t num) {
+    char buffer[10];
+    itoa(num, buffer, 10);
+    UART_sendString(buffer);
+}
+
+
+void ADC_init(void) {
+    
+# 243 "main.c" 3
+   (*(volatile uint8_t *)((0x07) + 0x20)) 
+# 243 "main.c"
+         = (1 << 
+# 243 "main.c" 3
+                 6
+# 243 "main.c"
+                      );
+    
+# 244 "main.c" 3
+   (*(volatile uint8_t *)((0x06) + 0x20)) 
+# 244 "main.c"
+          = (1 << 
+# 244 "main.c" 3
+                  7
+# 244 "main.c"
+                      ) | (1 << 
+# 244 "main.c" 3
+                                2
+# 244 "main.c"
+                                     ) | (1 << 
+# 244 "main.c" 3
+                                               1
+# 244 "main.c"
+                                                    ) | (1 << 
+# 244 "main.c" 3
+                                                              0
+# 244 "main.c"
+                                                                   );
+}
+
+uint16_t ADC_read(uint8_t channel) {
+    
+# 248 "main.c" 3
+   (*(volatile uint8_t *)((0x07) + 0x20)) 
+# 248 "main.c"
+         = (
+# 248 "main.c" 3
+            (*(volatile uint8_t *)((0x07) + 0x20)) 
+# 248 "main.c"
+                  & 0xF0) | (channel & 0x07);
+    
+# 249 "main.c" 3
+   (*(volatile uint8_t *)((0x06) + 0x20)) 
+# 249 "main.c"
+          |= (1 << 
+# 249 "main.c" 3
+                   6
+# 249 "main.c"
+                       );
+    while (
+# 250 "main.c" 3
+          (*(volatile uint8_t *)((0x06) + 0x20)) 
+# 250 "main.c"
+                 & (1 << 
+# 250 "main.c" 3
+                         6
+# 250 "main.c"
+                             ));
+    return 
+# 251 "main.c" 3
+          (*(volatile uint16_t *)((0x04) + 0x20))
+# 251 "main.c"
+             ;
+}
+
+int main(void) {
+    UART_init();
+    ADC_init();
+    Trends_Init();
+
+    
+# 259 "main.c" 3
+   (*(volatile uint8_t *)((0x17) + 0x20)) 
+# 259 "main.c"
+        |= (1 << 
+# 259 "main.c" 3
+                 0
+# 259 "main.c"
+                    );
+
+    uint8_t trend_timer = 0;
+
+    while (1) {
+        
+# 264 "main.c" 3
+       (*(volatile uint8_t *)((0x18) + 0x20)) 
+# 264 "main.c"
+             ^= (1 << 
+# 264 "main.c" 3
+                      0
+# 264 "main.c"
+                         );
+
+        UART_sendString("--- Patient Vitals ---\r\n");
+
+        for (uint8_t ch = 0; ch < 4; ch++) {
+            uint16_t val = ADC_read(ch);
+            UART_sendString("Ch ");
+            UART_sendNumber(ch);
+            UART_sendString(": ");
+            UART_sendNumber(val);
+            UART_sendString("\r\n");
+        }
+
+        UART_sendString("\r\n");
+
+
+        trend_timer++;
+        if (trend_timer >= 20) {
+            trend_timer = 0;
+            Task_Trend();
+        }
+
+        _delay_ms(500);
+
+
+        if (
+# 289 "main.c" 3
+           (*(volatile uint8_t *)((0x0B) + 0x20)) 
+# 289 "main.c"
+                 & (1 << 
+# 289 "main.c" 3
+                         7
+# 289 "main.c"
+                            )) {
+            char received_char = 
+# 290 "main.c" 3
+                                (*(volatile uint8_t *)((0x0C) + 0x20))
+# 290 "main.c"
+                                   ;
+
+
+            if (received_char == 'T' || received_char == 't') {
+                UART_sendString("\r\n--- Sending Trends CSV Data ---\r\n");
+
+                uint8_t count = Trends_GetCount();
+                char line_buffer[50];
+
+                for (uint8_t i = 0; i < count; i++) {
+                    Trends_GetSampleLine(i, line_buffer);
+                    UART_sendString(line_buffer);
+                }
+                UART_sendString("--- End of Trends ---\r\n\r\n");
+            }
+        }
+
+
+    }
+
+    return 0;
 }
