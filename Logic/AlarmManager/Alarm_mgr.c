@@ -27,7 +27,7 @@ void Alarm_Init(void) {
     
     ANN_Visual_Init();
     NurseCall_voidInit();
-    ShiftReg_Init();
+    ShiftReg_voidInit();
 }
 
 void Alarm_UpdateVitals(const PatientVitals_t* vitals) {
@@ -88,7 +88,7 @@ void Alarm_Process(void) {
         }
     }
 
-    ShiftReg_Write((u8)(flags & 0xFF));
+    ShiftReg_voidWriteByte((uint8)(flags & 0xFF));
 }
 
 Alarm_Priority_t Alarm_GetActivePriority(void) { return g_highestPriority; }
