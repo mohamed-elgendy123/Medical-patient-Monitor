@@ -4,6 +4,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+<<<<<<< HEAD
+=======
+
+#include <avr/interrupt.h>
+
+
+
+>>>>>>> bc2a737000a66a64e11cd2e17089e177312200fa
 #define CONSOLE_MAX_LINE_LENGTH 40
 
 static char line_buffer[CONSOLE_MAX_LINE_LENGTH + 1];
@@ -23,8 +31,9 @@ static void CONSOLE_ProcessLine(char *line) {
         return;
     }
 
+    
     // مطابقة الأوامر المطلوبة في الـ CLI
-    if (strncmp(line, "STATUS", 6) == 0) {
+   if (strncmp(line, "STATUS", 6) == 0) {
         UART_SendString((const uint8 *)"OK\r\n");
     } 
     else if (strncmp(line, "VITALS?", 7) == 0) {

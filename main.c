@@ -31,6 +31,7 @@
 
 #define SCHEDULER_CYCLE_TICKS 1000U
 
+<<<<<<< HEAD
 static void Task_Panel(void);
 static void Task_Timers(void);
 static void Task_FastVitals(void);
@@ -48,6 +49,13 @@ static char g_lastLine0[21] = "";
 static char g_lastLine1[21] = "";
 
 static void Task_Timers(void)
+=======
+
+
+
+
+static void Application_SelfTest(void)
+>>>>>>> bc2a737000a66a64e11cd2e17089e177312200fa
 {
     /* 50 ms flash on Heartbeat LED (PB3) */
     if (Heartbeat_Counter > 0U)
@@ -547,6 +555,77 @@ static void Task_OneHz(void)
   Alarm_UpdateVitals(&testVitals);
 }
 
+
+
+
+
+
+
+/* دالة حساب الـ Checksum بالـ XOR لكل الحروف */
+static uint8 Calculate_Checksum(const char *buffer)
+{
+  uint8 checksum = 0;
+  while (*buffer)
+  {
+    checksum ^= (uint8)(*buffer);
+    buffer++;
+  }
+  return checksum;
+}
+
+/* دالة إرسال التليمتري الكاملة بدلاً من OK */
+
+
+static void Send_Telemetry_Frame(void)
+{
+  char payload[110];
+  char frame[130];
+
+  VitalData_t *v_hr   = PatientCfg_GetVital(VITAL_HR);
+  VitalData_t *v_spo2 = PatientCfg_GetVital(VITAL_SPO2);
+  VitalData_t *v_temp = PatientCfg_GetVital(VITAL_TEMP);
+  VitalData_t *v_rr   = PatientCfg_GetVital(VITAL_RR);
+  VitalData_t *v_bp   = PatientCfg_GetVital(VITAL_NIBP);
+  u16 flags           = Alarm_GetActiveFlags();
+
+  int hr_val   = (v_hr && v_hr->Valid)     ? v_hr->Value   : 0;
+  int hrv_val  = 38; // قيمة افتراضية أو خذها من متغير الـ HRV لديك
+  int spo2_val = (v_spo2 && v_spo2->Valid) ? v_spo2->Value : 0;
+  int temp_val = (v_temp && v_temp->Valid) ? v_temp->Value : 0;
+  int rr_val   = (v_rr && v_rr->Valid)   ? v_rr->Value   : 0;
+  int sys_val  = (v_bp && v_bp->Valid)   ? v_bp->Value   : 0;
+  int dia_val  = 80; // قيمة الضغط الانبساطي الافتراضية
+
+
+
+
+
+
+
+
+
+
+  /* 1. تجميع الـ Payload المطلوب بدون $ و * */
+  sprintf(payload,
+          "PM,ID=BED0012,HR=%d,HV=%d,SP=%d,T=%d,NS=%d,ND=%d,RR=%d,AL=%04X,PRI=0,ST=MON,SIL=0,UP=3600",
+          hr_val, hrv_val, spo2_val, temp_val, sys_val, dia_val, rr_val, flags);
+
+  /* 2. حساب الـ Checksum للـ Payload */
+  uint8 chk = Calculate_Checksum(payload);
+
+  /* 3. تجميع الإطار النهائي بالتنسيق القياسي */
+  sprintf(frame, "$%s*%02X\r\n", payload, chk);
+
+  /* 4. إرسال الإطار عبر UART */
+  UART_SendString((const uint8 *)frame);
+}
+
+
+
+
+/*
+
+
 static void Task_Report(void)
 {
 }
@@ -627,6 +706,42 @@ static void Application_Init(void)
   (void)INTERRUPT_EnableGlobal();
 }
 
+
+*/
+
+
+
+
+
+static void Task_Report(void)
+{
+  uint8 rx_data = 0;
+
+  /* فحص ما إذا كان هناك أمر قادم عبر السيريال */
+  if (UART_IsDataReady() == E_OK)
+  {
+    UART_ReceiveByte(&rx_data);
+
+    /* إذا كان الأمر هو طلب الحالة STATUS (أو حرف S اختصاراً) */
+    if (rx_data == 'S' || rx_data == 's')
+    {
+      Send_Telemetry_Frame(); /* إرسال الإطار الصحيح مع Checksum */
+    }
+    else
+    {
+      UART_SendString((const uint8 *)"OK\r\n"); /* باقي الأوامر التنفيذية */
+    }
+  }
+  else
+  {
+    /* إرسال التليمتري الدوري كل ثانيتين بشكل طبيعي */
+    Send_Telemetry_Frame();
+  }
+}
+
+
+
+
 int main(void)
 {
   u16 Local_u16Phase = 0U;
@@ -660,14 +775,32 @@ int main(void)
       {
         Task_FastVitals();
       }
+<<<<<<< HEAD
       if ((Local_u16Phase % 100U) == 6U)
       {
         Task_OneHz();
       }
+=======
+
+      /* T-10: Serial Telemetry Report (2 s, Phase 7) */
+      /*
+>>>>>>> bc2a737000a66a64e11cd2e17089e177312200fa
       if ((Local_u16Phase % 200U) == 7U)
       {
         Task_Report();
       }
+<<<<<<< HEAD
+=======
+*/
+/* T-10: Serial Telemetry Report (10 s, Phase 7) */
+      if ((Local_u16Phase % 1000U) == 7U)
+      {
+        Task_Report();
+      }
+
+
+      /* T-11: Trends Storage (10 s, Phase 8) */
+>>>>>>> bc2a737000a66a64e11cd2e17089e177312200fa
       if ((Local_u16Phase % 1000U) == 8U)
       {
         Task_Trend();
