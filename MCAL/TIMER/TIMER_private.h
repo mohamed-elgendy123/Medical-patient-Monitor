@@ -51,8 +51,10 @@ typedef unsigned long int u32;
 #define TIMER_TIMSK (*(volatile u8 *)0x59U)
 #define TIMER_TIFR (*(volatile u8 *)0x58U)
 
-/* GPIO Port D (For OC2 output direction) */
+/* GPIO Port D (For OC2 output direction and pin toggle) */
 #define TIMER_DDRD (*(volatile u8 *)0x31U)
+#define TIMER_PORTD (*(volatile u8 *)0x32U)
+#define TIMER_OCIE2 7U
 
 /* ========================================================================= */
 /*                              BIT DEFINITIONS                              */

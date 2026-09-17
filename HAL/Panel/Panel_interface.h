@@ -46,4 +46,9 @@ uint8 Panel_IsPressed(uint8 Copy_u8Button);
  */
 uint8 Panel_IsSilenceActive(void);
 
+/*
+ * Description : Returns 1 if any button press event is currently pending.
+ */
+uint8 Panel_HasEvent(void);
+
 #endif /* PANEL_INTERFACE_H */

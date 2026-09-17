@@ -7,7 +7,7 @@
  * PCF8574 I2C address — most 16×2 backpack modules ship as 0x27.
  * Change here if your module uses a different address (0x20–0x27).
  */
-#define PCF8574_ADDRESS    0x27u
+#define PCF8574_ADDRESS    0x20u
 
 /*
  * PCF8574 pin-to-HD44780 mapping (de-facto standard backpack wiring):

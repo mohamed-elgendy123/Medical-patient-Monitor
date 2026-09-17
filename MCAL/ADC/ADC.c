@@ -44,17 +44,18 @@ STD_ReturnType ADC_ReadChannel(uint8 Copy_u8Channel, uint16 *Copy_pu16Reading){
         return E_NOK;
     }
     // Select channel, keep reference bits
-    //ADC_ADMUX |=  (Copy_u8Channel & 0x1F);    // XXX0 0000 | (XXXX XXXX & 0001 1111) = 000X XXXX     
-      ADC_ADMUX = (ADC_ADMUX & 0xE0) | (Copy_u8Channel & 0x07);            
-                                              // 000X XXXX 
-    // Start conversion
-    ADC_ADCSRA |= (1 << 6);                   // 0000 0001 << 6 = 0100 0000
-    // Wait for conversion to complete (ADIF = 1)
-    while((ADC_ADCSRA & (1 << 4)) == 0);       // 0000 0001 << 4 = 0001 0000
+    ADC_ADMUX = (ADC_ADMUX & 0xE0) | (Copy_u8Channel & 0x07);            
+    // Start conversion (Set ADSC)
+    ADC_ADCSRA |= (1 << 6);
+    // Wait for conversion to complete (wait while ADSC is 1 AND ADIF is 0) with timeout
+    uint16 Local_u16Timeout = 10000U;
+    while(((ADC_ADCSRA & (1 << 6)) != 0) && ((ADC_ADCSRA & (1 << 4)) == 0) && (--Local_u16Timeout > 0U));
     // Clear ADIF by writing 1 to it
-    ADC_ADCSRA |= (1 << 4);                   // 0000 000
-    // Read result
-    *Copy_pu16Reading = ADC_ADCL | ((uint16)ADC_ADCH << 8);              // Combine ADCL and ADCH into a single uint16 value
+    ADC_ADCSRA |= (1 << 4);
+    // Read result: ADCL must be read before ADCH per datasheet
+    uint16 Local_u16Low  = (uint16)ADC_ADCL;
+    uint16 Local_u16High = (uint16)ADC_ADCH;
+    *Copy_pu16Reading = Local_u16Low | (Local_u16High << 8);
     return E_OK;
 } 
 /*
@@ -99,8 +100,10 @@ STD_ReturnType ADC_GetResult(uint16 *Copy_pu16Reading)
         /* Clear ADIF flag by writing 1 to it */
         ADC_ADCSRA |= (1 << 4);
 
-        /* Read 10-bit result */
-        *Copy_pu16Reading = ADC_ADCL | ((uint16)ADC_ADCH << 8);
+        /* Read 10-bit result: ADCL before ADCH */
+        uint16 Local_u16Low  = (uint16)ADC_ADCL;
+        uint16 Local_u16High = (uint16)ADC_ADCH;
+        *Copy_pu16Reading = Local_u16Low | (Local_u16High << 8);
 
         return E_OK;
     }

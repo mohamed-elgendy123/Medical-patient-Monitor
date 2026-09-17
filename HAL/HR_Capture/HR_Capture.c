@@ -49,6 +49,7 @@ void HRC_Process(void)
         HRC_Asystole = 1U;
         HRC_CurrentBpm = HRC_INVALID_HR;
         HRC_CurrentHrvMs = 0U;
+        HRC_MedianCount = 0U;
         return;
     }
 
@@ -67,6 +68,7 @@ void HRC_Process(void)
     {
         HRC_CurrentBpm = HRC_INVALID_HR;
         HRC_CurrentHrvMs = 0U;
+        HRC_MedianCount = 0U;
         return;
     }
 
@@ -139,42 +141,52 @@ void HRC_ClearAsystole(void)
 
 static u16 HRC_CalculateMedian(void)
 {
-    u16 Local_u16Arr[3];
-    u16 Local_u16Temp;
+    u16 Local_u16Median = 0U;
 
-    Local_u16Arr[0] = HRC_MedianIntervals[0];
-    Local_u16Arr[1] = HRC_MedianIntervals[1];
-    Local_u16Arr[2] = HRC_MedianIntervals[2];
-
-    if ((HRC_MedianCount < MEDIAN_WINDOW_SIZE) ||
-        (Local_u16Arr[0] == 0U) || (Local_u16Arr[1] == 0U) ||
-        (Local_u16Arr[2] == 0U))
+    if (HRC_MedianCount == 0U)
     {
         return HRC_INVALID_HR;
     }
+    else if (HRC_MedianCount == 1U)
+    {
+        Local_u16Median = HRC_MedianIntervals[0];
+    }
+    else if (HRC_MedianCount == 2U)
+    {
+        Local_u16Median = HRC_MedianIntervals[1];
+    }
+    else
+    {
+        u16 Local_u16Arr[3];
+        u16 Local_u16Temp;
 
-    /* ترتيب العينات الثلاث للحصول على الوسيط */
-    if (Local_u16Arr[0] > Local_u16Arr[1])
-    {
-        Local_u16Temp = Local_u16Arr[0];
-        Local_u16Arr[0] = Local_u16Arr[1];
-        Local_u16Arr[1] = Local_u16Temp;
-    }
-    if (Local_u16Arr[1] > Local_u16Arr[2])
-    {
-        Local_u16Temp = Local_u16Arr[1];
-        Local_u16Arr[1] = Local_u16Arr[2];
-        Local_u16Arr[2] = Local_u16Temp;
-    }
-    if (Local_u16Arr[0] > Local_u16Arr[1])
-    {
-        Local_u16Temp = Local_u16Arr[0];
-        Local_u16Arr[0] = Local_u16Arr[1];
-        Local_u16Arr[1] = Local_u16Temp;
-    }
+        Local_u16Arr[0] = HRC_MedianIntervals[0];
+        Local_u16Arr[1] = HRC_MedianIntervals[1];
+        Local_u16Arr[2] = HRC_MedianIntervals[2];
 
-    /* أخذ العينة الوسطى */
-    u16 Local_u16Median = Local_u16Arr[1];
+        /* ترتيب العينات الثلاث للحصول على الوسيط */
+        if (Local_u16Arr[0] > Local_u16Arr[1])
+        {
+            Local_u16Temp = Local_u16Arr[0];
+            Local_u16Arr[0] = Local_u16Arr[1];
+            Local_u16Arr[1] = Local_u16Temp;
+        }
+        if (Local_u16Arr[1] > Local_u16Arr[2])
+        {
+            Local_u16Temp = Local_u16Arr[1];
+            Local_u16Arr[1] = Local_u16Arr[2];
+            Local_u16Arr[2] = Local_u16Temp;
+        }
+        if (Local_u16Arr[0] > Local_u16Arr[1])
+        {
+            Local_u16Temp = Local_u16Arr[0];
+            Local_u16Arr[0] = Local_u16Arr[1];
+            Local_u16Arr[1] = Local_u16Temp;
+        }
+
+        /* أخذ العينة الوسطى */
+        Local_u16Median = Local_u16Arr[1];
+    }
 
     if (Local_u16Median == 0U)
     {

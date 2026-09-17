@@ -1,6 +1,6 @@
-# 0 "MCAL/ADC/ADC.c"
-# 0 "<built-in>"
-# 0 "<command-line>"
+# 1 "MCAL/ADC/ADC.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
 # 1 "MCAL/ADC/ADC.c"
 # 9 "MCAL/ADC/ADC.c"
 # 1 "LIB/STD_TYPES.h" 1
@@ -72,17 +72,18 @@ STD_ReturnType ADC_ReadChannel(uint8 Copy_u8Channel, uint16 *Copy_pu16Reading){
         return E_NOK;
     }
 
-
-      (*((volatile uint8*)0x27)) = ((*((volatile uint8*)0x27)) & 0xE0) | (Copy_u8Channel & 0x07);
-
+    (*((volatile uint8*)0x27)) = ((*((volatile uint8*)0x27)) & 0xE0) | (Copy_u8Channel & 0x07);
 
     (*((volatile uint8*)0x26)) |= (1 << 6);
 
-    while(((*((volatile uint8*)0x26)) & (1 << 4)) == 0);
+    uint16 Local_u16Timeout = 10000U;
+    while((((*((volatile uint8*)0x26)) & (1 << 6)) != 0) && (((*((volatile uint8*)0x26)) & (1 << 4)) == 0) && (--Local_u16Timeout > 0U));
 
     (*((volatile uint8*)0x26)) |= (1 << 4);
 
-    *Copy_pu16Reading = (*((volatile uint8*)0x24)) | ((uint16)(*((volatile uint8*)0x25)) << 8);
+    uint16 Local_u16Low = (uint16)(*((volatile uint8*)0x24));
+    uint16 Local_u16High = (uint16)(*((volatile uint8*)0x25));
+    *Copy_pu16Reading = Local_u16Low | (Local_u16High << 8);
     return E_OK;
 }
 
@@ -128,7 +129,9 @@ STD_ReturnType ADC_GetResult(uint16 *Copy_pu16Reading)
         (*((volatile uint8*)0x26)) |= (1 << 4);
 
 
-        *Copy_pu16Reading = (*((volatile uint8*)0x24)) | ((uint16)(*((volatile uint8*)0x25)) << 8);
+        uint16 Local_u16Low = (uint16)(*((volatile uint8*)0x24));
+        uint16 Local_u16High = (uint16)(*((volatile uint8*)0x25));
+        *Copy_pu16Reading = Local_u16Low | (Local_u16High << 8);
 
         return E_OK;
     }
@@ -136,7 +139,7 @@ STD_ReturnType ADC_GetResult(uint16 *Copy_pu16Reading)
 
     return E_NOK;
 }
-# 119 "MCAL/ADC/ADC.c"
+# 122 "MCAL/ADC/ADC.c"
 STD_ReturnType ADC_SetInterrupt(uint8 Copy_u8State)
 {
     if (Copy_u8State == 1)

@@ -25,11 +25,25 @@ static uint16 g_u16SilenceTimer;           /* ticks remaining (0 = inactive)  */
 
 void Panel_Init(void)
 {
+    /* Disable JTAG to free PC2..PC5 for GPIO buttons (Silence, Menu, Up, Down)
+     * ATmega32 datasheet requires JTD (bit 7 of MCUCSR at IO 0x34) to be written
+     * twice within 4 clock cycles. */
+    uint8 Local_u8Temp;
+    __asm__ __volatile__ (
+        "in %0, 0x34\n\t"
+        "ori %0, 0x80\n\t"
+        "out 0x34, %0\n\t"
+        "out 0x34, %0\n\t"
+        : "=&d" (Local_u8Temp)
+    );
+
     uint8 i;
     for (i = 0; i < BTN_COUNT; i++) {
+        uint8 Local_u8InitVal = GPIO_HIGH;
         GPIO_SetPinDirection(PANEL_PORT, PANEL_PIN_BASE + i, GPIO_INPUT_PULLUP);
+        GPIO_GetPinValue(PANEL_PORT, PANEL_PIN_BASE + i, &Local_u8InitVal);
         g_au8Debounce[i] = 0u;
-        g_au8Stable[i]   = 1u;   /* released (HIGH with pull-up) */
+        g_au8Stable[i]   = Local_u8InitVal;
         g_au8Pressed[i]  = 0u;
     }
     g_u16SilenceTimer = 0u;
@@ -86,4 +100,15 @@ uint8 Panel_IsPressed(uint8 Copy_u8Button)
 uint8 Panel_IsSilenceActive(void)
 {
     return (g_u16SilenceTimer > 0u) ? 1u : 0u;
+}
+
+uint8 Panel_HasEvent(void)
+{
+    uint8 i;
+    for (i = 0; i < BTN_COUNT; i++) {
+        if (g_au8Pressed[i] != 0u) {
+            return 1u;
+        }
+    }
+    return 0u;
 }

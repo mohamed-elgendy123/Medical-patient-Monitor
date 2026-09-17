@@ -27,9 +27,17 @@
 #define PROFILE_NEO     2u
 #define PROFILE_COUNT   3u
 
-/* -------------------- Alarm severity -------------------- */
-#define ALARM_NONE    0u
-#define ALARM_HIGH    1u
+/* -------------------- Alarm severity & side -------------------- */
+#define ALARM_NONE        0u
+#define ALARM_LOW_SIDE    1u
+#define ALARM_HIGH_SIDE   2u
+
+#ifndef ALARM_PRIO_NONE
+#define ALARM_PRIO_NONE   0u
+#define ALARM_PRIO_LOW    1u
+#define ALARM_PRIO_MEDIUM 2u
+#define ALARM_PRIO_HIGH   3u
+#endif
 
 /* -------------------- Data types -------------------- */
 typedef struct {
@@ -65,6 +73,8 @@ void            PatientCfg_EvalAlarms(void);
 
 /* Return the vital-ID with the highest active alarm, or VITAL_COUNT if none */
 uint8           PatientCfg_GetHighestAlarm(void);
+uint8           PatientCfg_GetAlarmSide(uint8 Copy_u8VitalId);
+uint8           PatientCfg_GetAlarmPriority(uint8 Copy_u8VitalId);
 
 /* Short display names — returns pointer to RAM string ("HR", "SpO2", …) */
 const char*     PatientCfg_VitalName(uint8 Copy_u8VitalId);

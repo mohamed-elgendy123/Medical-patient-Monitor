@@ -58,7 +58,7 @@
 #define TWSR_STATUS_MASK    0xF8u
 #define TWSR_PRESCALER_MASK 0x03u
 
-#define I2C_TIMEOUT         50000UL
+#define I2C_TIMEOUT         1000UL
 
 #define MASTER_STEP(TWCR_EXTRA, EXPECTED_STATUS) \
     do { \

@@ -25,11 +25,11 @@ static uint8         g_u8ActiveProfile = PROFILE_ADULT;
  */
 static const sint16 g_as16Defaults[PROFILE_COUNT][VITAL_COUNT][2] PROGMEM = {
     /* Adult */
-    { {60, 100}, {90, 100}, {360, 375}, {12, 20}, {90, 140} },
+    { {50, 120}, {90, 100}, {350, 380}, {8, 30}, {90, 160} },
     /* Paediatric */
-    { {70, 120}, {92, 100}, {360, 375}, {18, 30}, {80, 120} },
+    { {70, 150}, {92, 100}, {355, 380}, {15, 40}, {80, 130} },
     /* Neonatal */
-    { {100, 160}, {88, 98}, {365, 375}, {30, 60}, {60, 90} }
+    { {100, 190}, {88, 98}, {360, 375}, {25, 60}, {55, 90} }
 };
 
 /* Short display names  (25 bytes RAM — acceptable) */
@@ -115,21 +115,52 @@ void PatientCfg_EvalAlarms(void)
             g_astVitals[i].AlarmLevel = ALARM_NONE;
             continue;
         }
-        if (g_astVitals[i].Value < g_astLimits[i].LowLimit ||
-            g_astVitals[i].Value > g_astLimits[i].HighLimit)
-        {
-            g_astVitals[i].AlarmLevel = ALARM_HIGH;
+        if (g_astVitals[i].Value < g_astLimits[i].LowLimit) {
+            g_astVitals[i].AlarmLevel = ALARM_LOW_SIDE;
+        } else if (g_astVitals[i].Value > g_astLimits[i].HighLimit) {
+            g_astVitals[i].AlarmLevel = ALARM_HIGH_SIDE;
         } else {
             g_astVitals[i].AlarmLevel = ALARM_NONE;
         }
     }
 }
 
+uint8 PatientCfg_GetAlarmSide(uint8 Copy_u8VitalId)
+{
+    if (Copy_u8VitalId >= VITAL_COUNT) { return ALARM_NONE; }
+    return g_astVitals[Copy_u8VitalId].AlarmLevel;
+}
+
+uint8 PatientCfg_GetAlarmPriority(uint8 Copy_u8VitalId)
+{
+    if (Copy_u8VitalId >= VITAL_COUNT) { return ALARM_PRIO_NONE; }
+    if (g_astVitals[Copy_u8VitalId].AlarmLevel == ALARM_NONE) { return ALARM_PRIO_NONE; }
+
+    /* High priority per README §11.2: HR, SpO2, and NIBP Low */
+    if (Copy_u8VitalId == VITAL_HR || Copy_u8VitalId == VITAL_SPO2) {
+        return ALARM_PRIO_HIGH;
+    }
+    if (Copy_u8VitalId == VITAL_NIBP && g_astVitals[Copy_u8VitalId].AlarmLevel == ALARM_LOW_SIDE) {
+        return ALARM_PRIO_HIGH;
+    }
+    /* Medium priority: Temp, Resp, and NIBP High */
+    return ALARM_PRIO_MEDIUM;
+}
+
 uint8 PatientCfg_GetHighestAlarm(void)
 {
     uint8 i;
+    /* 1. Check for any High-priority active alarm first */
     for (i = 0; i < VITAL_COUNT; i++) {
-        if (g_astVitals[i].AlarmLevel != ALARM_NONE) {
+        if (g_astVitals[i].AlarmLevel != ALARM_NONE &&
+            PatientCfg_GetAlarmPriority(i) == ALARM_PRIO_HIGH) {
+            return i;
+        }
+    }
+    /* 2. Check for any Medium-priority active alarm */
+    for (i = 0; i < VITAL_COUNT; i++) {
+        if (g_astVitals[i].AlarmLevel != ALARM_NONE &&
+            PatientCfg_GetAlarmPriority(i) == ALARM_PRIO_MEDIUM) {
             return i;
         }
     }

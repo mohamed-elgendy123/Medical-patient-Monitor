@@ -1,6 +1,6 @@
-# 0 "HAL/Annunciator/Annunciator_audio.c"
-# 0 "<built-in>"
-# 0 "<command-line>"
+# 1 "HAL/Annunciator/Annunciator_audio.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
 # 1 "HAL/Annunciator/Annunciator_audio.c"
 # 1 "./LIB/STD_TYPES.h" 1
 # 13 "./LIB/STD_TYPES.h"
@@ -46,6 +46,7 @@ uint8 TIMER0_IsTickPending(void);
 void TIMER0_ClearTick(void);
 
 void TIMER1_Init(void);
+void TIMER1_Poll(void);
 uint8 TIMER1_IsCaptureReady(void);
 void TIMER1_ClearCaptureFlag(void);
 uint16 TIMER1_GetLastInterval(void);

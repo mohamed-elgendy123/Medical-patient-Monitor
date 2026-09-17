@@ -87,12 +87,11 @@ void TIMER1_Init(void)
     TIMER1_TCNT1 = 0U;
 
     /* 2. مسح أي رايات مقاطعة معلقة في TIFR بكتابة 1 منطقي */
-    SET_BIT(TIMER_TIFR, TIMER1_ICF1);
-    SET_BIT(TIMER_TIFR, TIMER1_TOV1);
+    TIMER_TIFR = (1U << TIMER1_ICF1) | (1U << TIMER1_TOV1);
 
-    /* 3. تفعيل مانع الضوضاء ICNC1، والحافة الصاعدة ICES1، والمقسم 256 */
-    SET_BIT(TIMER1_TCCR1B, TIMER1_ICNC1);
+    /* 3. تفعيل الحافة الصاعدة ICES1، ومرشح الضوضاء ICNC1، والمقسم 256 */
     SET_BIT(TIMER1_TCCR1B, TIMER1_ICES1);
+    SET_BIT(TIMER1_TCCR1B, TIMER1_ICNC1);
     SET_BIT(TIMER1_TCCR1B, TIMER1_CS12);
 
     /* 4. تفعيل مقاطعة الالتقاط والفيضان في TIMSK */
@@ -114,8 +113,72 @@ void TIMER1_Init(void)
     Timer1_LastInterval = 0U;
 }
 
+static void TIMER1_ProcessCapture(u16 Copy_u16Capture)
+{
+    if (Timer1_HasLastCapture == 0U)
+    {
+        Timer1_LastCapture = Copy_u16Capture;
+        Timer1_HasLastCapture = 1U;
+        return;
+    }
+
+    Timer1_LastInterval = (u16)(Copy_u16Capture - Timer1_LastCapture);
+    Timer1_Intervals[Timer1_RingIndex] = Timer1_LastInterval;
+    Timer1_LastCapture = Copy_u16Capture;
+
+    Timer1_RingIndex++;
+    if (Timer1_RingIndex >= TIMER1_CAPTURE_RING_SIZE)
+    {
+        Timer1_RingIndex = 0U;
+    }
+
+    Timer1_CaptureReady = 1U;
+    Timer1_OverflowCount = 0U;
+    Timer1_Asystole = 0U;
+}
+
+void TIMER1_Poll(void)
+{
+    /* Check Timer1 overflow flag TOV1 in TIFR in case simulator missed ISR */
+    if ((TIMER_TIFR & (1U << TIMER1_TOV1)) != 0U)
+    {
+        TIMER_TIFR = (1U << TIMER1_TOV1); /* Clear TOV1 (W1C) */
+        Timer1_OverflowCount++;
+        if (Timer1_OverflowCount >= TIMER1_ASYSTOLE_OVF_LIMIT)
+        {
+            Timer1_Asystole = 1U;
+        }
+    }
+
+    /* Track PD6 (ICP1 pin) state for rising edge detection */
+    static u8 s_u8PrevPD6 = 0U;
+    u8 s_u8CurrPD6 = (READ_BIT(*(volatile u8 *)0x30U, 6U) != 0U) ? 1U : 0U; /* PIND bit 6 */
+    u8 s_u8RisingEdge = ((s_u8PrevPD6 == 0U) && (s_u8CurrPD6 != 0U)) ? 1U : 0U;
+    s_u8PrevPD6 = s_u8CurrPD6;
+
+    if (Timer1_CaptureReady != 0U)
+    {
+        return;
+    }
+
+    /* Check 1: Hardware Input Capture Flag ICF1 in TIFR */
+    if ((TIMER_TIFR & (1U << TIMER1_ICF1)) != 0U)
+    {
+        u16 Local_u16Cap = TIMER1_ICR1;
+        TIMER_TIFR = (1U << TIMER1_ICF1); /* Clear ICF1 (W1C) */
+        TIMER1_ProcessCapture(Local_u16Cap);
+    }
+    /* Check 2: Software edge detection fallback if simulator missed ICF1 */
+    else if (s_u8RisingEdge != 0U)
+    {
+        u16 Local_u16Count = TIMER1_TCNT1;
+        TIMER1_ProcessCapture(Local_u16Count);
+    }
+}
+
 u8 TIMER1_IsCaptureReady(void)
 {
+    TIMER1_Poll();
     return (Timer1_CaptureReady != 0U) ? 1U : 0U;
 }
 
@@ -172,35 +235,40 @@ void TIMER2_Init(void)
 
 void TIMER2_SetTone(uint8 Copy_u8Tone)
 {
-    /* Stop Clock Source first (CS22=0, CS21=0, CS20=0) */
-    CLR_BIT(TIMER2_TCCR2, TIMER2_CS22);
-    CLR_BIT(TIMER2_TCCR2, TIMER2_CS21);
-    CLR_BIT(TIMER2_TCCR2, TIMER2_CS20);
+    /* Reset counter so phase starts cleanly */
+    TIMER2_TCNT2 = 0U;
 
-    /* Logic rewritten using if - else if - else ladder */
     if (Copy_u8Tone == TIMER2_TONE_HIGH)
     {
-        /* 960 Hz Tone: Prescaler 32, OCR2 = 129 */
+        /* 960 Hz Tone: Prescaler 32, OCR2 = 129, Toggle OC2 on Compare Match */
         TIMER2_OCR2 = 129U;
-        SET_BIT(TIMER2_TCCR2, TIMER2_CS21);
-        SET_BIT(TIMER2_TCCR2, TIMER2_CS20);
+        TIMER2_TCCR2 = (1U << TIMER2_COM20) | (1U << TIMER2_WGM21) |
+                       (1U << TIMER2_CS21)  | (1U << TIMER2_CS20);
+        SET_BIT(TIMER_TIMSK, TIMER_OCIE2);
     }
     else if (Copy_u8Tone == TIMER2_TONE_MEDIUM)
     {
-        /* 640 Hz Tone: Prescaler 64, OCR2 = 97 */
+        /* 640 Hz Tone: Prescaler 64, OCR2 = 97, Toggle OC2 on Compare Match */
         TIMER2_OCR2 = 97U;
-        SET_BIT(TIMER2_TCCR2, TIMER2_CS22);
+        TIMER2_TCCR2 = (1U << TIMER2_COM20) | (1U << TIMER2_WGM21) |
+                       (1U << TIMER2_CS22);
+        SET_BIT(TIMER_TIMSK, TIMER_OCIE2);
     }
     else if (Copy_u8Tone == TIMER2_TONE_LOW)
     {
-        /* 480 Hz Tone: Prescaler 64, OCR2 = 129 */
+        /* 480 Hz Tone: Prescaler 64, OCR2 = 129, Toggle OC2 on Compare Match */
         TIMER2_OCR2 = 129U;
-        SET_BIT(TIMER2_TCCR2, TIMER2_CS22);
+        TIMER2_TCCR2 = (1U << TIMER2_COM20) | (1U << TIMER2_WGM21) |
+                       (1U << TIMER2_CS22);
+        SET_BIT(TIMER_TIMSK, TIMER_OCIE2);
     }
     else
     {
-        /* TIMER2_TONE_MUTE or invalid value */
+        /* TIMER2_TONE_MUTE: disconnect OC2 (COM20=0), stop clock, drive PD7 low */
+        CLR_BIT(TIMER_TIMSK, TIMER_OCIE2);
+        TIMER2_TCCR2 = (1U << TIMER2_WGM21);
         TIMER2_OCR2 = 0U;
+        CLR_BIT(TIMER_PORTD, TIMER_OC2_PD7);
     }
 }
 
@@ -221,28 +289,7 @@ ISR(TIMER0_COMP_vect)
 
 ISR(TIMER1_CAPT_vect)
 {
-    u16 Local_u16Capture = TIMER1_ICR1;
-
-    if (Timer1_HasLastCapture == 0U)
-    {
-        Timer1_LastCapture = Local_u16Capture;
-        Timer1_HasLastCapture = 1U;
-        return;
-    }
-
-    Timer1_LastInterval = (u16)(Local_u16Capture - Timer1_LastCapture);
-    Timer1_Intervals[Timer1_RingIndex] = Timer1_LastInterval;
-    Timer1_LastCapture = Local_u16Capture;
-
-    Timer1_RingIndex++;
-    if (Timer1_RingIndex >= TIMER1_CAPTURE_RING_SIZE)
-    {
-        Timer1_RingIndex = 0U;
-    }
-
-    Timer1_CaptureReady = 1U;
-    Timer1_OverflowCount = 0U;
-    Timer1_Asystole = 0U; /* إلغاء توقف القلب فور التقاط النبضة */
+    TIMER1_ProcessCapture(TIMER1_ICR1);
 }
 
 ISR(TIMER1_OVF_vect)
@@ -254,4 +301,10 @@ ISR(TIMER1_OVF_vect)
     {
         Timer1_Asystole = 1U;
     }
+}
+
+ISR(TIMER2_COMP_vect)
+{
+    /* Toggle PD7 on compare match so tone/LED oscillates cleanly in simulator */
+    TIMER_PORTD ^= (1U << TIMER_OC2_PD7);
 }

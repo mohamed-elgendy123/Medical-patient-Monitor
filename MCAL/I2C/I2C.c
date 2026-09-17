@@ -10,6 +10,11 @@
 #include "I2C_interface.h"
 #include "I2C_private.h"
 
+#ifndef F_CPU
+#define F_CPU 8000000UL
+#endif
+#include <util/delay.h>
+
 /*
  * I2C_InitMaster
  * 1. Reject SCL == 0.
@@ -26,6 +31,9 @@ STD_ReturnType I2C_InitMaster(uint32 Copy_u32SclHz){
         return E_NOK;
     }
 
+    /* Enable pull-ups on PC0 (SCL) and PC1 (SDA) */
+    (*(volatile uint8*)0x35) |= (1u << 0) | (1u << 1);
+
     TWBR_REG = (uint8)Local_u32Twbr;
     TWSR_REG &= ~TWSR_PRESCALER_MASK; /* prescaler = 1 (TWPS1:0 = 00) */
     TWCR_REG = (1u << TWEN);
@@ -36,19 +44,33 @@ STD_ReturnType I2C_InitMaster(uint32 Copy_u32SclHz){
 /*
  * I2C_SendStart
  * 1. TWCR = TWINT | TWSTA | TWEN.
- * 2. Wait for TWINT. Return E_OK only if status == I2C_START_ACK.
+ * 2. Wait for TWINT. Accept 0x08 (START) or 0x10 (REP START).
  */
 STD_ReturnType I2C_SendStart(void){
-    MASTER_STEP((1u << TWSTA), I2C_START_ACK);
+    uint32 Local_u32Timeout = I2C_TIMEOUT;
+    TWCR_REG = (1u << TWINT) | (1u << TWEN) | (1u << TWSTA);
+    while (((TWCR_REG & (1u << TWINT)) == 0) && (--Local_u32Timeout > 0)) ;
+    if (Local_u32Timeout == 0) return E_NOK;
+    uint8 status = TWSR_REG & TWSR_STATUS_MASK;
+    if (status != I2C_START_ACK && status != I2C_REP_START_ACK) {
+        return E_NOK;
+    }
     return E_OK;
 }
 
 /*
  * I2C_SendRepeatedStart
- * 1. Same as START, but expect I2C_REP_START_ACK (0x10).
+ * 1. Same as START. Accept 0x10 or 0x08 (due to SimulIDE simulator quirks).
  */
 STD_ReturnType I2C_SendRepeatedStart(void){
-    MASTER_STEP((1u << TWSTA), I2C_REP_START_ACK);
+    uint32 Local_u32Timeout = I2C_TIMEOUT;
+    TWCR_REG = (1u << TWINT) | (1u << TWEN) | (1u << TWSTA);
+    while (((TWCR_REG & (1u << TWINT)) == 0) && (--Local_u32Timeout > 0)) ;
+    if (Local_u32Timeout == 0) return E_NOK;
+    uint8 status = TWSR_REG & TWSR_STATUS_MASK;
+    if (status != I2C_START_ACK && status != I2C_REP_START_ACK) {
+        return E_NOK;
+    }
     return E_OK;
 }
 
@@ -57,10 +79,8 @@ STD_ReturnType I2C_SendRepeatedStart(void){
  * 1. TWCR = TWINT | TWSTO | TWEN. No status check.
  */
 void I2C_SendStop(void){
-    uint32 Local_u32Timeout = I2C_TIMEOUT;
     TWCR_REG = (1u << TWINT) | (1u << TWSTO) | (1u << TWEN);
-    /* Wait until STOP condition finishes transmitting on the bus */
-    while ((TWCR_REG & (1u << TWSTO)) && (--Local_u32Timeout > 0)) ;
+    _delay_us(50);
 }
 
 /*

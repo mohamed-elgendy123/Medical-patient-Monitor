@@ -51,8 +51,9 @@ STD_ReturnType UART_Init(uint32 Copy_u32BaudRate)
 
 STD_ReturnType UART_SendByte(uint8 Copy_u8Data)
 {
-    /* 1. Wait until UDRE flag is set to 1 (Data Register Empty) */
-    while (!(UCSRA & (1 << UDRE)));
+    /* 1. Wait until UDRE flag is set to 1 with timeout */
+    uint16 Local_u16Timeout = 5000U;
+    while (!(UCSRA & (1 << UDRE)) && (--Local_u16Timeout > 0U));
 
     /* Write byte to UDR register */
     UDR = Copy_u8Data;

@@ -45,6 +45,7 @@ typedef struct {
     u16 diaBP;
     u8  sensorConnected;
     u8  leadStatus;
+    u8  codeBlue;
 } PatientVitals_t;
 
 void Alarm_Init(void);

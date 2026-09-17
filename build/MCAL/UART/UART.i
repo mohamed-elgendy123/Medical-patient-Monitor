@@ -1,6 +1,6 @@
-# 0 "MCAL/UART/UART.c"
-# 0 "<built-in>"
-# 0 "<command-line>"
+# 1 "MCAL/UART/UART.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
 # 1 "MCAL/UART/UART.c"
 # 9 "MCAL/UART/UART.c"
 # 1 "LIB/STD_TYPES.h" 1
@@ -82,14 +82,15 @@ STD_ReturnType UART_Init(uint32 Copy_u32BaudRate)
 STD_ReturnType UART_SendByte(uint8 Copy_u8Data)
 {
 
-    while (!((*((volatile uint8*)0x2B)) & (1 << 5)));
+    uint16 Local_u16Timeout = 5000U;
+    while (!((*((volatile uint8*)0x2B)) & (1 << 5)) && (--Local_u16Timeout > 0U));
 
 
     (*((volatile uint8*)0x2C)) = Copy_u8Data;
 
     return E_OK;
 }
-# 71 "MCAL/UART/UART.c"
+# 72 "MCAL/UART/UART.c"
  STD_ReturnType UART_ReceiveByte(uint8 *Copy_pu8Data)
 {
 
@@ -106,7 +107,7 @@ STD_ReturnType UART_SendByte(uint8 Copy_u8Data)
 
     return E_OK;
 }
-# 96 "MCAL/UART/UART.c"
+# 97 "MCAL/UART/UART.c"
 STD_ReturnType UART_SendString(const uint8 *Copy_pu8String)
 {
 
@@ -125,7 +126,7 @@ STD_ReturnType UART_SendString(const uint8 *Copy_pu8String)
 
     return E_OK;
 }
-# 122 "MCAL/UART/UART.c"
+# 123 "MCAL/UART/UART.c"
 STD_ReturnType UART_IsDataReady(void)
 {
 
@@ -136,7 +137,7 @@ STD_ReturnType UART_IsDataReady(void)
 
     return E_NOK;
 }
-# 140 "MCAL/UART/UART.c"
+# 141 "MCAL/UART/UART.c"
 STD_ReturnType UART_SetRxInterrupt(uint8 Copy_u8State)
 {
     if (Copy_u8State == 1)

@@ -26,6 +26,7 @@ u8 TIMER0_IsTickPending(void);
 void TIMER0_ClearTick(void);
 
 void TIMER1_Init(void);
+void TIMER1_Poll(void);
 u8 TIMER1_IsCaptureReady(void);
 void TIMER1_ClearCaptureFlag(void);
 u16 TIMER1_GetLastInterval(void);

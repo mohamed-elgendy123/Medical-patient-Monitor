@@ -93,7 +93,7 @@ ANN_Audio_Tick:
 /* stack size = 0 */
 .L__stack_usage = 0
 	lds r24,Ann_Muted
-	cp r24, __zero_reg__
+	tst r24
 	breq .L10
 	lds r24,Ann_SilenceTicks
 	lds r25,Ann_SilenceTicks+1
@@ -127,13 +127,13 @@ ANN_Audio_Tick:
 	breq .L25
 	lds r24,Ann_CurrentPriority
 	cpi r24,lo8(2)
-	brne .L26
-	ldi r24,lo8(-36)
-	ldi r25,lo8(5)
-	ldi r18,lo8(3)
-	ldi r20,lo8(15)
+	breq .L26
+	ldi r25,0
+	ldi r24,0
+	ldi r18,lo8(2)
+	ldi r20,lo8(20)
 	ldi r21,0
-	ldi r22,lo8(20)
+	ldi r22,lo8(25)
 	ldi r23,0
 .L15:
 	lds r30,Ann_CycleTicks
@@ -176,12 +176,12 @@ ANN_Audio_Tick:
 	ldi r23,0
 	rjmp .L15
 .L26:
-	ldi r24,0
-	ldi r25,0
-	ldi r18,lo8(2)
-	ldi r20,lo8(20)
+	ldi r24,lo8(-36)
+	ldi r25,lo8(5)
+	ldi r18,lo8(3)
+	ldi r20,lo8(15)
 	ldi r21,0
-	ldi r22,lo8(25)
+	ldi r22,lo8(20)
 	ldi r23,0
 	rjmp .L15
 .L17:
@@ -313,5 +313,5 @@ Ann_Phase:
 	.size	Ann_CurrentPriority, 1
 Ann_CurrentPriority:
 	.zero	1
-	.ident	"GCC: (GNU) 15.2.0"
+	.ident	"GCC: (GNU) 7.3.0"
 .global __do_clear_bss

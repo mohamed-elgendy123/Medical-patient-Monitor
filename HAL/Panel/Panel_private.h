@@ -13,7 +13,7 @@
  * Debounce: require DEBOUNCE_COUNT consecutive identical readings
  * before accepting the new state.  At 10 ms per sample → 30 ms settle.
  */
-#define DEBOUNCE_COUNT   3u
+#define DEBOUNCE_COUNT   1u
 
 /* Silence duration: 120 s at 10 ms per tick = 12 000 ticks (fits uint16) */
 #define SILENCE_DURATION_TICKS  12000u

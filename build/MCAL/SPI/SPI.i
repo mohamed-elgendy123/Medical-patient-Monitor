@@ -1,6 +1,6 @@
-# 0 "MCAL/SPI/SPI.c"
-# 0 "<built-in>"
-# 0 "<command-line>"
+# 1 "MCAL/SPI/SPI.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
 # 1 "MCAL/SPI/SPI.c"
 # 1 "MCAL/SPI/../../LIB/STD_TYPES.h" 1
 # 13 "MCAL/SPI/../../LIB/STD_TYPES.h"
@@ -119,9 +119,10 @@ STD_ReturnType SPI_InitMaster(uint8 Copy_u8Prescaler)
 
 uint8 SPI_TransceiveByte(uint8 Copy_u8Data)
 {
+    uint16 Local_u16Timeout = 2000U;
     (*((volatile uint8*)0x2F)) = Copy_u8Data;
 
-    while (((*((volatile uint8*)0x2E)) & (1u << 7u)) == 0u)
+    while ((((*((volatile uint8*)0x2E)) & (1u << 7u)) == 0u) && (--Local_u16Timeout > 0U))
     {
 
     }

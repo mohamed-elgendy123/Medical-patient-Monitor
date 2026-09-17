@@ -18,6 +18,7 @@
 #include "LCD_I2C_interface.h"
 #include "Panel_interface.h"
 #include "patient_cfg.h"
+#include "monitor_fsm.h"
 #include "menu.h"
 
 #include <string.h>   /* memset */
@@ -137,11 +138,45 @@ static void Dashboard_Render(void)
     VitalData_t *Local_pstV;
     uint8       Local_u8Alarm;
 
-    /* ---------- Row 0 ---------- */
+    if (Monitor_GetState() == SYSTEM_STATE_STANDBY) {
+        /* FR-16: All physiological alarms are suspended; the LCD shows STANDBY
+         * with a large reminder and the elapsed standby time. */
+        uint32 Local_u32Sec = Monitor_GetStandbyElapsedSec();
+        uint16 Local_u16Min = (uint16)(Local_u32Sec / 60U);
+        uint8  Local_u8Sec  = (uint8)(Local_u32Sec % 60U);
+
+        /* Line 0: "*** STANDBY  ***" */
+        memset(Local_acLine, ' ', LCD_I2C_COLS);
+        Local_acLine[LCD_I2C_COLS] = '\0';
+        PutStr(Local_acLine, 0, "*** STANDBY  ***");
+        LCD_I2C_SetCursor(0, 0);
+        LCD_I2C_WriteString(Local_acLine);
+
+        /* Line 1: "TIME:    mm:ss" */
+        memset(Local_acLine, ' ', LCD_I2C_COLS);
+        Local_acLine[LCD_I2C_COLS] = '\0';
+        PutStr(Local_acLine, 0, "TIME:    ");
+        if (Local_u16Min < 10U) {
+            Local_acLine[9]  = '0';
+            Local_acLine[10] = (char)('0' + Local_u16Min);
+        } else {
+            Local_acLine[9]  = (char)('0' + (Local_u16Min / 10U));
+            Local_acLine[10] = (char)('0' + (Local_u16Min % 10U));
+        }
+        Local_acLine[11] = ':';
+        Local_acLine[12] = (char)('0' + (Local_u8Sec / 10U));
+        Local_acLine[13] = (char)('0' + (Local_u8Sec % 10U));
+
+        LCD_I2C_SetCursor(1, 0);
+        LCD_I2C_WriteString(Local_acLine);
+        return;
+    }
+
+    /* ---------- Row 0: "HR:xxx S:xxx T:xx" (16 chars) ---------- */
     memset(Local_acLine, ' ', LCD_I2C_COLS);
     Local_acLine[LCD_I2C_COLS] = '\0';
 
-    /* HR (col 0–6) */
+    /* HR (col 0-5): "HR:" + 3 chars */
     PutStr(Local_acLine, 0, "HR:");
     Local_pstV = PatientCfg_GetVital(VITAL_HR);
     if (Local_pstV != NULL && Local_pstV->Valid) {
@@ -150,8 +185,8 @@ static void Dashboard_Render(void)
         PutStr(Local_acLine, 3, "---");
     }
 
-    /* SpO2 (col 7–11) */
-    PutStr(Local_acLine, 7, "S:");
+    /* SpO2 (col 6-11): " S:" + 3 chars */
+    PutStr(Local_acLine, 6, " S:");
     Local_pstV = PatientCfg_GetVital(VITAL_SPO2);
     if (Local_pstV != NULL && Local_pstV->Valid) {
         PutNum(Local_acLine, 9, Local_pstV->Value);
@@ -159,13 +194,13 @@ static void Dashboard_Render(void)
         PutStr(Local_acLine, 9, "---");
     }
 
-    /* Temp — whole degrees (col 13–15) */
-    PutStr(Local_acLine, 13, "T:");
+    /* Temp (col 12-15): "T:" + 2 chars */
+    PutStr(Local_acLine, 12, "T:");
     Local_pstV = PatientCfg_GetVital(VITAL_TEMP);
     if (Local_pstV != NULL && Local_pstV->Valid) {
-        PutNum(Local_acLine, 15, Local_pstV->Value / 10);
+        PutNum(Local_acLine, 14, Local_pstV->Value / 10);
     } else {
-        PutStr(Local_acLine, 15, "-");
+        PutStr(Local_acLine, 14, "--");
     }
 
     LCD_I2C_SetCursor(0, 0);
@@ -175,29 +210,71 @@ static void Dashboard_Render(void)
     memset(Local_acLine, ' ', LCD_I2C_COLS);
     Local_acLine[LCD_I2C_COLS] = '\0';
 
-    Local_u8Alarm = PatientCfg_GetHighestAlarm();
+    {
+        Local_u8Alarm = PatientCfg_GetHighestAlarm();
 
-    if (Local_u8Alarm < VITAL_COUNT && (g_u8DashTick & 0x04u)) {
-        /* Alarm banner — alternates every ~4 update cycles */
-        PutStr(Local_acLine, 0, "*HI ");
-        PutStr(Local_acLine, 4, PatientCfg_VitalName(Local_u8Alarm));
-        PutStr(Local_acLine, 9, "ALARM*");
-    } else {
-        /* Normal: RR + BP */
-        PutStr(Local_acLine, 0, "RR:");
-        Local_pstV = PatientCfg_GetVital(VITAL_RR);
-        if (Local_pstV != NULL && Local_pstV->Valid) {
-            PutNum(Local_acLine, 3, Local_pstV->Value);
-        } else {
-            PutStr(Local_acLine, 3, "--");
-        }
+        if (Local_u8Alarm < VITAL_COUNT && (g_u8DashTick & 0x04u)) {
+            /* Alarm banner per FR-17 — alternates every ~4 update cycles */
+            uint8        Local_u8Side = PatientCfg_GetAlarmSide(Local_u8Alarm);
+            uint8        Local_u8Prio = PatientCfg_GetAlarmPriority(Local_u8Alarm);
+            VitalData_t *Local_pstAlarmV = PatientCfg_GetVital(Local_u8Alarm);
+            sint16       Local_s16Val = (Local_pstAlarmV != NULL) ? Local_pstAlarmV->Value : 0;
 
-        PutStr(Local_acLine, 6, "BP:");
-        Local_pstV = PatientCfg_GetVital(VITAL_NIBP);
-        if (Local_pstV != NULL && Local_pstV->Valid) {
-            PutNum(Local_acLine, 9, Local_pstV->Value);
+            if (Local_u8Prio == ALARM_PRIO_HIGH) {
+                /* High priority alarm: enclosed in '!!' and '!!' per FR-17 */
+                Local_acLine[0]  = '!';
+                Local_acLine[1]  = '!';
+                Local_acLine[14] = '!';
+                Local_acLine[15] = '!';
+
+                if (Local_u8Alarm == VITAL_HR) {
+                    PutStr(Local_acLine, 2, (Local_u8Side == ALARM_LOW_SIDE) ? "HR LOW   " : "HR HIGH  ");
+                    PutNum(Local_acLine, 11, Local_s16Val);
+                } else if (Local_u8Alarm == VITAL_SPO2) {
+                    PutStr(Local_acLine, 2, "SPO2 LOW ");
+                    PutNum(Local_acLine, 11, Local_s16Val);
+                } else if (Local_u8Alarm == VITAL_NIBP) {
+                    PutStr(Local_acLine, 2, "BP LOW   ");
+                    PutNum(Local_acLine, 11, Local_s16Val);
+                }
+            } else {
+                /* Medium priority alarm: enclosed in '!' and '!' per FR-17 */
+                Local_acLine[0]  = '!';
+                Local_acLine[15] = '!';
+
+                if (Local_u8Alarm == VITAL_TEMP) {
+                    char Local_acTBuf[6];
+                    FormatTemp(Local_s16Val, Local_acTBuf, sizeof(Local_acTBuf));
+                    PutStr(Local_acLine, 1, (Local_u8Side == ALARM_LOW_SIDE) ? "TEMP LOW  " : "TEMP HIGH ");
+                    PutStr(Local_acLine, 11, Local_acTBuf);
+                } else if (Local_u8Alarm == VITAL_RR) {
+                    PutStr(Local_acLine, 1, (Local_u8Side == ALARM_LOW_SIDE) ? "RESP LOW  " : "RESP HIGH ");
+                    PutNum(Local_acLine, 11, Local_s16Val);
+                } else if (Local_u8Alarm == VITAL_NIBP) {
+                    PutStr(Local_acLine, 1, "BP HIGH   ");
+                    PutNum(Local_acLine, 11, Local_s16Val);
+                } else if (Local_u8Alarm == VITAL_HR) {
+                    PutStr(Local_acLine, 1, (Local_u8Side == ALARM_LOW_SIDE) ? "HR LOW    " : "HR HIGH   ");
+                    PutNum(Local_acLine, 11, Local_s16Val);
+                }
+            }
         } else {
-            PutStr(Local_acLine, 9, "---");
+            /* Normal: RR (col 0-5) + BP (col 7-15) */
+            PutStr(Local_acLine, 0, "RR:");
+            Local_pstV = PatientCfg_GetVital(VITAL_RR);
+            if (Local_pstV != NULL && Local_pstV->Valid) {
+                PutNum(Local_acLine, 3, Local_pstV->Value);
+            } else {
+                PutStr(Local_acLine, 3, "--");
+            }
+
+            PutStr(Local_acLine, 7, "  BP:");
+            Local_pstV = PatientCfg_GetVital(VITAL_NIBP);
+            if (Local_pstV != NULL && Local_pstV->Valid) {
+                PutNum(Local_acLine, 12, Local_pstV->Value);
+            } else {
+                PutStr(Local_acLine, 12, "---");
+            }
         }
     }
 
@@ -295,19 +372,18 @@ void Menu_Update(void)
 
     /* ---------- DASHBOARD ---------- */
     case MENU_DASHBOARD:
-        Dashboard_Render();
-
         if (Panel_IsPressed(BTN_MENU)) {
             g_u8State         = MENU_SELECT_VITAL;
             g_u8SelectedVital = 0u;
             LCD_I2C_Clear();
+            Menu_RenderSelect();
+            return;
         }
+        Dashboard_Render();
         break;
 
     /* ---------- SELECT VITAL ---------- */
     case MENU_SELECT_VITAL:
-        Menu_RenderSelect();
-
         if (Panel_IsPressed(BTN_UP)) {
             g_u8SelectedVital = (g_u8SelectedVital == 0u)
                               ? (uint8)(VITAL_COUNT - 1u)
@@ -322,13 +398,14 @@ void Menu_Update(void)
             g_s16EditValue = Local_stLim.LowLimit;
             g_u8State      = MENU_EDIT_LOW;
             LCD_I2C_Clear();
+            Menu_RenderEdit();
+            return;
         }
+        Menu_RenderSelect();
         break;
 
     /* ---------- EDIT LOW LIMIT ---------- */
     case MENU_EDIT_LOW:
-        Menu_RenderEdit();
-
         if (Panel_IsPressed(BTN_UP)) {
             g_s16EditValue += PatientCfg_GetStep(g_u8SelectedVital);
         }
@@ -341,13 +418,14 @@ void Menu_Update(void)
             g_s16EditValue = Local_stLim.HighLimit;
             g_u8State      = MENU_EDIT_HIGH;
             LCD_I2C_Clear();
+            Menu_RenderEdit();
+            return;
         }
+        Menu_RenderEdit();
         break;
 
     /* ---------- EDIT HIGH LIMIT ---------- */
     case MENU_EDIT_HIGH:
-        Menu_RenderEdit();
-
         if (Panel_IsPressed(BTN_UP)) {
             g_s16EditValue += PatientCfg_GetStep(g_u8SelectedVital);
         }
@@ -358,7 +436,10 @@ void Menu_Update(void)
             PatientCfg_SetHigh(g_u8SelectedVital, g_s16EditValue);
             g_u8State = MENU_DASHBOARD;
             LCD_I2C_Clear();
+            Dashboard_Render();
+            return;
         }
+        Menu_RenderEdit();
         break;
 
     default:

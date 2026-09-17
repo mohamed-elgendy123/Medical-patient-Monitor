@@ -1,6 +1,6 @@
-# 0 "HAL/HR_Capture/HR_Capture.c"
-# 0 "<built-in>"
-# 0 "<command-line>"
+# 1 "HAL/HR_Capture/HR_Capture.c"
+# 1 "<built-in>"
+# 1 "<command-line>"
 # 1 "HAL/HR_Capture/HR_Capture.c"
 # 1 "./LIB/STD_TYPES.h" 1
 # 13 "./LIB/STD_TYPES.h"
@@ -46,6 +46,7 @@ uint8 TIMER0_IsTickPending(void);
 void TIMER0_ClearTick(void);
 
 void TIMER1_Init(void);
+void TIMER1_Poll(void);
 uint8 TIMER1_IsCaptureReady(void);
 void TIMER1_ClearCaptureFlag(void);
 uint16 TIMER1_GetLastInterval(void);
@@ -113,6 +114,7 @@ void HRC_Process(void)
         HRC_Asystole = 1U;
         HRC_CurrentBpm = 0U;
         HRC_CurrentHrvMs = 0U;
+        HRC_MedianCount = 0U;
         return;
     }
 
@@ -131,6 +133,7 @@ void HRC_Process(void)
     {
         HRC_CurrentBpm = 0U;
         HRC_CurrentHrvMs = 0U;
+        HRC_MedianCount = 0U;
         return;
     }
 
@@ -203,42 +206,52 @@ void HRC_ClearAsystole(void)
 
 static uint16 HRC_CalculateMedian(void)
 {
-    uint16 Local_u16Arr[3];
-    uint16 Local_u16Temp;
+    uint16 Local_u16Median = 0U;
 
-    Local_u16Arr[0] = HRC_MedianIntervals[0];
-    Local_u16Arr[1] = HRC_MedianIntervals[1];
-    Local_u16Arr[2] = HRC_MedianIntervals[2];
-
-    if ((HRC_MedianCount < 3U) ||
-        (Local_u16Arr[0] == 0U) || (Local_u16Arr[1] == 0U) ||
-        (Local_u16Arr[2] == 0U))
+    if (HRC_MedianCount == 0U)
     {
         return 0U;
     }
-
-
-    if (Local_u16Arr[0] > Local_u16Arr[1])
+    else if (HRC_MedianCount == 1U)
     {
-        Local_u16Temp = Local_u16Arr[0];
-        Local_u16Arr[0] = Local_u16Arr[1];
-        Local_u16Arr[1] = Local_u16Temp;
+        Local_u16Median = HRC_MedianIntervals[0];
     }
-    if (Local_u16Arr[1] > Local_u16Arr[2])
+    else if (HRC_MedianCount == 2U)
     {
-        Local_u16Temp = Local_u16Arr[1];
-        Local_u16Arr[1] = Local_u16Arr[2];
-        Local_u16Arr[2] = Local_u16Temp;
+        Local_u16Median = HRC_MedianIntervals[1];
     }
-    if (Local_u16Arr[0] > Local_u16Arr[1])
+    else
     {
-        Local_u16Temp = Local_u16Arr[0];
-        Local_u16Arr[0] = Local_u16Arr[1];
-        Local_u16Arr[1] = Local_u16Temp;
-    }
+        uint16 Local_u16Arr[3];
+        uint16 Local_u16Temp;
+
+        Local_u16Arr[0] = HRC_MedianIntervals[0];
+        Local_u16Arr[1] = HRC_MedianIntervals[1];
+        Local_u16Arr[2] = HRC_MedianIntervals[2];
 
 
-    uint16 Local_u16Median = Local_u16Arr[1];
+        if (Local_u16Arr[0] > Local_u16Arr[1])
+        {
+            Local_u16Temp = Local_u16Arr[0];
+            Local_u16Arr[0] = Local_u16Arr[1];
+            Local_u16Arr[1] = Local_u16Temp;
+        }
+        if (Local_u16Arr[1] > Local_u16Arr[2])
+        {
+            Local_u16Temp = Local_u16Arr[1];
+            Local_u16Arr[1] = Local_u16Arr[2];
+            Local_u16Arr[2] = Local_u16Temp;
+        }
+        if (Local_u16Arr[0] > Local_u16Arr[1])
+        {
+            Local_u16Temp = Local_u16Arr[0];
+            Local_u16Arr[0] = Local_u16Arr[1];
+            Local_u16Arr[1] = Local_u16Temp;
+        }
+
+
+        Local_u16Median = Local_u16Arr[1];
+    }
 
     if (Local_u16Median == 0U)
     {

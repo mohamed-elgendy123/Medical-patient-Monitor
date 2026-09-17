@@ -13,6 +13,8 @@ typedef enum {
 
 void Monitor_Init(void);
 void Monitor_Run(void);
+void Monitor_ToggleStandby(void);
 System_State_t Monitor_GetState(void);
+uint32 Monitor_GetStandbyElapsedSec(void);
 
 #endif /* MONITOR_FSM_H */

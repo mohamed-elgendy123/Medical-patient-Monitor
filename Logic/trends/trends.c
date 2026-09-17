@@ -1,9 +1,16 @@
+#include "ADC_interface.h"
 
 #include "trends.h"
 #include <stdio.h>
 
-// مطابقة تماماً لاسم الدالة الموجودة في main.c (بحرف r صغير)
-extern uint16_t ADC_read(uint8_t channel);
+
+static uint16_t _adc_read(uint8_t channel) {
+    uint16_t val = 0;
+    ADC_ReadChannel(channel, &val);
+    return val;
+}
+
+
 
 static TrendSample_t trend_buffer[TREND_BUFFER_SIZE];
 static uint8_t trend_head = 0;
@@ -20,10 +27,10 @@ void Trends_Init(void) {
 }
 
 void Task_Trend(void) {
-    trend_buffer[trend_head].channels[0] = ADC_read(0);
-    trend_buffer[trend_head].channels[1] = ADC_read(1);
-    trend_buffer[trend_head].channels[2] = ADC_read(2);
-    trend_buffer[trend_head].channels[3] = ADC_read(3);
+    trend_buffer[trend_head].channels[0] = _adc_read(0);
+    trend_buffer[trend_head].channels[1] = _adc_read(1);
+    trend_buffer[trend_head].channels[2] = _adc_read(2);
+    trend_buffer[trend_head].channels[3] = _adc_read(3);
 
     trend_head = (trend_head + 1) % TREND_BUFFER_SIZE;
     if (trend_count < TREND_BUFFER_SIZE) {

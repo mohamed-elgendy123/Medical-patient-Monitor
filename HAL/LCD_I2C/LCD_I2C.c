@@ -30,68 +30,100 @@ static uint8 g_u8Backlight = LCD_BL;
 /* Write one byte to the PCF8574 via I2C */
 static STD_ReturnType PCF8574_Write(uint8 Copy_u8Data)
 {
-    STD_ReturnType Local_enRet;
-
-    Local_enRet = I2C_SendStart();
-    if (Local_enRet != E_OK) { return E_NOK; }
-
-    Local_enRet = I2C_SendSlaveAddressWithWrite(PCF8574_ADDRESS);
-    if (Local_enRet != E_OK) { I2C_SendStop(); return E_NOK; }
-
-    Local_enRet = I2C_SendByte(Copy_u8Data);
+    if (I2C_SendStart() != E_OK) { return E_NOK; }
+    if (I2C_SendSlaveAddressWithWrite(PCF8574_ADDRESS) != E_OK) {
+        I2C_SendStop();
+        return E_NOK;
+    }
+    (void)I2C_SendByte(Copy_u8Data);
     I2C_SendStop();
-    return Local_enRet;
+    _delay_us(50);
+    return E_OK;
 }
 
-/* Pulse EN: write byte with EN=1, then with EN=0 */
+/* Pulse EN: write byte with EN=1, then with EN=0 within single I2C frame */
 static STD_ReturnType LCD_PulseNibble(uint8 Copy_u8Nibble)
 {
-    STD_ReturnType Local_enRet;
+    if (I2C_SendStart() != E_OK) { return E_NOK; }
+    if (I2C_SendSlaveAddressWithWrite(PCF8574_ADDRESS) != E_OK) {
+        I2C_SendStop();
+        return E_NOK;
+    }
 
-    Local_enRet = PCF8574_Write(Copy_u8Nibble | LCD_EN);
-    if (Local_enRet != E_OK) { return E_NOK; }
+    (void)I2C_SendByte(Copy_u8Nibble | LCD_EN);
+    _delay_us(5);
+    (void)I2C_SendByte(Copy_u8Nibble & (uint8)~LCD_EN);
+    _delay_us(5);
 
-    Local_enRet = PCF8574_Write(Copy_u8Nibble & (uint8)~LCD_EN);
-    return Local_enRet;
+    I2C_SendStop();
+    _delay_us(50);
+    return E_OK;
 }
 
 /*
  * Send a full byte in 4-bit mode (high nibble first, then low nibble).
- * Copy_u8IsData: 0 = command (RS=0), non-zero = data (RS=1).
+ * Single I2C frame: Start -> SLA+W -> H_EN1 -> H_EN0 -> L_EN1 -> L_EN0 -> Stop.
+ * Completely eliminates any repeated start condition.
  */
 static STD_ReturnType LCD_WriteByte(uint8 Copy_u8Data, uint8 Copy_u8IsData)
 {
-    STD_ReturnType Local_enRet;
     uint8 Local_u8Flags = g_u8Backlight;
+    uint8 high_nibble = (Copy_u8Data & 0xF0u) | Local_u8Flags;
+    uint8 low_nibble  = ((uint8)(Copy_u8Data << 4) & 0xF0u) | Local_u8Flags;
 
     if (Copy_u8IsData) {
-        Local_u8Flags |= LCD_RS;
+        high_nibble |= LCD_RS;
+        low_nibble  |= LCD_RS;
     }
 
-    /* High nibble */
-    Local_enRet = LCD_PulseNibble((Copy_u8Data & 0xF0u) | Local_u8Flags);
-    if (Local_enRet != E_OK) { return E_NOK; }
+    if (I2C_SendStart() != E_OK) { return E_NOK; }
+    if (I2C_SendSlaveAddressWithWrite(PCF8574_ADDRESS) != E_OK) {
+        I2C_SendStop();
+        return E_NOK;
+    }
 
-    /* Low nibble */
-    Local_enRet = LCD_PulseNibble(((uint8)(Copy_u8Data << 4) & 0xF0u) | Local_u8Flags);
-    return Local_enRet;
+    /* High nibble EN pulse */
+    (void)I2C_SendByte(high_nibble | LCD_EN);
+    _delay_us(5);
+    (void)I2C_SendByte(high_nibble & (uint8)~LCD_EN);
+    _delay_us(5);
+
+    /* Low nibble EN pulse */
+    (void)I2C_SendByte(low_nibble | LCD_EN);
+    _delay_us(5);
+    (void)I2C_SendByte(low_nibble & (uint8)~LCD_EN);
+    _delay_us(5);
+
+    I2C_SendStop();
+    _delay_us(50);
+
+    return E_OK;
 }
 
 static STD_ReturnType LCD_Command(uint8 Copy_u8Cmd)
 {
-    return LCD_WriteByte(Copy_u8Cmd, 0u);
+    STD_ReturnType ret = LCD_WriteByte(Copy_u8Cmd, 0u);
+    if (Copy_u8Cmd == LCD_CMD_CLEAR || Copy_u8Cmd == LCD_CMD_HOME) {
+        _delay_ms(2);
+    } else {
+        _delay_us(50);
+    }
+    return ret;
 }
 
 static STD_ReturnType LCD_Data(uint8 Copy_u8Char)
 {
-    return LCD_WriteByte(Copy_u8Char, 1u);
+    STD_ReturnType ret = LCD_WriteByte(Copy_u8Char, 1u);
+    _delay_us(50);
+    return ret;
 }
 
 /* ==================== Public API ==================== */
 
 STD_ReturnType LCD_I2C_Init(void)
 {
-    STD_ReturnType Local_enRet;
+    /* Enable internal pull-ups on PC0 (SCL) and PC1 (SDA) */
+    (*(volatile uint8*)0x35) |= (1u << 0) | (1u << 1);
 
     /* HD44780 power-on: wait > 40 ms */
     _delay_ms(50);
@@ -101,36 +133,26 @@ STD_ReturnType LCD_I2C_Init(void)
      *   three times Function-Set 8-bit (0x3x nibble) then switch to 4-bit.
      *   During this phase only single nibbles are sent.
      */
-    Local_enRet = LCD_PulseNibble(0x30u | g_u8Backlight);
-    if (Local_enRet != E_OK) { return E_NOK; }
+    LCD_PulseNibble(0x30u | g_u8Backlight);
     _delay_ms(5);
 
-    Local_enRet = LCD_PulseNibble(0x30u | g_u8Backlight);
-    if (Local_enRet != E_OK) { return E_NOK; }
+    LCD_PulseNibble(0x30u | g_u8Backlight);
     _delay_us(150);
 
-    Local_enRet = LCD_PulseNibble(0x30u | g_u8Backlight);
-    if (Local_enRet != E_OK) { return E_NOK; }
+    LCD_PulseNibble(0x30u | g_u8Backlight);
     _delay_us(150);
 
     /* Switch to 4-bit interface */
-    Local_enRet = LCD_PulseNibble(0x20u | g_u8Backlight);
-    if (Local_enRet != E_OK) { return E_NOK; }
+    LCD_PulseNibble(0x20u | g_u8Backlight);
     _delay_us(150);
 
     /* From here on, normal 4-bit command path (two nibbles per byte) */
-    Local_enRet = LCD_Command(LCD_CMD_FUNCTION_4BIT);   /* 4-bit, 2-line, 5×8 */
-    if (Local_enRet != E_OK) { return E_NOK; }
+    LCD_Command(LCD_CMD_FUNCTION_4BIT);   /* 4-bit, 2-line, 5×8 */
+    LCD_Command(LCD_CMD_DISPLAY_ON);      /* display ON, cursor OFF */
+    LCD_Command(LCD_CMD_CLEAR);           /* clear display */
+    LCD_Command(LCD_CMD_ENTRY_MODE);      /* increment, no shift */
 
-    Local_enRet = LCD_Command(LCD_CMD_DISPLAY_ON);      /* display ON, cursor OFF */
-    if (Local_enRet != E_OK) { return E_NOK; }
-
-    Local_enRet = LCD_Command(LCD_CMD_CLEAR);
-    if (Local_enRet != E_OK) { return E_NOK; }
-    _delay_ms(2);
-
-    Local_enRet = LCD_Command(LCD_CMD_ENTRY_MODE);      /* increment, no shift */
-    return Local_enRet;
+    return E_OK;
 }
 
 STD_ReturnType LCD_I2C_Clear(void)

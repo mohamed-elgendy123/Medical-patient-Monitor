@@ -49,9 +49,10 @@ STD_ReturnType SPI_InitMaster(uint8 Copy_u8Prescaler)
 
 uint8 SPI_TransceiveByte(uint8 Copy_u8Data)
 {
+    uint16 Local_u16Timeout = 2000U;
     SPI_SPDR_REG = Copy_u8Data;
 
-    while ((SPI_SPSR_REG & (1u << SPI_SPSR_SPIF)) == 0u)
+    while (((SPI_SPSR_REG & (1u << SPI_SPSR_SPIF)) == 0u) && (--Local_u16Timeout > 0U))
     {
         /* Wait */
     }

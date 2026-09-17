@@ -19,16 +19,16 @@ RingBuffer_Init:
 	cp r22,__zero_reg__
 	cpc r23,__zero_reg__
 	breq .L1
-	st Z,r22
 	std Z+1,r23
-	std Z+6,r20
+	st Z,r22
 	std Z+7,r21
-	std Z+2,__zero_reg__
+	std Z+6,r20
 	std Z+3,__zero_reg__
-	std Z+4,__zero_reg__
+	std Z+2,__zero_reg__
 	std Z+5,__zero_reg__
-	std Z+8,__zero_reg__
+	std Z+4,__zero_reg__
 	std Z+9,__zero_reg__
+	std Z+8,__zero_reg__
 .L1:
 /* epilogue start */
 	ret
@@ -62,68 +62,51 @@ RingBuffer_IsFull:
 .global	RingBuffer_Push
 	.type	RingBuffer_Push, @function
 RingBuffer_Push:
+	push r16
+	push r17
 	push r28
 	push r29
-	rcall .
-	rcall .
-	in r28,__SP_L__
-	in r29,__SP_H__
 /* prologue: function */
-/* frame size = 4 */
-/* stack size = 6 */
-.L__stack_usage = 6
-	std Y+3,r24
-	std Y+4,r25
-	std Y+1,r22
-	std Y+2,r23
+/* frame size = 0 */
+/* stack size = 4 */
+.L__stack_usage = 4
 	sbiw r24,0
 	breq .L16
+	movw r16,r22
+	movw r28,r24
 	call RingBuffer_IsFull
 	cpse r24,__zero_reg__
 	rjmp .L16
-	ldd r26,Y+3
-	ldd r27,Y+4
-	adiw r26,2
-	ld r24,X+
-	ld r25,X+
-	sbiw r26,4
+	ldd r24,Y+2
+	ldd r25,Y+3
 	lsl r24
 	rol r25
-	ld r30,X+
-	ld r31,X+
+	ld r30,Y
+	ldd r31,Y+1
 	add r30,r24
 	adc r31,r25
-	ldd r24,Y+1
-	ldd r25,Y+2
-	st Z,r24
-	std Z+1,r25
-	ld r24,X+
-	ld r25,X+
+	std Z+1,r17
+	st Z,r16
+	ldd r24,Y+2
+	ldd r25,Y+3
 	adiw r24,1
-	adiw r26,2
-	ld r22,X+
-	ld r23,X+
+	ldd r22,Y+6
+	ldd r23,Y+7
 	call __udivmodhi4
-	ldd r26,Y+3
-	ldd r27,Y+4
-	adiw r26,2
-	st X+,r24
-	st X+,r25
-	adiw r26,4
-	ld r24,X+
-	ld r25,X+
+	std Y+3,r25
+	std Y+2,r24
+	ldd r24,Y+8
+	ldd r25,Y+9
 	adiw r24,1
-	st -X,r25
-	st -X,r24
+	std Y+9,r25
+	std Y+8,r24
 	ldi r24,lo8(1)
 .L13:
 /* epilogue start */
-	pop __tmp_reg__
-	pop __tmp_reg__
-	pop __tmp_reg__
-	pop __tmp_reg__
 	pop r29
 	pop r28
+	pop r17
+	pop r16
 	ret
 .L16:
 	ldi r24,0
@@ -163,12 +146,13 @@ RingBuffer_Pop:
 /* frame size = 0 */
 /* stack size = 4 */
 .L__stack_usage = 4
-	movw r28,r24
-	movw r16,r22
 	sbiw r24,0
 	breq .L28
-	or r22,r23
+	cp r22,__zero_reg__
+	cpc r23,__zero_reg__
 	breq .L28
+	movw r16,r22
+	movw r28,r24
 	call RingBuffer_IsEmpty
 	cpse r24,__zero_reg__
 	rjmp .L28
@@ -183,21 +167,21 @@ RingBuffer_Pop:
 	ld r24,Z
 	ldd r25,Z+1
 	movw r30,r16
-	st Z,r24
 	std Z+1,r25
+	st Z,r24
 	ldd r24,Y+4
 	ldd r25,Y+5
 	adiw r24,1
 	ldd r22,Y+6
 	ldd r23,Y+7
 	call __udivmodhi4
-	std Y+4,r24
 	std Y+5,r25
+	std Y+4,r24
 	ldd r24,Y+8
 	ldd r25,Y+9
 	sbiw r24,1
-	std Y+8,r24
 	std Y+9,r25
+	std Y+8,r24
 	ldi r24,lo8(1)
 .L24:
 /* epilogue start */
@@ -210,4 +194,4 @@ RingBuffer_Pop:
 	ldi r24,0
 	rjmp .L24
 	.size	RingBuffer_Pop, .-RingBuffer_Pop
-	.ident	"GCC: (GNU) 15.2.0"
+	.ident	"GCC: (GNU) 7.3.0"
