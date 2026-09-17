@@ -491,10 +491,18 @@ int main(void)
       }
 
       /* T-10: Serial Telemetry Report (2 s, Phase 7) */
+      /*
       if ((Local_u16Phase % 200U) == 7U)
       {
         Task_Report();
       }
+*/
+/* T-10: Serial Telemetry Report (10 s, Phase 7) */
+      if ((Local_u16Phase % 1000U) == 7U)
+      {
+        Task_Report();
+      }
+
 
       /* T-11: Trends Storage (10 s, Phase 8) */
       if ((Local_u16Phase % 1000U) == 8U)

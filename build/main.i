@@ -1694,12 +1694,12 @@ int main(void)
       {
         Task_FastVitals();
       }
-
-
-      if ((Local_u16Phase % 200U) == 7U)
+# 501 "main.c"
+      if ((Local_u16Phase % 1000U) == 7U)
       {
         Task_Report();
       }
+
 
 
       if ((Local_u16Phase % 1000U) == 8U)

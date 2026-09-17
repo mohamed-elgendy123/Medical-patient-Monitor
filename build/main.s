@@ -726,11 +726,8 @@ main:
 	brne .L72
 	call Task_FastVitals
 .L72:
-	movw r24,r16
-	ldi r22,lo8(-56)
-	ldi r23,0
-	call __udivmodhi4
-	sbiw r24,7
+	cpi r16,7
+	cpc r17,__zero_reg__
 	brne .L73
 	std Y+1,__zero_reg__
 	call UART_IsDataReady
@@ -745,11 +742,6 @@ main:
 	brne .L75
 .L74:
 	call Send_Telemetry_Frame
-.L73:
-	cpi r16,8
-	cpc r17,__zero_reg__
-	brne .L77
-	call Task_Trend
 .L77:
 	call Monitor_Run
 	call ANN_Audio_Tick
@@ -778,7 +770,13 @@ main:
 	ldi r24,lo8(.LC6)
 	ldi r25,hi8(.LC6)
 	call UART_SendString
-	rjmp .L73
+	rjmp .L77
+.L73:
+	cpi r16,8
+	cpc r17,__zero_reg__
+	brne .L77
+	call Task_Trend
+	rjmp .L77
 	.size	main, .-main
 	.section	.bss.s_u16SilenceTicks.0,"aw",@nobits
 	.type	s_u16SilenceTicks.0, @object
