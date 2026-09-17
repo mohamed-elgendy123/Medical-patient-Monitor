@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+
+#include <avr/interrupt.h>
+
 #define CONSOLE_MAX_LINE_LENGTH 40
 
 static char line_buffer[CONSOLE_MAX_LINE_LENGTH + 1];
@@ -108,4 +111,9 @@ void CONSOLE_Task(void) {
             }
         }
     }
+}
+
+
+ISR(USART_RXC_vect) {
+    CONSOLE_Task();
 }

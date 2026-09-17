@@ -36,8 +36,8 @@ STD_ReturnType UART_Init(uint32 Copy_u32BaudRate)
     UCSRC = (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
 
     /* 4. UCSRB = RXEN | TXEN */
-    UCSRB = (1 << RXEN) | (1 << TXEN);
-
+    //UCSRB = (1 << RXEN) | (1 << TXEN);
+UCSRB = (1 << RXEN) | (1 << TXEN) | (1 << RXCIE);
     return E_OK;
 }
 

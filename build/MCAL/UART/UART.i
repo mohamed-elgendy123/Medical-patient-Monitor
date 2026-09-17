@@ -74,8 +74,8 @@ STD_ReturnType UART_Init(uint32 Copy_u32BaudRate)
     (*((volatile uint8*)0x40)) = (1 << 7) | (1 << 2) | (1 << 1);
 
 
-    (*((volatile uint8*)0x2A)) = (1 << 4) | (1 << 3);
 
+(*((volatile uint8*)0x2A)) = (1 << 4) | (1 << 3) | (1 << 7);
     return E_OK;
 }
 # 52 "MCAL/UART/UART.c"
