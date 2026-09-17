@@ -1,6 +1,6 @@
-# 1 "HAL/HR_Capture/HR_Capture.c"
-# 1 "<built-in>"
-# 1 "<command-line>"
+# 0 "HAL/HR_Capture/HR_Capture.c"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "HAL/HR_Capture/HR_Capture.c"
 # 1 "./LIB/STD_TYPES.h" 1
 # 13 "./LIB/STD_TYPES.h"

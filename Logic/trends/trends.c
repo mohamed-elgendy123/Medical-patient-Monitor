@@ -1,15 +1,14 @@
-#include "ADC_interface.h"
 
+#include "ADC_interface.h"
 #include "trends.h"
 #include <stdio.h>
 
 
 static uint16_t _adc_read(uint8_t channel) {
     uint16_t val = 0;
-    ADC_ReadChannel(channel, &val);
+    ADC_ReadChannel(channel, (uint16*)&val); 
     return val;
 }
-
 
 
 static TrendSample_t trend_buffer[TREND_BUFFER_SIZE];

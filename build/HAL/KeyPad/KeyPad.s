@@ -17,8 +17,8 @@ KeyPad_Init:
 	brsh .L3
 	ldi r22,lo8(-16)
 	call GPIO_SetPortDirection
-	ldi r25,0
 	ldi r24,0
+	ldi r25,0
 	ret
 .L3:
 	ldi r24,lo8(1)
@@ -30,11 +30,6 @@ KeyPad_Init:
 .global	KeyPad_GetPressedKey
 	.type	KeyPad_GetPressedKey, @function
 KeyPad_GetPressedKey:
-	push r7
-	push r8
-	push r9
-	push r10
-	push r11
 	push r12
 	push r13
 	push r14
@@ -43,40 +38,38 @@ KeyPad_GetPressedKey:
 	push r17
 	push r28
 	push r29
-	push __zero_reg__
+	rcall .
+	rcall .
 	in r28,__SP_L__
 	in r29,__SP_H__
 /* prologue: function */
-/* frame size = 1 */
-/* stack size = 14 */
-.L__stack_usage = 14
+/* frame size = 4 */
+/* stack size = 12 */
+.L__stack_usage = 12
+	std Y+2,r24
+	movw r14,r22
 	cpi r24,lo8(4)
 	brlo .+2
-	rjmp .L10
-	cp r22,__zero_reg__
-	cpc r23,__zero_reg__
+	rjmp .L11
+	or r22,r23
 	brne .+2
-	rjmp .L10
-	movw r14,r22
-	mov r17,r24
+	rjmp .L11
 	ldi r22,lo8(-16)
 	call GPIO_SetPortDirection
-	movw r22,r28
-	subi r22,-1
-	sbci r23,-1
-	mov r24,r17
+	movw r12,r28
+	ldi r24,-1
+	sub r12,r24
+	sbc r13,r24
+	movw r22,r12
+	ldd r24,Y+2
 	call GPIO_GetPortValue
-	ldi r24,lo8(4)
-	mov r12,r24
-	mov r13,__zero_reg__
-	clr r8
-	inc r8
-	mov r9,__zero_reg__
+	ldi r16,lo8(4)
+	ldi r17,0
+	std Y+3,r12
+	std Y+4,r13
 .L8:
-	ldi r16,lo8(-4)
-	add r16,r12
-	movw r22,r8
-	mov r0,r12
+	ldi r22,lo8(1)
+	mov r0,r16
 	rjmp 2f
 	1:
 	lsl r22
@@ -84,19 +77,18 @@ KeyPad_GetPressedKey:
 	dec r0
 	brpl 1b
 	com r22
-	mov r24,r17
+	ldd r24,Y+2
 	call GPIO_SetPortValue
-	mov r11,__zero_reg__
-	mov r10,__zero_reg__
+	mov r12,__zero_reg__
+	mov r13,__zero_reg__
 .L7:
-	movw r22,r28
-	subi r22,-1
-	sbci r23,-1
-	mov r24,r17
+	ldd r22,Y+3
+	ldd r23,Y+4
+	ldd r24,Y+2
 	call GPIO_GetPortValue
 	ldd r24,Y+1
 	ldi r25,0
-	mov r0,r10
+	mov r0,r12
 	rjmp 2f
 	1:
 	asr r25
@@ -106,16 +98,20 @@ KeyPad_GetPressedKey:
 	brpl 1b
 	sbrc r24,0
 	rjmp .L6
+	subi r16,lo8(-(-4))
 	lsl r16
 	lsl r16
-	add r16,r10
+	add r16,r12
+.L9:
 	movw r30,r14
 	st Z,r16
-.L13:
-	ldi r25,0
 	ldi r24,0
+	ldi r25,0
 .L4:
 /* epilogue start */
+	pop __tmp_reg__
+	pop __tmp_reg__
+	pop __tmp_reg__
 	pop __tmp_reg__
 	pop r29
 	pop r28
@@ -125,35 +121,25 @@ KeyPad_GetPressedKey:
 	pop r14
 	pop r13
 	pop r12
-	pop r11
-	pop r10
-	pop r9
-	pop r8
-	pop r7
 	ret
 .L6:
 	ldi r31,-1
-	sub r10,r31
-	sbc r11,r31
+	sub r12,r31
+	sbc r13,r31
 	ldi r24,4
-	cp r10,r24
-	cpc r11,__zero_reg__
-	brne .L7
-	ldi r30,-1
-	sub r12,r30
-	sbc r13,r30
-	ldi r31,8
-	cp r12,r31
+	cp r12,r24
 	cpc r13,__zero_reg__
-	breq .+2
-	rjmp .L8
-	ldi r24,lo8(-1)
-	movw r30,r14
-	st Z,r24
-	rjmp .L13
-.L10:
+	brne .L7
+	subi r16,-1
+	sbci r17,-1
+	cpi r16,8
+	cpc r17,__zero_reg__
+	brne .L8
+	ldi r16,lo8(-1)
+	rjmp .L9
+.L11:
 	ldi r24,lo8(1)
 	ldi r25,0
 	rjmp .L4
 	.size	KeyPad_GetPressedKey, .-KeyPad_GetPressedKey
-	.ident	"GCC: (GNU) 7.3.0"
+	.ident	"GCC: (GNU) 15.2.0"

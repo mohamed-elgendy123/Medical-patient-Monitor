@@ -1,19 +1,19 @@
+# 0 "main.c"
+# 0 "<built-in>"
+# 0 "<command-line>"
 # 1 "main.c"
-# 1 "<built-in>"
-# 1 "<command-line>"
-# 1 "main.c"
 
 
-# 1 "/usr/lib/avr/include/stdio.h" 1 3
-# 44 "/usr/lib/avr/include/stdio.h" 3
-# 1 "/usr/lib/avr/include/inttypes.h" 1 3
-# 37 "/usr/lib/avr/include/inttypes.h" 3
-# 1 "/usr/lib/gcc/avr/7.3.0/include/stdint.h" 1 3 4
-# 9 "/usr/lib/gcc/avr/7.3.0/include/stdint.h" 3 4
-# 1 "/usr/lib/avr/include/stdint.h" 1 3 4
-# 125 "/usr/lib/avr/include/stdint.h" 3 4
-
-# 125 "/usr/lib/avr/include/stdint.h" 3 4
+# 1 "C:/avr-gcc/avr/include/stdio.h" 1 3
+# 44 "C:/avr-gcc/avr/include/stdio.h" 3
+# 1 "C:/avr-gcc/avr/include/inttypes.h" 1 3
+# 37 "C:/avr-gcc/avr/include/inttypes.h" 3
+# 1 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdint.h" 1 3 4
+# 9 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdint.h" 3 4
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+# 1 "C:/avr-gcc/avr/include/stdint.h" 1 3 4
+# 125 "C:/avr-gcc/avr/include/stdint.h" 3 4
 typedef signed int int8_t __attribute__((__mode__(__QI__)));
 typedef unsigned int uint8_t __attribute__((__mode__(__QI__)));
 typedef signed int int16_t __attribute__ ((__mode__ (__HI__)));
@@ -23,14 +23,14 @@ typedef unsigned int uint32_t __attribute__ ((__mode__ (__SI__)));
 
 typedef signed int int64_t __attribute__((__mode__(__DI__)));
 typedef unsigned int uint64_t __attribute__((__mode__(__DI__)));
-# 146 "/usr/lib/avr/include/stdint.h" 3 4
+# 146 "C:/avr-gcc/avr/include/stdint.h" 3 4
 typedef int16_t intptr_t;
 
 
 
 
 typedef uint16_t uintptr_t;
-# 163 "/usr/lib/avr/include/stdint.h" 3 4
+# 163 "C:/avr-gcc/avr/include/stdint.h" 3 4
 typedef int8_t int_least8_t;
 
 
@@ -72,7 +72,7 @@ typedef int64_t int_least64_t;
 
 
 typedef uint64_t uint_least64_t;
-# 217 "/usr/lib/avr/include/stdint.h" 3 4
+# 217 "C:/avr-gcc/avr/include/stdint.h" 3 4
 typedef int8_t int_fast8_t;
 
 
@@ -114,57 +114,60 @@ typedef int64_t int_fast64_t;
 
 
 typedef uint64_t uint_fast64_t;
-# 277 "/usr/lib/avr/include/stdint.h" 3 4
+# 277 "C:/avr-gcc/avr/include/stdint.h" 3 4
 typedef int64_t intmax_t;
 
 
 
 
 typedef uint64_t uintmax_t;
-# 10 "/usr/lib/gcc/avr/7.3.0/include/stdint.h" 2 3 4
-# 38 "/usr/lib/avr/include/inttypes.h" 2 3
-# 77 "/usr/lib/avr/include/inttypes.h" 3
+# 12 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdint.h" 2 3 4
+#pragma GCC diagnostic pop
+# 38 "C:/avr-gcc/avr/include/inttypes.h" 2 3
+# 77 "C:/avr-gcc/avr/include/inttypes.h" 3
 typedef int32_t int_farptr_t;
 
 
 
+
+
 typedef uint32_t uint_farptr_t;
-# 45 "/usr/lib/avr/include/stdio.h" 2 3
-# 1 "/usr/lib/gcc/avr/7.3.0/include/stdarg.h" 1 3 4
-# 40 "/usr/lib/gcc/avr/7.3.0/include/stdarg.h" 3 4
+# 45 "C:/avr-gcc/avr/include/stdio.h" 2 3
+# 1 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdarg.h" 1 3 4
+# 40 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdarg.h" 3 4
 typedef __builtin_va_list __gnuc_va_list;
-# 99 "/usr/lib/gcc/avr/7.3.0/include/stdarg.h" 3 4
+# 103 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stdarg.h" 3 4
 typedef __gnuc_va_list va_list;
-# 46 "/usr/lib/avr/include/stdio.h" 2 3
+# 46 "C:/avr-gcc/avr/include/stdio.h" 2 3
 
 
 
 
-# 1 "/usr/lib/gcc/avr/7.3.0/include/stddef.h" 1 3 4
-# 216 "/usr/lib/gcc/avr/7.3.0/include/stddef.h" 3 4
+# 1 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stddef.h" 1 3 4
+# 229 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stddef.h" 3 4
 typedef unsigned int size_t;
-# 51 "/usr/lib/avr/include/stdio.h" 2 3
-# 244 "/usr/lib/avr/include/stdio.h" 3
+# 51 "C:/avr-gcc/avr/include/stdio.h" 2 3
+# 250 "C:/avr-gcc/avr/include/stdio.h" 3
 struct __file {
  char *buf;
  unsigned char unget;
  uint8_t flags;
-# 263 "/usr/lib/avr/include/stdio.h" 3
+# 269 "C:/avr-gcc/avr/include/stdio.h" 3
  int size;
  int len;
  int (*put)(char, struct __file *);
  int (*get)(struct __file *);
  void *udata;
 };
-# 277 "/usr/lib/avr/include/stdio.h" 3
+# 283 "C:/avr-gcc/avr/include/stdio.h" 3
 typedef struct __file FILE;
-# 407 "/usr/lib/avr/include/stdio.h" 3
+# 420 "C:/avr-gcc/avr/include/stdio.h" 3
 extern struct __file *__iob[];
-# 419 "/usr/lib/avr/include/stdio.h" 3
+# 432 "C:/avr-gcc/avr/include/stdio.h" 3
 extern FILE *fdevopen(int (*__put)(char, FILE*), int (*__get)(FILE*));
-# 436 "/usr/lib/avr/include/stdio.h" 3
+# 449 "C:/avr-gcc/avr/include/stdio.h" 3
 extern int fclose(FILE *__stream);
-# 610 "/usr/lib/avr/include/stdio.h" 3
+# 623 "C:/avr-gcc/avr/include/stdio.h" 3
 extern int vfprintf(FILE *__stream, const char *__fmt, va_list __ap);
 
 
@@ -187,7 +190,7 @@ extern int putc(int __c, FILE *__stream);
 
 
 extern int putchar(int __c);
-# 651 "/usr/lib/avr/include/stdio.h" 3
+# 664 "C:/avr-gcc/avr/include/stdio.h" 3
 extern int printf(const char *__fmt, ...);
 
 
@@ -215,7 +218,7 @@ extern int sprintf(char *__s, const char *__fmt, ...);
 
 
 extern int sprintf_P(char *__s, const char *__fmt, ...);
-# 687 "/usr/lib/avr/include/stdio.h" 3
+# 700 "C:/avr-gcc/avr/include/stdio.h" 3
 extern int snprintf(char *__s, size_t __n, const char *__fmt, ...);
 
 
@@ -235,7 +238,7 @@ extern int vsprintf(char *__s, const char *__fmt, va_list ap);
 
 
 extern int vsprintf_P(char *__s, const char *__fmt, va_list ap);
-# 715 "/usr/lib/avr/include/stdio.h" 3
+# 728 "C:/avr-gcc/avr/include/stdio.h" 3
 extern int vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
 
 
@@ -277,7 +280,7 @@ extern int puts(const char *__str);
 
 
 extern int puts_P(const char *__str);
-# 764 "/usr/lib/avr/include/stdio.h" 3
+# 777 "C:/avr-gcc/avr/include/stdio.h" 3
 extern size_t fwrite(const void *__ptr, size_t __size, size_t __nmemb,
          FILE *__stream);
 
@@ -296,9 +299,9 @@ extern int getc(FILE *__stream);
 
 
 extern int getchar(void);
-# 812 "/usr/lib/avr/include/stdio.h" 3
+# 825 "C:/avr-gcc/avr/include/stdio.h" 3
 extern int ungetc(int __c, FILE *__stream);
-# 824 "/usr/lib/avr/include/stdio.h" 3
+# 837 "C:/avr-gcc/avr/include/stdio.h" 3
 extern char *fgets(char *__str, int __size, FILE *__stream);
 
 
@@ -307,7 +310,7 @@ extern char *fgets(char *__str, int __size, FILE *__stream);
 
 
 extern char *gets(char *__str);
-# 842 "/usr/lib/avr/include/stdio.h" 3
+# 855 "C:/avr-gcc/avr/include/stdio.h" 3
 extern size_t fread(void *__ptr, size_t __size, size_t __nmemb,
         FILE *__stream);
 
@@ -315,9 +318,9 @@ extern size_t fread(void *__ptr, size_t __size, size_t __nmemb,
 
 
 extern void clearerr(FILE *__stream);
-# 859 "/usr/lib/avr/include/stdio.h" 3
+# 872 "C:/avr-gcc/avr/include/stdio.h" 3
 extern int feof(FILE *__stream);
-# 870 "/usr/lib/avr/include/stdio.h" 3
+# 883 "C:/avr-gcc/avr/include/stdio.h" 3
 extern int ferror(FILE *__stream);
 
 
@@ -377,7 +380,7 @@ extern int sscanf(const char *__buf, const char *__fmt, ...);
 
 
 extern int sscanf_P(const char *__buf, const char *__fmt, ...);
-# 940 "/usr/lib/avr/include/stdio.h" 3
+# 953 "C:/avr-gcc/avr/include/stdio.h" 3
 static __inline__ int fflush(FILE *stream __attribute__((unused)))
 {
  return 0;
@@ -406,13 +409,13 @@ extern int setvbuf(FILE *stream, char *buf, int mode, size_t size);
 extern FILE *tmpfile(void);
 extern char *tmpnam (char *s);
 # 4 "main.c" 2
-# 1 "/usr/lib/avr/include/stdlib.h" 1 3
-# 48 "/usr/lib/avr/include/stdlib.h" 3
-# 1 "/usr/lib/gcc/avr/7.3.0/include/stddef.h" 1 3 4
-# 328 "/usr/lib/gcc/avr/7.3.0/include/stddef.h" 3 4
+# 1 "C:/avr-gcc/avr/include/stdlib.h" 1 3
+# 48 "C:/avr-gcc/avr/include/stdlib.h" 3
+# 1 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stddef.h" 1 3 4
+# 344 "C:/avr-gcc/lib/gcc/avr/15.2.0/include/stddef.h" 3 4
 typedef int wchar_t;
-# 49 "/usr/lib/avr/include/stdlib.h" 2 3
-# 70 "/usr/lib/avr/include/stdlib.h" 3
+# 49 "C:/avr-gcc/avr/include/stdlib.h" 2 3
+# 71 "C:/avr-gcc/avr/include/stdlib.h" 3
 typedef struct {
  int quot;
  int rem;
@@ -426,16 +429,34 @@ typedef struct {
 
 
 typedef int (*__compar_fn_t)(const void *, const void *);
-# 116 "/usr/lib/avr/include/stdlib.h" 3
+# 121 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern void abort(void) __attribute__((__noreturn__));
+
+
+static __inline__ __attribute__((__always_inline__))
+int abs (int __i)
+{
+    return __builtin_abs (__i);
+}
 
 
 
 
 extern int abs(int __i) __attribute__((__const__));
-# 130 "/usr/lib/avr/include/stdlib.h" 3
+
+
+static __inline__ __attribute__((__always_inline__))
+long labs (long __i)
+{
+    return __builtin_labs (__i);
+}
+
+
+
+
+
 extern long labs(long __i) __attribute__((__const__));
-# 153 "/usr/lib/avr/include/stdlib.h" 3
+# 166 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern void *bsearch(const void *__key, const void *__base, size_t __nmemb,
        size_t __size, int (*__compar)(const void *, const void *));
 
@@ -452,20 +473,20 @@ extern div_t div(int __num, int __denom) __asm__("__divmodhi4") __attribute__((_
 
 
 extern ldiv_t ldiv(long __num, long __denom) __asm__("__divmodsi4") __attribute__((__const__));
-# 185 "/usr/lib/avr/include/stdlib.h" 3
+# 198 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern void qsort(void *__base, size_t __nmemb, size_t __size,
     __compar_fn_t __compar);
-# 218 "/usr/lib/avr/include/stdlib.h" 3
+# 231 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern long strtol(const char *__nptr, char **__endptr, int __base);
-# 252 "/usr/lib/avr/include/stdlib.h" 3
+# 265 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern unsigned long strtoul(const char *__nptr, char **__endptr, int __base);
-# 264 "/usr/lib/avr/include/stdlib.h" 3
+# 277 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern long atol(const char *__s) __attribute__((__pure__));
-# 276 "/usr/lib/avr/include/stdlib.h" 3
+# 289 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern int atoi(const char *__s) __attribute__((__pure__));
-# 288 "/usr/lib/avr/include/stdlib.h" 3
+# 301 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern void exit(int __status) __attribute__((__noreturn__));
-# 300 "/usr/lib/avr/include/stdlib.h" 3
+# 313 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern void *malloc(size_t __size) __attribute__((__malloc__));
 
 
@@ -496,13 +517,38 @@ extern char *__malloc_heap_end;
 
 
 extern void *calloc(size_t __nele, size_t __size) __attribute__((__malloc__));
-# 348 "/usr/lib/avr/include/stdlib.h" 3
+# 361 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern void *realloc(void *__ptr, size_t __size) __attribute__((__malloc__));
 
+extern float strtof(const char *__nptr, char **__endptr);
+
+
+
+
+
 extern double strtod(const char *__nptr, char **__endptr);
-# 361 "/usr/lib/avr/include/stdlib.h" 3
+
+
+
+
+
+
+extern long double strtold(const char *__nptr, char **__endptr);
+
+
+
+
+
+
+
+extern int atexit(void (*func)(void));
+# 394 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern float atoff(const char *__nptr);
+# 403 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern double atof(const char *__nptr);
-# 383 "/usr/lib/avr/include/stdlib.h" 3
+# 412 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern long double atofl(const char *__nptr);
+# 434 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern int rand(void);
 
 
@@ -515,7 +561,7 @@ extern void srand(unsigned int __seed);
 
 
 extern int rand_r(unsigned long *__ctx);
-# 428 "/usr/lib/avr/include/stdlib.h" 3
+# 479 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern __inline__ __attribute__((__gnu_inline__))
 char *itoa (int __val, char *__s, int __radix)
 {
@@ -530,37 +576,47 @@ char *itoa (int __val, char *__s, int __radix)
  return __itoa_ncheck (__val, __s, __radix);
     }
 }
-# 473 "/usr/lib/avr/include/stdlib.h" 3
+# 524 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern __inline__ __attribute__((__gnu_inline__))
 char *ltoa (long __val, char *__s, int __radix)
 {
-    if (!__builtin_constant_p (__radix)) {
+    if (!__builtin_constant_p (__radix))
+    {
  extern char *__ltoa (long, char *, int);
  return __ltoa (__val, __s, __radix);
-    } else if (__radix < 2 || __radix > 36) {
+    }
+    else if (__radix < 2 || __radix > 36)
+    {
  *__s = 0;
  return __s;
-    } else {
+    }
+    else
+    {
  extern char *__ltoa_ncheck (long, char *, unsigned char);
  return __ltoa_ncheck (__val, __s, __radix);
     }
 }
-# 516 "/usr/lib/avr/include/stdlib.h" 3
+# 572 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern __inline__ __attribute__((__gnu_inline__))
 char *utoa (unsigned int __val, char *__s, int __radix)
 {
-    if (!__builtin_constant_p (__radix)) {
+    if (!__builtin_constant_p (__radix))
+    {
  extern char *__utoa (unsigned int, char *, int);
  return __utoa (__val, __s, __radix);
-    } else if (__radix < 2 || __radix > 36) {
+    }
+    else if (__radix < 2 || __radix > 36)
+    {
  *__s = 0;
  return __s;
-    } else {
+    }
+    else
+    {
  extern char *__utoa_ncheck (unsigned int, char *, unsigned char);
  return __utoa_ncheck (__val, __s, __radix);
     }
 }
-# 558 "/usr/lib/avr/include/stdlib.h" 3
+# 619 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern __inline__ __attribute__((__gnu_inline__))
 char *ultoa (unsigned long __val, char *__s, int __radix)
 {
@@ -575,7 +631,7 @@ char *ultoa (unsigned long __val, char *__s, int __radix)
  return __ultoa_ncheck (__val, __s, __radix);
     }
 }
-# 590 "/usr/lib/avr/include/stdlib.h" 3
+# 651 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern long random(void);
 
 
@@ -590,24 +646,57 @@ extern void srandom(unsigned long __seed);
 
 
 extern long random_r(unsigned long *__ctx);
-# 649 "/usr/lib/avr/include/stdlib.h" 3
+# 708 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern char *ftostre(float __val, char *__s, unsigned char __prec,
+                     unsigned char __flags);
+
+
+
+
+
+
 extern char *dtostre(double __val, char *__s, unsigned char __prec,
        unsigned char __flags);
-# 666 "/usr/lib/avr/include/stdlib.h" 3
+
+
+
+
+
+
+
+extern char *ldtostre(long double __val, char *__s, unsigned char __prec,
+       unsigned char __flags);
+# 742 "C:/avr-gcc/avr/include/stdlib.h" 3
+extern char *ftostrf(float __val, signed char __width,
+                     unsigned char __prec, char *__s);
+
+
+
+
+
+
 extern char *dtostrf(double __val, signed char __width,
                      unsigned char __prec, char *__s);
-# 685 "/usr/lib/avr/include/stdlib.h" 3
-extern int atexit(void (*)(void));
+
+
+
+
+
+
+
+extern char *ldtostrf(long double __val, signed char __width,
+                      unsigned char __prec, char *__s);
+# 778 "C:/avr-gcc/avr/include/stdlib.h" 3
 extern int system (const char *);
 extern char *getenv (const char *);
 # 5 "main.c" 2
-# 1 "/usr/lib/avr/include/util/delay.h" 1 3
-# 45 "/usr/lib/avr/include/util/delay.h" 3
-# 1 "/usr/lib/avr/include/util/delay_basic.h" 1 3
-# 40 "/usr/lib/avr/include/util/delay_basic.h" 3
+# 1 "C:/avr-gcc/avr/include/util/delay.h" 1 3
+# 50 "C:/avr-gcc/avr/include/util/delay.h" 3
+# 1 "C:/avr-gcc/avr/include/util/delay_basic.h" 1 3
+# 40 "C:/avr-gcc/avr/include/util/delay_basic.h" 3
 static __inline__ void _delay_loop_1(uint8_t __count) __attribute__((__always_inline__));
 static __inline__ void _delay_loop_2(uint16_t __count) __attribute__((__always_inline__));
-# 80 "/usr/lib/avr/include/util/delay_basic.h" 3
+# 80 "C:/avr-gcc/avr/include/util/delay_basic.h" 3
 void
 _delay_loop_1(uint8_t __count)
 {
@@ -618,295 +707,64 @@ _delay_loop_1(uint8_t __count)
   : "0" (__count)
  );
 }
-# 102 "/usr/lib/avr/include/util/delay_basic.h" 3
+# 102 "C:/avr-gcc/avr/include/util/delay_basic.h" 3
 void
 _delay_loop_2(uint16_t __count)
 {
+# 113 "C:/avr-gcc/avr/include/util/delay_basic.h" 3
  __asm__ volatile (
   "1: sbiw %0,1" "\n\t"
   "brne 1b"
-  : "=w" (__count)
-  : "0" (__count)
+  : "+w" (__count)
  );
+
 }
-# 46 "/usr/lib/avr/include/util/delay.h" 2 3
-# 1 "/usr/lib/avr/include/math.h" 1 3
-# 127 "/usr/lib/avr/include/math.h" 3
-extern double cos(double __x) __attribute__((__const__));
+# 51 "C:/avr-gcc/avr/include/util/delay.h" 2 3
+# 151 "C:/avr-gcc/avr/include/util/delay.h" 3
+static __inline__ __attribute__((__always_inline__)) void _delay_ms(double __ms);
 
-
-
-
-
-extern double sin(double __x) __attribute__((__const__));
-
-
-
-
-
-extern double tan(double __x) __attribute__((__const__));
-
-
-
-
-
-
-extern double fabs(double __x) __attribute__((__const__));
-
-
-
-
-
-
-extern double fmod(double __x, double __y) __attribute__((__const__));
-# 168 "/usr/lib/avr/include/math.h" 3
-extern double modf(double __x, double *__iptr);
-
-
-extern float modff (float __x, float *__iptr);
-
-
-
-
-extern double sqrt(double __x) __attribute__((__const__));
-
-
-extern float sqrtf (float) __attribute__((__const__));
-
-
-
-
-extern double cbrt(double __x) __attribute__((__const__));
-# 195 "/usr/lib/avr/include/math.h" 3
-extern double hypot (double __x, double __y) __attribute__((__const__));
-
-
-
-
-
-
-
-extern double square(double __x) __attribute__((__const__));
-
-
-
-
-
-
-extern double floor(double __x) __attribute__((__const__));
-
-
-
-
-
-
-extern double ceil(double __x) __attribute__((__const__));
-# 235 "/usr/lib/avr/include/math.h" 3
-extern double frexp(double __x, int *__pexp);
-
-
-
-
-
-
-
-extern double ldexp(double __x, int __exp) __attribute__((__const__));
-
-
-
-
-
-extern double exp(double __x) __attribute__((__const__));
-
-
-
-
-
-extern double cosh(double __x) __attribute__((__const__));
-
-
-
-
-
-extern double sinh(double __x) __attribute__((__const__));
-
-
-
-
-
-extern double tanh(double __x) __attribute__((__const__));
-
-
-
-
-
-
-
-extern double acos(double __x) __attribute__((__const__));
-
-
-
-
-
-
-
-extern double asin(double __x) __attribute__((__const__));
-
-
-
-
-
-
-extern double atan(double __x) __attribute__((__const__));
-# 299 "/usr/lib/avr/include/math.h" 3
-extern double atan2(double __y, double __x) __attribute__((__const__));
-
-
-
-
-
-extern double log(double __x) __attribute__((__const__));
-
-
-
-
-
-extern double log10(double __x) __attribute__((__const__));
-
-
-
-
-
-extern double pow(double __x, double __y) __attribute__((__const__));
-
-
-
-
-
-
-extern int isnan(double __x) __attribute__((__const__));
-# 334 "/usr/lib/avr/include/math.h" 3
-extern int isinf(double __x) __attribute__((__const__));
-
-
-
-
-
-
-__attribute__((__const__)) static inline int isfinite (double __x)
-{
-    unsigned char __exp;
-    __asm__ (
- "mov	%0, %C1		\n\t"
- "lsl	%0		\n\t"
- "mov	%0, %D1		\n\t"
- "rol	%0		"
- : "=r" (__exp)
- : "r" (__x) );
-    return __exp != 0xff;
-}
-
-
-
-
-
-
-__attribute__((__const__)) static inline double copysign (double __x, double __y)
-{
-    __asm__ (
- "bst	%D2, 7	\n\t"
- "bld	%D0, 7	"
- : "=r" (__x)
- : "0" (__x), "r" (__y) );
-    return __x;
-}
-# 377 "/usr/lib/avr/include/math.h" 3
-extern int signbit (double __x) __attribute__((__const__));
-
-
-
-
-
-
-extern double fdim (double __x, double __y) __attribute__((__const__));
-# 393 "/usr/lib/avr/include/math.h" 3
-extern double fma (double __x, double __y, double __z) __attribute__((__const__));
-
-
-
-
-
-
-
-extern double fmax (double __x, double __y) __attribute__((__const__));
-
-
-
-
-
-
-
-extern double fmin (double __x, double __y) __attribute__((__const__));
-
-
-
-
-
-
-extern double trunc (double __x) __attribute__((__const__));
-# 427 "/usr/lib/avr/include/math.h" 3
-extern double round (double __x) __attribute__((__const__));
-# 440 "/usr/lib/avr/include/math.h" 3
-extern long lround (double __x) __attribute__((__const__));
-# 454 "/usr/lib/avr/include/math.h" 3
-extern long lrint (double __x) __attribute__((__const__));
-# 47 "/usr/lib/avr/include/util/delay.h" 2 3
-# 86 "/usr/lib/avr/include/util/delay.h" 3
-static __inline__ void _delay_us(double __us) __attribute__((__always_inline__));
-static __inline__ void _delay_ms(double __ms) __attribute__((__always_inline__));
-# 165 "/usr/lib/avr/include/util/delay.h" 3
 void
 _delay_ms(double __ms)
 {
  double __tmp ;
 
 
-
  uint32_t __ticks_dc;
- extern void __builtin_avr_delay_cycles(unsigned long);
+ extern void __builtin_avr_delay_cycles(uint32_t);
  __tmp = ((
-# 174 "/usr/lib/avr/include/util/delay.h"
+# 161 "C:/avr-gcc/avr/include/util/delay.h"
           8000000UL
-# 174 "/usr/lib/avr/include/util/delay.h" 3
+# 161 "C:/avr-gcc/avr/include/util/delay.h" 3
                ) / 1e3) * __ms;
-# 184 "/usr/lib/avr/include/util/delay.h" 3
-  __ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+# 171 "C:/avr-gcc/avr/include/util/delay.h" 3
+  __ticks_dc = (uint32_t)(__builtin_ceil(__builtin_fabs(__tmp)));
 
 
  __builtin_avr_delay_cycles(__ticks_dc);
-# 210 "/usr/lib/avr/include/util/delay.h" 3
+# 197 "C:/avr-gcc/avr/include/util/delay.h" 3
 }
-# 254 "/usr/lib/avr/include/util/delay.h" 3
+# 234 "C:/avr-gcc/avr/include/util/delay.h" 3
+static __inline__ __attribute__((__always_inline__)) void _delay_us(double __us);
+
 void
 _delay_us(double __us)
 {
  double __tmp ;
 
 
-
  uint32_t __ticks_dc;
- extern void __builtin_avr_delay_cycles(unsigned long);
+ extern void __builtin_avr_delay_cycles(uint32_t);
  __tmp = ((
-# 263 "/usr/lib/avr/include/util/delay.h"
+# 244 "C:/avr-gcc/avr/include/util/delay.h"
           8000000UL
-# 263 "/usr/lib/avr/include/util/delay.h" 3
+# 244 "C:/avr-gcc/avr/include/util/delay.h" 3
                ) / 1e6) * __us;
-# 273 "/usr/lib/avr/include/util/delay.h" 3
-  __ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+# 254 "C:/avr-gcc/avr/include/util/delay.h" 3
+  __ticks_dc = (uint32_t)(__builtin_ceil(__builtin_fabs(__tmp)));
 
 
  __builtin_avr_delay_cycles(__ticks_dc);
-# 299 "/usr/lib/avr/include/util/delay.h" 3
+# 281 "C:/avr-gcc/avr/include/util/delay.h" 3
 }
 # 6 "main.c" 2
 
@@ -1695,15 +1553,7 @@ static void Task_Report(void)
   int bp_val = (v_bp && v_bp->Valid) ? v_bp->Value : 0;
 
   sprintf(buf, "!DAT,%d,%d,%d.%d,%d,%d,0x%04X\r\n",
-          hr_val, spo2_val, temp_val / 10, 
-# 295 "main.c" 3
-                                          __builtin_abs(
-# 295 "main.c"
-                                          temp_val % 10
-# 295 "main.c" 3
-                                          )
-# 295 "main.c"
-                                                            ,
+          hr_val, spo2_val, temp_val / 10, abs(temp_val % 10),
           rr_val, bp_val, flags);
   UART_SendString((const uint8 *)buf);
 }

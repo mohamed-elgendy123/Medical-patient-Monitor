@@ -17,8 +17,8 @@ SevenSegment_Init:
 	brsh .L3
 	ldi r22,lo8(-1)
 	call GPIO_SetPortDirection
-	ldi r25,0
 	ldi r24,0
+	ldi r25,0
 	ret
 .L3:
 	ldi r24,lo8(1)
@@ -26,18 +26,9 @@ SevenSegment_Init:
 /* epilogue start */
 	ret
 	.size	SevenSegment_Init, .-SevenSegment_Init
-	.section	.rodata
+	.section	.rodata.SevenSegment_Display.str1.1,"aMS",@progbits,1
 .LC0:
-	.byte	63
-	.byte	6
-	.byte	91
-	.byte	79
-	.byte	102
-	.byte	109
-	.byte	125
-	.byte	7
-	.byte	127
-	.byte	111
+	.base64	"PwZbT2ZtfQd/bwA="
 	.section	.text.SevenSegment_Display,"ax",@progbits
 .global	SevenSegment_Display
 	.type	SevenSegment_Display, @function
@@ -68,16 +59,14 @@ SevenSegment_Display:
 	st X+,r0
 	dec r25
 	brne 0b
-	ldi r30,lo8(1)
-	ldi r31,0
-	add r30,r28
-	adc r31,r29
+	movw r30,r28
+	adiw r30,1
 	add r30,r22
 	adc r31,__zero_reg__
 	ld r22,Z
 	call GPIO_SetPortValue
-	ldi r25,0
 	ldi r24,0
+	ldi r25,0
 .L4:
 /* epilogue start */
 	adiw r28,10
@@ -94,5 +83,5 @@ SevenSegment_Display:
 	ldi r25,0
 	rjmp .L4
 	.size	SevenSegment_Display, .-SevenSegment_Display
-	.ident	"GCC: (GNU) 7.3.0"
+	.ident	"GCC: (GNU) 15.2.0"
 .global __do_copy_data
