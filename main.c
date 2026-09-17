@@ -39,6 +39,10 @@
 
 #define SCHEDULER_CYCLE_TICKS 1000U
 
+
+
+
+
 static void Application_SelfTest(void)
 {
   /* 1. Turn ON all annunciators per NFR-02 */
@@ -275,6 +279,77 @@ static void Task_FastVitals(void)
   }
 }
 
+
+
+
+
+
+
+/* دالة حساب الـ Checksum بالـ XOR لكل الحروف */
+static uint8 Calculate_Checksum(const char *buffer)
+{
+  uint8 checksum = 0;
+  while (*buffer)
+  {
+    checksum ^= (uint8)(*buffer);
+    buffer++;
+  }
+  return checksum;
+}
+
+/* دالة إرسال التليمتري الكاملة بدلاً من OK */
+
+
+static void Send_Telemetry_Frame(void)
+{
+  char payload[110];
+  char frame[130];
+
+  VitalData_t *v_hr   = PatientCfg_GetVital(VITAL_HR);
+  VitalData_t *v_spo2 = PatientCfg_GetVital(VITAL_SPO2);
+  VitalData_t *v_temp = PatientCfg_GetVital(VITAL_TEMP);
+  VitalData_t *v_rr   = PatientCfg_GetVital(VITAL_RR);
+  VitalData_t *v_bp   = PatientCfg_GetVital(VITAL_NIBP);
+  u16 flags           = Alarm_GetActiveFlags();
+
+  int hr_val   = (v_hr && v_hr->Valid)     ? v_hr->Value   : 0;
+  int hrv_val  = 38; // قيمة افتراضية أو خذها من متغير الـ HRV لديك
+  int spo2_val = (v_spo2 && v_spo2->Valid) ? v_spo2->Value : 0;
+  int temp_val = (v_temp && v_temp->Valid) ? v_temp->Value : 0;
+  int rr_val   = (v_rr && v_rr->Valid)   ? v_rr->Value   : 0;
+  int sys_val  = (v_bp && v_bp->Valid)   ? v_bp->Value   : 0;
+  int dia_val  = 80; // قيمة الضغط الانبساطي الافتراضية
+
+
+
+
+
+
+
+
+
+
+  /* 1. تجميع الـ Payload المطلوب بدون $ و * */
+  sprintf(payload,
+          "PM,ID=BED0012,HR=%d,HV=%d,SP=%d,T=%d,NS=%d,ND=%d,RR=%d,AL=%04X,PRI=0,ST=MON,SIL=0,UP=3600",
+          hr_val, hrv_val, spo2_val, temp_val, sys_val, dia_val, rr_val, flags);
+
+  /* 2. حساب الـ Checksum للـ Payload */
+  uint8 chk = Calculate_Checksum(payload);
+
+  /* 3. تجميع الإطار النهائي بالتنسيق القياسي */
+  sprintf(frame, "$%s*%02X\r\n", payload, chk);
+
+  /* 4. إرسال الإطار عبر UART */
+  UART_SendString((const uint8 *)frame);
+}
+
+
+
+
+/*
+
+
 static void Task_Report(void)
 {
   char buf[64];
@@ -296,6 +371,42 @@ static void Task_Report(void)
           rr_val, bp_val, flags);
   UART_SendString((const uint8 *)buf);
 }
+
+
+*/
+
+
+
+
+
+static void Task_Report(void)
+{
+  uint8 rx_data = 0;
+
+  /* فحص ما إذا كان هناك أمر قادم عبر السيريال */
+  if (UART_IsDataReady() == E_OK)
+  {
+    UART_ReceiveByte(&rx_data);
+
+    /* إذا كان الأمر هو طلب الحالة STATUS (أو حرف S اختصاراً) */
+    if (rx_data == 'S' || rx_data == 's')
+    {
+      Send_Telemetry_Frame(); /* إرسال الإطار الصحيح مع Checksum */
+    }
+    else
+    {
+      UART_SendString((const uint8 *)"OK\r\n"); /* باقي الأوامر التنفيذية */
+    }
+  }
+  else
+  {
+    /* إرسال التليمتري الدوري كل ثانيتين بشكل طبيعي */
+    Send_Telemetry_Frame();
+  }
+}
+
+
+
 
 int main(void)
 {

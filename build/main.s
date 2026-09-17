@@ -199,24 +199,29 @@ Task_FastVitals:
 	pop r11
 	ret
 	.size	Task_FastVitals, .-Task_FastVitals
-	.section	.rodata.main.str1.1,"aMS",@progbits,1
+	.section	.rodata.Send_Telemetry_Frame.str1.1,"aMS",@progbits,1
 .LC0:
-	.string	"=== SYSTEM SELF-TEST ===\r\n"
+	.string	"PM,ID=BED0012,HR=%d,HV=%d,SP=%d,T=%d,NS=%d,ND=%d,RR=%d,AL=%04X,PRI=0,ST=MON,SIL=0,UP=3600"
 .LC1:
-	.string	"PATIENT MONITOR "
-.LC2:
-	.string	"SELF-TEST...    "
-.LC3:
-	.string	"PATIENT MONITOR READY\r\n"
-.LC4:
-	.string	"!DAT,%d,%d,%d.%d,%d,%d,0x%04X\r\n"
-	.section	.text.startup.main,"ax",@progbits
-.global	main
-	.type	main, @function
-main:
+	.string	"$%s*%02X\r\n"
+	.section	.text.Send_Telemetry_Frame,"ax",@progbits
+	.type	Send_Telemetry_Frame, @function
+Send_Telemetry_Frame:
+	push r8
+	push r9
+	push r10
+	push r11
+	push r12
+	push r13
+	push r14
+	push r15
+	push r16
+	push r17
+	push r28
+	push r29
 	in r28,__SP_L__
 	in r29,__SP_H__
-	subi r28,64
+	subi r28,-16
 	sbc r29,__zero_reg__
 	in __tmp_reg__,__SREG__
 	cli
@@ -224,9 +229,226 @@ main:
 	out __SREG__,__tmp_reg__
 	out __SP_L__,r28
 /* prologue: function */
-/* frame size = 64 */
-/* stack size = 64 */
-.L__stack_usage = 64
+/* frame size = 240 */
+/* stack size = 252 */
+.L__stack_usage = 252
+	ldi r24,0
+	call PatientCfg_GetVital
+	movw r8,r24
+	ldi r24,lo8(1)
+	call PatientCfg_GetVital
+	movw r10,r24
+	ldi r24,lo8(2)
+	call PatientCfg_GetVital
+	movw r12,r24
+	ldi r24,lo8(3)
+	call PatientCfg_GetVital
+	movw r14,r24
+	ldi r24,lo8(4)
+	call PatientCfg_GetVital
+	movw r16,r24
+	call Alarm_GetActiveFlags
+	cp r8,__zero_reg__
+	cpc r9,__zero_reg__
+	brne .+2
+	rjmp .L44
+	movw r26,r8
+	adiw r26,2
+	ld r18,X
+	sbiw r26,2
+	cp r18, __zero_reg__
+	brne .+2
+	rjmp .L45
+	ld r18,X+
+	ld r19,X
+.L37:
+	cp r10,__zero_reg__
+	cpc r11,__zero_reg__
+	brne .+2
+	rjmp .L46
+	movw r30,r10
+	ldd r20,Z+2
+	cp r20, __zero_reg__
+	brne .+2
+	rjmp .L47
+	ld r20,Z
+	ldd r21,Z+1
+.L38:
+	cp r12,__zero_reg__
+	cpc r13,__zero_reg__
+	brne .+2
+	rjmp .L48
+	movw r26,r12
+	adiw r26,2
+	ld r22,X
+	sbiw r26,2
+	cp r22, __zero_reg__
+	brne .+2
+	rjmp .L49
+	ld r22,X+
+	ld r23,X
+.L39:
+	cp r14,__zero_reg__
+	cpc r15,__zero_reg__
+	brne .+2
+	rjmp .L51
+	movw r26,r14
+	adiw r26,2
+	ld r30,X
+	sbiw r26,2
+	cp r30, __zero_reg__
+	brne .+2
+	rjmp .L51
+	ld r26,X
+	movw r30,r14
+	ldd r27,Z+1
+.L40:
+	cp r16,__zero_reg__
+	cpc r17,__zero_reg__
+	brne .+2
+	rjmp .L52
+	movw r30,r16
+	ldd r15,Z+2
+	cp r15, __zero_reg__
+	brne .+2
+	rjmp .L53
+	ld r15,Z
+	ldd r17,Z+1
+.L41:
+	push r25
+	push r24
+	push r27
+	push r26
+	push __zero_reg__
+	ldi r24,lo8(80)
+	push r24
+	push r17
+	push r15
+	push r23
+	push r22
+	push r21
+	push r20
+	push __zero_reg__
+	ldi r24,lo8(38)
+	push r24
+	push r19
+	push r18
+	ldi r24,lo8(.LC0)
+	ldi r25,hi8(.LC0)
+	push r25
+	push r24
+	movw r16,r28
+	subi r16,125
+	sbci r17,-1
+	push r17
+	push r16
+	call sprintf
+	movw r30,r16
+	in __tmp_reg__,__SREG__
+	cli
+	out __SP_H__,r29
+	out __SREG__,__tmp_reg__
+	out __SP_L__,r28
+	ldi r24,0
+	movw r18,r16
+.L42:
+	ld r25,Z
+	cpse r25,__zero_reg__
+	rjmp .L43
+	push __zero_reg__
+	push r24
+	push r19
+	push r18
+	ldi r24,lo8(.LC1)
+	ldi r25,hi8(.LC1)
+	push r25
+	push r24
+	movw r16,r28
+	subi r16,-1
+	sbci r17,-1
+	push r17
+	push r16
+	call sprintf
+	movw r24,r16
+	call UART_SendString
+	in __tmp_reg__,__SREG__
+	cli
+	out __SP_H__,r29
+	out __SREG__,__tmp_reg__
+	out __SP_L__,r28
+/* epilogue start */
+	subi r28,16
+	sbci r29,-1
+	in __tmp_reg__,__SREG__
+	cli
+	out __SP_H__,r29
+	out __SREG__,__tmp_reg__
+	out __SP_L__,r28
+	pop r29
+	pop r28
+	pop r17
+	pop r16
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop r11
+	pop r10
+	pop r9
+	pop r8
+	ret
+.L44:
+	ldi r18,0
+.L45:
+	ldi r19,0
+	rjmp .L37
+.L46:
+	ldi r20,0
+.L47:
+	ldi r21,0
+	rjmp .L38
+.L48:
+	ldi r22,0
+.L49:
+	ldi r23,0
+	rjmp .L39
+.L51:
+	ldi r26,0
+	ldi r27,0
+	rjmp .L40
+.L52:
+	mov r15,__zero_reg__
+.L53:
+	ldi r17,0
+	rjmp .L41
+.L43:
+	adiw r30,1
+	eor r24,r25
+	rjmp .L42
+	.size	Send_Telemetry_Frame, .-Send_Telemetry_Frame
+	.section	.rodata.main.str1.1,"aMS",@progbits,1
+.LC2:
+	.string	"=== SYSTEM SELF-TEST ===\r\n"
+.LC3:
+	.string	"PATIENT MONITOR "
+.LC4:
+	.string	"SELF-TEST...    "
+.LC5:
+	.string	"PATIENT MONITOR READY\r\n"
+.LC6:
+	.string	"OK\r\n"
+	.section	.text.startup.main,"ax",@progbits
+.global	main
+	.type	main, @function
+main:
+	rcall .
+	push __tmp_reg__
+	in r28,__SP_L__
+	in r29,__SP_H__
+/* prologue: function */
+/* frame size = 3 */
+/* stack size = 3 */
+.L__stack_usage = 3
 	ldi r20,lo8(1)
 	ldi r22,lo8(7)
 	ldi r24,lo8(2)
@@ -300,20 +522,20 @@ main:
 	call ShiftReg_voidWriteByte
 	ldi r24,lo8(2)
 	call ANN_Audio_SetPriority
-	ldi r24,lo8(.LC0)
-	ldi r25,hi8(.LC0)
+	ldi r24,lo8(.LC2)
+	ldi r25,hi8(.LC2)
 	call UART_SendString
 	ldi r22,0
 	ldi r24,0
 	call LCD_I2C_SetCursor
-	ldi r24,lo8(.LC1)
-	ldi r25,hi8(.LC1)
+	ldi r24,lo8(.LC3)
+	ldi r25,hi8(.LC3)
 	call LCD_I2C_WriteString
 	ldi r22,0
 	ldi r24,lo8(1)
 	call LCD_I2C_SetCursor
-	ldi r24,lo8(.LC2)
-	ldi r25,hi8(.LC2)
+	ldi r24,lo8(.LC4)
+	ldi r25,hi8(.LC4)
 	call LCD_I2C_WriteString
 	ldi r18,lo8(159999)
 	ldi r24,hi8(159999)
@@ -325,12 +547,12 @@ main:
 	rjmp .
 	nop
 	call ANN_Audio_Mute
-	ldi r26,lo8(319999)
-	ldi r27,hi8(319999)
-	ldi r18,hlo8(319999)
-1:	subi r26,1
-	sbci r27,0
-	sbci r18,0
+	ldi r18,lo8(319999)
+	ldi r24,hi8(319999)
+	ldi r25,hlo8(319999)
+1:	subi r18,1
+	sbci r24,0
+	sbci r25,0
 	brne 1b
 	rjmp .
 	nop
@@ -357,8 +579,8 @@ main:
 	call ANN_Visual_Init
 	call HRC_ClearAsystole
 	call LCD_I2C_Clear
-	ldi r24,lo8(.LC3)
-	ldi r25,hi8(.LC3)
+	ldi r24,lo8(.LC5)
+	ldi r25,hi8(.LC5)
 	call UART_SendString
 	call INTERRUPT_EnableGlobal
 	call HRC_ClearAsystole
@@ -370,39 +592,41 @@ main:
 	call Menu_Update
 	ldi r16,0
 	ldi r17,0
-	movw r4,r28
-	ldi r24,-1
-	sub r4,r24
-	sbc r5,r24
+	movw r14,r28
+	ldi r18,-1
+	sub r14,r18
+	sbc r15,r18
 	ldi r24,lo8(5)
-	mov r3,r24
-.L37:
+	mov r13,r24
+.L55:
 	ldi r20,lo8(1)
 	ldi r22,lo8(7)
 	ldi r24,lo8(2)
 	call GPIO_SetPinValue
 	std Y+1,__zero_reg__
-	movw r20,r4
+	movw r20,r14
 	ldi r22,lo8(6)
 	ldi r24,lo8(3)
 	call GPIO_GetPinValue
 	lds r24,s_u8PrevPD6.2
+	std Y+2,r14
+	std Y+3,r15
 	cpse r24,__zero_reg__
-	rjmp .L38
+	rjmp .L56
 	ldd r24,Y+1
 	cp r24, __zero_reg__
-	breq .L38
+	breq .L56
 	ldi r20,lo8(1)
 	ldi r22,lo8(3)
 	ldi r24,lo8(1)
 	call GPIO_SetPinValue
-	sts s_u8HbPulseTicks.1,r3
+	sts s_u8HbPulseTicks.1,r13
 	ldi r24,lo8(1)
 	sts g_u8HeartbeatActive,r24
 	call HRC_ClearAsystole
 	sts s_u16SilenceTicks.0,__zero_reg__
 	sts s_u16SilenceTicks.0+1,__zero_reg__
-.L38:
+.L56:
 	ldd r24,Y+1
 	sts s_u8PrevPD6.2,r24
 	lds r24,s_u16SilenceTicks.0
@@ -412,234 +636,121 @@ main:
 	sts s_u16SilenceTicks.0+1,r25
 	cpi r24,-111
 	sbci r25,1
-	brlo .L39
+	brlo .L57
 	sts g_u8HeartbeatActive,__zero_reg__
-.L39:
+.L57:
 	lds r24,s_u8HbPulseTicks.1
 	cp r24, __zero_reg__
-	breq .L41
+	breq .L59
 	subi r24,lo8(-(-1))
 	sts s_u8HbPulseTicks.1,r24
 	cpse r24,__zero_reg__
-	rjmp .L41
+	rjmp .L59
 	ldi r20,0
 	ldi r22,lo8(3)
 	ldi r24,lo8(1)
 	call GPIO_SetPinValue
-.L41:
+.L59:
 	call TIMER1_IsCaptureReady
 	cpse r24,__zero_reg__
 	call ANN_Visual_TriggerHeartbeat
-.L43:
+.L61:
 	call HRC_Process
 	call Panel_Update
 	call Panel_HasEvent
-	mov r15,r24
+	mov r12,r24
 	sbrc r16,0
 	call CONSOLE_Task
-.L44:
+.L62:
 	movw r24,r16
 	ldi r22,lo8(5)
 	ldi r23,0
 	call __udivmodhi4
 	sbiw r24,2
-	breq .L45
-	cp r15, __zero_reg__
-	breq .L46
-.L45:
+	breq .L63
+	cp r12, __zero_reg__
+	breq .L64
+.L63:
 	ldi r24,0
 	call Panel_IsPressed
 	cpse r24,__zero_reg__
 	call Alarm_Acknowledge
-.L47:
+.L65:
 	ldi r24,lo8(4)
 	call Panel_IsPressed
 	cpse r24,__zero_reg__
 	call Monitor_ToggleStandby
-.L48:
+.L66:
 	call Menu_IsInDashboard
 	cp r24, __zero_reg__
-	breq .L46
+	breq .L64
 	ldi r24,lo8(2)
 	call Panel_IsPressed
 	ldi r24,lo8(3)
 	call Panel_IsPressed
-.L46:
+.L64:
 	movw r24,r16
 	ldi r22,lo8(10)
 	ldi r23,0
 	call __udivmodhi4
 	sbiw r24,3
-	brne .L50
+	brne .L68
 	call Alarm_Process
-.L50:
+.L68:
 	movw r24,r16
 	ldi r22,lo8(25)
 	ldi r23,0
 	call __udivmodhi4
 	sbiw r24,5
-	breq .L51
-	cp r15, __zero_reg__
-	breq .L52
+	breq .L69
+	cp r12, __zero_reg__
+	breq .L70
 	lds r24,s_u8LcdCooldown.3
 	cpse r24,__zero_reg__
-	rjmp .L52
-.L51:
+	rjmp .L70
+.L69:
 	call Menu_Update
-	sts s_u8LcdCooldown.3,r3
-.L52:
+	sts s_u8LcdCooldown.3,r13
+.L70:
 	lds r24,s_u8LcdCooldown.3
 	cp r24, __zero_reg__
-	breq .L53
+	breq .L71
 	subi r24,lo8(-(-1))
 	sts s_u8LcdCooldown.3,r24
-.L53:
+.L71:
 	movw r24,r16
 	ldi r22,lo8(50)
 	ldi r23,0
 	call __udivmodhi4
 	sbiw r24,4
-	brne .L54
+	brne .L72
 	call Task_FastVitals
-.L54:
+.L72:
 	movw r24,r16
 	ldi r22,lo8(-56)
 	ldi r23,0
 	call __udivmodhi4
 	sbiw r24,7
-	breq .+2
-	rjmp .L55
-	ldi r24,0
-	call PatientCfg_GetVital
-	movw r10,r24
-	ldi r24,lo8(1)
-	call PatientCfg_GetVital
-	movw r12,r24
-	ldi r24,lo8(2)
-	call PatientCfg_GetVital
-	movw r8,r24
-	ldi r24,lo8(3)
-	call PatientCfg_GetVital
-	movw r14,r24
-	ldi r24,lo8(4)
-	call PatientCfg_GetVital
-	movw r6,r24
-	call Alarm_GetActiveFlags
-	movw r30,r24
-	cp r10,__zero_reg__
-	cpc r11,__zero_reg__
-	brne .+2
-	rjmp .L66
-	movw r26,r10
-	adiw r26,2
-	ld r24,X
-	sbiw r26,2
-	cp r24, __zero_reg__
-	brne .+2
-	rjmp .L66
-	ld r18,X+
-	ld r19,X
-.L56:
-	cp r12,__zero_reg__
-	cpc r13,__zero_reg__
-	brne .+2
-	rjmp .L68
-	movw r26,r12
-	adiw r26,2
-	ld r24,X
-	sbiw r26,2
-	cp r24, __zero_reg__
-	brne .+2
-	rjmp .L68
-	ld r20,X+
-	ld r13,X
-.L57:
-	cp r8,__zero_reg__
-	cpc r9,__zero_reg__
-	brne .+2
-	rjmp .L70
-	movw r26,r8
-	adiw r26,2
-	ld r24,X
-	sbiw r26,2
-	cp r24, __zero_reg__
-	brne .+2
-	rjmp .L70
-	ld r24,X+
-	ld r25,X+
-.L58:
-	cp r14,__zero_reg__
-	cpc r15,__zero_reg__
-	brne .+2
-	rjmp .L72
-	movw r26,r14
-	adiw r26,2
-	ld r21,X
-	sbiw r26,2
-	cp r21, __zero_reg__
-	brne .+2
-	rjmp .L72
-	ld r12,X+
-	ld r15,X
-.L59:
-	cp r6,__zero_reg__
-	cpc r7,__zero_reg__
-	brne .+2
-	rjmp .L74
-	movw r26,r6
-	adiw r26,2
-	ld r21,X
-	sbiw r26,2
-	cp r21, __zero_reg__
-	brne .+2
-	rjmp .L74
-	ld r14,X+
-	ld r11,X
-.L60:
-	ldi r22,lo8(10)
-	ldi r23,0
-	call __divmodhi4
-	push r31
-	push r30
-	push r11
-	push r14
-	push r15
-	push r12
-	movw r30,r24
-	sbrs r25,7
-	rjmp .L61
-	neg r31
-	neg r30
-	sbc r31,__zero_reg__
-.L61:
-	push r31
-	push r30
-	push r23
-	push r22
-	push r13
-	push r20
-	push r19
-	push r18
-	ldi r24,lo8(.LC4)
-	ldi r25,hi8(.LC4)
-	push r25
-	push r24
-	push r5
-	push r4
-	call sprintf
-	movw r24,r4
-	call UART_SendString
-	in __tmp_reg__,__SREG__
-	cli
-	out __SP_H__,r29
-	out __SREG__,__tmp_reg__
-	out __SP_L__,r28
-.L55:
+	brne .L73
+	std Y+1,__zero_reg__
+	call UART_IsDataReady
+	or r24,r25
+	brne .L74
+	ldd r24,Y+2
+	ldd r25,Y+3
+	call UART_ReceiveByte
+	ldd r24,Y+1
+	andi r24,lo8(-33)
+	cpi r24,lo8(83)
+	brne .L75
+.L74:
+	call Send_Telemetry_Frame
+.L73:
 	cpi r16,8
 	cpc r17,__zero_reg__
-	brne .L62
+	brne .L77
 	call Task_Trend
-.L62:
+.L77:
 	call Monitor_Run
 	call ANN_Audio_Tick
 	call ANN_Visual_Tick
@@ -647,42 +758,27 @@ main:
 	ldi r22,lo8(7)
 	ldi r24,lo8(2)
 	call GPIO_SetPinValue
-	ldi r26,lo8(19999)
-	ldi r27,hi8(19999)
-1:	sbiw r26,1
+	ldi r24,lo8(19999)
+	ldi r25,hi8(19999)
+1:	sbiw r24,1
 	brne 1b
 	rjmp .
 	nop
 	subi r16,-1
 	sbci r17,-1
 	cpi r16,-24
-	ldi r27,3
-	cpc r17,r27
+	ldi r25,3
+	cpc r17,r25
 	breq .+2
-	rjmp .L37
+	rjmp .L55
 	ldi r16,0
 	ldi r17,0
-	rjmp .L37
-.L66:
-	ldi r18,0
-	ldi r19,0
-	rjmp .L56
-.L68:
-	ldi r20,0
-	mov r13,__zero_reg__
-	rjmp .L57
-.L70:
-	ldi r24,0
-	ldi r25,0
-	rjmp .L58
-.L72:
-	mov r12,__zero_reg__
-	mov r15,__zero_reg__
-	rjmp .L59
-.L74:
-	mov r14,__zero_reg__
-	mov r11,__zero_reg__
-	rjmp .L60
+	rjmp .L55
+.L75:
+	ldi r24,lo8(.LC6)
+	ldi r25,hi8(.LC6)
+	call UART_SendString
+	rjmp .L73
 	.size	main, .-main
 	.section	.bss.s_u16SilenceTicks.0,"aw",@nobits
 	.type	s_u16SilenceTicks.0, @object

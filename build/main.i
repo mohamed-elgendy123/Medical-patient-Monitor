@@ -1299,7 +1299,7 @@ STD_ReturnType UART_IsDataReady(void);
 STD_ReturnType UART_SetRxInterrupt(uint8 Copy_u8State);
 STD_ReturnType UART_SetTxInterrupt(uint8 Copy_u8State);
 # 27 "main.c" 2
-# 42 "main.c"
+# 46 "main.c"
 static void Application_SelfTest(void)
 {
 
@@ -1535,10 +1535,26 @@ static void Task_FastVitals(void)
     Alarm_UpdateVitals(&pVitals);
   }
 }
-
-static void Task_Report(void)
+# 289 "main.c"
+static uint8 Calculate_Checksum(const char *buffer)
 {
-  char buf[64];
+  uint8 checksum = 0;
+  while (*buffer)
+  {
+    checksum ^= (uint8)(*buffer);
+    buffer++;
+  }
+  return checksum;
+}
+
+
+
+
+static void Send_Telemetry_Frame(void)
+{
+  char payload[110];
+  char frame[130];
+
   VitalData_t *v_hr = PatientCfg_GetVital(0u);
   VitalData_t *v_spo2 = PatientCfg_GetVital(1u);
   VitalData_t *v_temp = PatientCfg_GetVital(2u);
@@ -1547,16 +1563,55 @@ static void Task_Report(void)
   uint16 flags = Alarm_GetActiveFlags();
 
   int hr_val = (v_hr && v_hr->Valid) ? v_hr->Value : 0;
+  int hrv_val = 38;
   int spo2_val = (v_spo2 && v_spo2->Valid) ? v_spo2->Value : 0;
   int temp_val = (v_temp && v_temp->Valid) ? v_temp->Value : 0;
   int rr_val = (v_rr && v_rr->Valid) ? v_rr->Value : 0;
-  int bp_val = (v_bp && v_bp->Valid) ? v_bp->Value : 0;
+  int sys_val = (v_bp && v_bp->Valid) ? v_bp->Value : 0;
+  int dia_val = 80;
+# 333 "main.c"
+  sprintf(payload,
+          "PM,ID=BED0012,HR=%d,HV=%d,SP=%d,T=%d,NS=%d,ND=%d,RR=%d,AL=%04X,PRI=0,ST=MON,SIL=0,UP=3600",
+          hr_val, hrv_val, spo2_val, temp_val, sys_val, dia_val, rr_val, flags);
 
-  sprintf(buf, "!DAT,%d,%d,%d.%d,%d,%d,0x%04X\r\n",
-          hr_val, spo2_val, temp_val / 10, abs(temp_val % 10),
-          rr_val, bp_val, flags);
-  UART_SendString((const uint8 *)buf);
+
+  uint8 chk = Calculate_Checksum(payload);
+
+
+  sprintf(frame, "$%s*%02X\r\n", payload, chk);
+
+
+  UART_SendString((const uint8 *)frame);
 }
+# 382 "main.c"
+static void Task_Report(void)
+{
+  uint8 rx_data = 0;
+
+
+  if (UART_IsDataReady() == E_OK)
+  {
+    UART_ReceiveByte(&rx_data);
+
+
+    if (rx_data == 'S' || rx_data == 's')
+    {
+      Send_Telemetry_Frame();
+    }
+    else
+    {
+      UART_SendString((const uint8 *)"OK\r\n");
+    }
+  }
+  else
+  {
+
+    Send_Telemetry_Frame();
+  }
+}
+
+
+
 
 int main(void)
 {
