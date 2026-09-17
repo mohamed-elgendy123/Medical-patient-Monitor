@@ -58,6 +58,11 @@ raises an alarm when one of them goes out of range.**
 
 Outputs: three coloured alarm lamps, a speaker, an LCD, a serial link, and an
 74HC595 driving an 8-LED alarm and vital status bar over SPI.
+<img width="1164" height="826" alt="image" src="https://github.com/user-attachments/assets/f6162772-f2fd-4e1a-9c80-3ca81d9c9492" />
+<img width="1162" height="834" alt="image" src="https://github.com/user-attachments/assets/f8a8b6e4-d576-4a2d-b50f-a08ed89bd53e" />
+
+
+
 
 ### The measurements are the easy part
 
@@ -1238,7 +1243,3 @@ Maximum **+20**; final score capped at 100.
 
 *Prepared by Ahmed Ellamie | ahmed.ellamiee@gmail.com*
 ??? ??????? ?? ????? ?????? ?????? ????? ????? ???????? ???????.
-<img width="1164" height="826" alt="image" src="https://github.com/user-attachments/assets/f6162772-f2fd-4e1a-9c80-3ca81d9c9492" />
-<img width="1162" height="834" alt="image" src="https://github.com/user-attachments/assets/f8a8b6e4-d576-4a2d-b50f-a08ed89bd53e" />
-
-
